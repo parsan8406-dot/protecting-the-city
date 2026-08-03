@@ -1,0 +1,242 @@
+[gd_scene format=3 uid="uid://bnlpx0dyhcile"]
+
+[ext_resource type="Script" uid="uid://umhowgn3h14x" path="res://scripts/character_select_screen.gd" id="1_3a6v1"]
+[ext_resource type="Texture2D" uid="uid://bp4c76qnkm6ay" path="res://assets/Rectangle (2).png" id="2_74l3e"]
+[ext_resource type="Texture2D" uid="uid://0qukk1sb1y0t" path="res://assets/menuchar.png" id="3_74l3e"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="3_bnqy1"]
+[ext_resource type="Texture2D" uid="uid://cvnmc103ux04a" path="res://assets/Path.png" id="3_l5yg1"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="6_hvwck"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bnqy1"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ywn7r"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_hvwck"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_5ko3l"]
+light_mode = 1
+
+[sub_resource type="Animation" id="Animation_ywn7r"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node2D/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-77.00001, -174.00002)]
+}
+
+[sub_resource type="Animation" id="Animation_cf44g"]
+resource_name = "light_move"
+length = 7.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node2D/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.01, 7),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-77.00001, -174.00002), Vector2(1000, 1000), Vector2(1000, 1000)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_6n400"]
+_data = {
+&"RESET": SubResource("Animation_ywn7r"),
+&"light_move": SubResource("Animation_cf44g")
+}
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hvwck"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5ko3l"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ywn7r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cf44g"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6n400"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qxnfv"]
+
+[node name="CharacterSelectScreen" type="Control" unique_id=186032089]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3a6v1")
+
+[node name="Node2D" type="Control" parent="." unique_id=168889155]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RedBG" type="TextureRect" parent="Node2D" unique_id=1178484458]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_74l3e")
+expand_mode = 1
+
+[node name="LavaLight" type="PointLight2D" parent="Node2D" unique_id=1613793039]
+position = Vector2(-77.00001, -174.00002)
+rotation = -0.54352754
+scale = Vector2(12.219881, 1)
+color = Color(0.71551484, 0.21765238, 0, 1)
+energy = 3.75
+texture = ExtResource("3_bnqy1")
+
+[node name="ColorRect" type="ColorRect" parent="Node2D" unique_id=1419105522]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.29463828, 1.8349849e-07, 4.813075e-08, 0.5254902)
+
+[node name="MoltenRocks" type="TextureRect" parent="Node2D" unique_id=386027496]
+material = SubResource("CanvasItemMaterial_bnqy1")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -55.0
+offset_top = -55.0
+offset_right = 45.0
+offset_bottom = -55.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_l5yg1")
+expand_mode = 1
+
+[node name="CharImage" type="TextureRect" parent="." unique_id=2062959945]
+material = SubResource("CanvasItemMaterial_ywn7r")
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -148.0
+offset_top = -70.0
+offset_right = -108.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.4, 1.4)
+
+[node name="CharBar2" type="TextureRect" parent="." unique_id=1477618714]
+material = SubResource("CanvasItemMaterial_hvwck")
+custom_minimum_size = Vector2(575, 400)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -578.0
+offset_top = -296.0
+offset_right = -3.0
+offset_bottom = 104.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("3_74l3e")
+expand_mode = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharBar2" unique_id=514971954]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharactersGrid" type="GridContainer" parent="CharBar2/ScrollContainer" unique_id=872023168]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 4
+
+[node name="CharBar" type="TextureRect" parent="." unique_id=933926876]
+material = SubResource("CanvasItemMaterial_5ko3l")
+custom_minimum_size = Vector2(575, 400)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -295.0
+offset_right = 575.0
+offset_bottom = 105.0
+grow_vertical = 0
+texture = ExtResource("3_74l3e")
+expand_mode = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CharBar" unique_id=435663521]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 22.0
+offset_bottom = 22.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="WeaponsGrid" type="GridContainer" parent="CharBar/ScrollContainer" unique_id=1752818677]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 3
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=593772412]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=785472993]
+libraries/ = SubResource("AnimationLibrary_6n400")
+autoplay = &"light_move"
+
+[node name="BackButton" type="Button" parent="." unique_id=1527593084]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -127.0
+offset_top = 50.0
+offset_right = -50.0
+offset_bottom = 100.0
+grow_horizontal = 0
+pivot_offset = Vector2(38, 26)
+theme_override_fonts/font = ExtResource("6_hvwck")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxEmpty_hvwck")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_5ko3l")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ywn7r")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_cf44g")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_6n400")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_qxnfv")
+text = "بازگشت"
+
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

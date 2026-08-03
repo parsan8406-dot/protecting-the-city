@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://hqhc2prb7atm"]
+
+[ext_resource type="Texture2D" uid="uid://kfdvr6cihbps" path="res://assets/enemy.png" id="1_i4y8e"]
+[ext_resource type="Script" uid="uid://ce7v2b1likfjf" path="res://scripts/enemy.gd" id="1_t266d"]
+[ext_resource type="Texture2D" uid="uid://b6hur5ciwas84" path="res://assets/light.png" id="2_t266d"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="4_e50u1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_e50u1"]
+radius = 58.30952
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_x680i"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_5uyxc"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_d8ydn"]
+light_mode = 1
+
+[node name="enemy" type="CharacterBody2D" unique_id=1234975233]
+script = ExtResource("1_t266d")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1928766249]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_i4y8e")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=774410662]
+shape = SubResource("CircleShape2D_e50u1")
+
+[node name="VisionZone" type="Area2D" parent="." unique_id=1706631675]
+
+[node name="PointLight2D" type="PointLight2D" parent="VisionZone" unique_id=1939247651]
+position = Vector2(9.490595, 210)
+rotation = -3.1415925
+scale = Vector2(0.7165503, 0.62)
+color = Color(1, 0.57691324, 0.5152409, 1)
+texture = ExtResource("2_t266d")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="VisionZone" unique_id=465550911]
+polygon = PackedVector2Array(-79, 369, 93, 367, 8, 59)
+
+[node name="HealthBar" type="Node2D" parent="." unique_id=1416481510]
+material = SubResource("CanvasItemMaterial_x680i")
+position = Vector2(-60, 0)
+
+[node name="Background" type="ColorRect" parent="HealthBar" unique_id=1487443734]
+material = SubResource("CanvasItemMaterial_5uyxc")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_right = 30.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(1, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="HealthBar" unique_id=1532337851]
+material = SubResource("CanvasItemMaterial_d8ydn")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_right = 30.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.6404326, 0.33560532, 1)
+
+[node name="HealthLabel" type="Label" parent="HealthBar" unique_id=372197424]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -20.0
+offset_right = 10.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(20, 13)
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("4_e50u1")
+theme_override_font_sizes/font_size = 12
+text = "100"
+horizontal_alignment = 1
+vertical_alignment = 1

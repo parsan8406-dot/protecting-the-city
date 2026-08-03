@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://dn7loo82ygtrb"]
+
+[ext_resource type="Script" uid="uid://dugmv751xkspd" path="res://scripts/char_card.gd" id="1_ykj4p"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ykj4p"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_fgg6r"]
+light_mode = 1
+
+[sub_resource type="Shader" id="Shader_ykj4p"]
+code = "shader_type canvas_item;
+
+uniform float speed = 1.5;
+
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+void fragment() {
+    // پیدا کردن مرکز
+    vec2 center = vec2(0.5, 0.5);
+    vec2 uv = UV - center;
+    
+    // چرخش رنگ‌ها
+    float angle = atan(uv.y, uv.x) / (2.0 * 3.14159);
+    float hue = fract(angle + TIME * speed);
+    
+    // گرفتن شکل و میزان گردی گوشه‌ها از StyleBox گودوت
+    float current_alpha = COLOR.a;
+    
+    // رنگ‌آمیزی قاب با حفظ شکل و آلفای اصلی
+    COLOR = vec4(hsv2rgb(vec3(hue, 1.0, 1.0)), current_alpha);
+}  "
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3xauf"]
+shader = SubResource("Shader_ykj4p")
+shader_parameter/speed = 1.5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ykj4p"]
+bg_color = Color(1, 1, 1, 1)
+draw_center = false
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+corner_radius_top_left = 35
+corner_radius_top_right = 35
+corner_radius_bottom_right = 35
+corner_radius_bottom_left = 35
+
+[node name="CharCard" type="TextureButton" unique_id=1899633677]
+material = SubResource("CanvasItemMaterial_ykj4p")
+custom_minimum_size = Vector2(150, 200)
+offset_right = 150.0
+offset_bottom = 200.0
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("1_ykj4p")
+
+[node name="Img" type="ColorRect" parent="." unique_id=1467121675]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="ItemImage" type="TextureRect" parent="Img" unique_id=1545010349]
+material = SubResource("CanvasItemMaterial_fgg6r")
+custom_minimum_size = Vector2(80, 140)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -68.0
+offset_top = -189.0
+offset_right = 68.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset = Vector2(10, 10)
+pivot_offset_ratio = Vector2(-10, -10)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RGBBorder" type="Panel" parent="." unique_id=926087111]
+material = SubResource("ShaderMaterial_3xauf")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_top = 6.0
+offset_right = -2.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(5, 5)
+pivot_offset_ratio = Vector2(-5, -5)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ykj4p")

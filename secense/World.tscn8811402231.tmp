@@ -1,0 +1,330 @@
+[gd_scene format=3 uid="uid://bjsw2f8b71rnk"]
+
+[ext_resource type="Script" uid="uid://cqkil0ydvjuib" path="res://scripts/world.gd" id="1_84k7k"]
+[ext_resource type="Texture2D" uid="uid://dp10tiluqfwux" path="res://assets/asphalt.png" id="1_l3wer"]
+[ext_resource type="Texture2D" uid="uid://dlau1vhfwg4ri" path="res://assets/old_01.png" id="1_skw3l"]
+[ext_resource type="PackedScene" uid="uid://wctrba23n0y1" path="res://secense/ammo_box.tscn" id="2_2mfbo"]
+[ext_resource type="Script" uid="uid://cjuu28gx24wkt" path="res://scripts/player.gd" id="2_aea43"]
+[ext_resource type="PackedScene" uid="uid://dalu1u38fljwk" path="res://secense/player.tscn" id="3_mperp"]
+[ext_resource type="Script" uid="uid://btkbewis11uw5" path="res://scripts/virtual_joystick.gd" id="4_icha4"]
+[ext_resource type="PackedScene" uid="uid://brxyuq5vjtb6b" path="res://secense/bullet.tscn" id="4_kg8lr"]
+[ext_resource type="Texture2D" uid="uid://bdepsdxw5xj5a" path="res://assets/bullet.png" id="4_kvrcq"]
+[ext_resource type="Texture2D" uid="uid://b3snddfxgw6ct" path="res://assets/circle.png" id="5_l3wer"]
+[ext_resource type="Texture2D" uid="uid://b6hur5ciwas84" path="res://assets/light.png" id="5_p815x"]
+[ext_resource type="Texture2D" uid="uid://cp0onwooeqh12" path="res://assets/pointer.png" id="6_x6wqi"]
+[ext_resource type="Texture2D" uid="uid://dd8n05yadjabr" path="res://assets/shoot.png" id="7_6ybb6"]
+[ext_resource type="AudioStream" uid="uid://djhvkfn0eqg4d" path="res://assets/shootsound.mp3" id="8_bnfok"]
+[ext_resource type="Texture2D" uid="uid://df4hehowrfaqo" path="res://assets/army1-Fighter.png" id="8_viiip"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="9_85pjd"]
+[ext_resource type="Texture2D" uid="uid://ddwgoywp2w3b1" path="res://assets/gunak47-Fighter.png" id="9_og0yf"]
+[ext_resource type="PackedScene" uid="uid://hqhc2prb7atm" path="res://secense/enemy.tscn" id="10_85pjd"]
+[ext_resource type="Texture2D" uid="uid://cirp1f4sygqmo" path="res://assets/Ammo.png" id="10_wauol"]
+[ext_resource type="AudioStream" uid="uid://b255585q1q0pv" path="res://assets/breechblock.mp3" id="12_viiip"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_kg8lr"]
+light_mode = 1
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_icha4"]
+texture = ExtResource("1_skw3l")
+texture_region_size = Vector2i(250, 250)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-125, -125, 125, -125, 125, 125, -125, 125)
+
+[sub_resource type="TileSet" id="TileSet_l3wer"]
+tile_size = Vector2i(250, 250)
+physics_layer_0/collision_layer = 1
+sources/1 = SubResource("TileSetAtlasSource_icha4")
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_85pjd"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mperp"]
+light_mode = 1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ykxu2"]
+radius = 58.549126
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_6ybb6"]
+light_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kg8lr"]
+particle_flag_disable_z = true
+direction = Vector3(0, 0, 0)
+spread = 30.0
+initial_velocity_min = 200.0
+initial_velocity_max = 300.0
+scale_min = 2.0
+scale_max = 2.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x6wqi"]
+size = Vector2(2000, 17)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p815x"]
+size = Vector2(30, 1000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_85pjd"]
+size = Vector2(2000, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kg8lr"]
+size = Vector2(27, 1000)
+
+[node name="Node2D" type="Node2D" unique_id=1300743185]
+script = ExtResource("1_84k7k")
+ammo_box_scene = ExtResource("2_2mfbo")
+other_player_scene = ExtResource("3_mperp")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1351134807]
+texture = ExtResource("1_l3wer")
+offset = Vector2(1000, 500)
+
+[node name="TileMap" type="TileMap" parent="." unique_id=1002763029]
+material = SubResource("CanvasItemMaterial_kg8lr")
+scale = Vector2(0.2, 0.2)
+tile_set = SubResource("TileSet_l3wer")
+format = 2
+layer_0/tile_data = PackedInt32Array(65537, 1, 0, 65538, 1, 0, 65539, 1, 0, 65540, 1, 0, 131076, 1, 0, 196616, 1, 0, 196617, 1, 0, 196618, 1, 0, 196619, 1, 0, 262155, 1, 0, 327691, 1, 0, 393227, 1, 0, 458754, 1, 0, 458755, 1, 0, 458756, 1, 0, 458757, 1, 0, 983047, 1, 0, 983048, 1, 0, 983049, 1, 0, 983050, 1, 0, 983051, 1, 0, 983052, 1, 0, 983053, 1, 0, 983054, 1, 0, 983055, 1, 0, 983056, 1, 0, 983057, 1, 0, 1179671, 1, 0, 1179672, 1, 0, 1179673, 1, 0, 1179674, 1, 0, 1179675, 1, 0, 1179676, 1, 0, 1179677, 1, 0, 1114141, 1, 0, 1114140, 1, 0, 1048604, 1, 0, 1048605, 1, 0, 983069, 1, 0, 917533, 1, 0, 983068, 1, 0, 917532, 1, 0, 131108, 1, 0, 196644, 1, 0, 262180, 1, 0, 327716, 1, 0, 393252, 1, 0, 458788, 1, 0, 917542, 1, 0, 917543, 1, 0, 983079, 1, 0, 1048615, 1, 0, 1114151, 1, 0, 131093, 1, 0, 131094, 1, 0, 131095, 1, 0, 131096, 1, 0, 131097, 1, 0, 131098, 1, 0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 3, 1, 0, 1245184, 1, 0, 1245185, 1, 0, 1245186, 1, 0, 1245187, 1, 0, 1179648, 1, 0, 786456, 1, 0, 720920, 1, 0, 655384, 1, 0, 589848, 1, 0, 524312, 1, 0, 524311, 1, 0, 524310, 1, 0, 786453, 1, 0, 786454, 1, 0, 786455, 1, 0, 524309, 1, 0)
+
+[node name="SpawnPoints" type="Node2D" parent="." unique_id=1425805761]
+
+[node name="Marker2D" type="Marker2D" parent="SpawnPoints" unique_id=1259597171]
+position = Vector2(47, 150)
+
+[node name="Marker2D2" type="Marker2D" parent="SpawnPoints" unique_id=1048249558]
+position = Vector2(356, 49)
+
+[node name="Marker2D3" type="Marker2D" parent="SpawnPoints" unique_id=1344697852]
+position = Vector2(666, 196)
+
+[node name="Marker2D4" type="Marker2D" parent="SpawnPoints" unique_id=239607270]
+position = Vector2(290, 431)
+
+[node name="Marker2D5" type="Marker2D" parent="SpawnPoints" unique_id=819555171]
+position = Vector2(763, 401)
+
+[node name="Marker2D6" type="Marker2D" parent="SpawnPoints" unique_id=617003955]
+position = Vector2(1058, 464)
+
+[node name="Marker2D7" type="Marker2D" parent="SpawnPoints" unique_id=1616159728]
+position = Vector2(1043, 181)
+
+[node name="Marker2D8" type="Marker2D" parent="SpawnPoints" unique_id=1204616662]
+position = Vector2(1514, 122)
+
+[node name="Marker2D14" type="Marker2D" parent="SpawnPoints" unique_id=1167561906]
+position = Vector2(1351, 843)
+
+[node name="Marker2D15" type="Marker2D" parent="SpawnPoints" unique_id=1040464135]
+position = Vector2(186, 873)
+
+[node name="Marker2D9" type="Marker2D" parent="SpawnPoints" unique_id=428811328]
+position = Vector2(1770, 387)
+
+[node name="Marker2D10" type="Marker2D" parent="SpawnPoints" unique_id=473643347]
+position = Vector2(1868, 522)
+
+[node name="Marker2D11" type="Marker2D" parent="SpawnPoints" unique_id=1797324270]
+position = Vector2(1897, 771)
+
+[node name="Marker2D12" type="Marker2D" parent="SpawnPoints" unique_id=653309214]
+position = Vector2(1567, 891)
+
+[node name="Marker2D13" type="Marker2D" parent="SpawnPoints" unique_id=961479112]
+position = Vector2(1954, 71)
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1763369643]
+position = Vector2(480, 372)
+scale = Vector2(0.5, 0.5)
+script = ExtResource("2_aea43")
+bullet_icon = ExtResource("4_kvrcq")
+bullet_scene = ExtResource("4_kg8lr")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1124163466]
+material = SubResource("CanvasItemMaterial_85pjd")
+position = Vector2(-1.25926, -32.56729)
+rotation = 3.1415927
+scale = Vector2(0.32608047, 0.3260805)
+texture = ExtResource("8_viiip")
+offset = Vector2(14.952881, 22.903809)
+
+[node name="gun" type="Sprite2D" parent="Player" unique_id=388009437]
+material = SubResource("CanvasItemMaterial_mperp")
+position = Vector2(-6, -40)
+rotation = 3.1415927
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("9_og0yf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1407593955]
+shape = SubResource("CircleShape2D_ykxu2")
+
+[node name="DetectionZone" type="Area2D" parent="Player" unique_id=659449889 groups=["enemy"]]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Player/DetectionZone" unique_id=1041978865]
+position = Vector2(-4.799988, -39.799988)
+polygon = PackedVector2Array(0, -60, 78, -294, -86, -294)
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1241382027]
+scale = Vector2(386.76004, 12.201983)
+zoom = Vector2(2, 2)
+limit_left = 0
+limit_top = 0
+limit_right = 2000
+limit_bottom = 1000
+position_smoothing_enabled = true
+
+[node name="PointLight2D" type="PointLight2D" parent="Player" unique_id=262826703]
+position = Vector2(-8.799984, -217.29999)
+scale = Vector2(0.64599997, 0.466)
+color = Color(0.42084792, 0.603903, 1, 1)
+texture = ExtResource("5_p815x")
+
+[node name="FireTimer" type="Timer" parent="Player" unique_id=477668274]
+wait_time = 0.1
+one_shot = true
+
+[node name="SightRay" type="RayCast2D" parent="Player" unique_id=429871077]
+position = Vector2(-2, -28)
+collision_mask = 2
+
+[node name="MuzzleFlash" type="GPUParticles2D" parent="Player" unique_id=1293958586]
+material = SubResource("CanvasItemMaterial_6ybb6")
+position = Vector2(-4, -120)
+emitting = false
+amount = 3
+texture = ExtResource("7_6ybb6")
+lifetime = 0.1
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_kg8lr")
+
+[node name="ShootSound" type="AudioStreamPlayer" parent="Player" unique_id=612468188]
+stream = ExtResource("8_bnfok")
+volume_db = -7.5
+max_polyphony = 5
+
+[node name="ReloadAmmo" type="AudioStreamPlayer" parent="Player" unique_id=647524643]
+stream = ExtResource("12_viiip")
+volume_db = -7.0
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=235635253]
+
+[node name="Sprite2D" type="Sprite2D" parent="UI" unique_id=695051783]
+position = Vector2(796.5, 587.5)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("10_wauol")
+
+[node name="AmmoDisplay" type="HBoxContainer" parent="UI" unique_id=1171764266]
+offset_left = 497.0
+offset_top = 562.0
+offset_right = 537.0
+offset_bottom = 602.0
+theme_override_constants/separation = 0
+
+[node name="VirtualJoystick" type="Control" parent="UI" unique_id=515283422]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 171.0
+offset_top = 491.0
+offset_right = 211.0
+offset_bottom = 531.0
+script = ExtResource("4_icha4")
+
+[node name="Base" type="Sprite2D" parent="UI/VirtualJoystick" unique_id=454249490]
+texture = ExtResource("5_l3wer")
+
+[node name="Knob" type="Sprite2D" parent="UI/VirtualJoystick" unique_id=902483809]
+position = Vector2(-2, 6)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_x6wqi")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=1595614026]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=696899836]
+position = Vector2(1000, -8.5)
+shape = SubResource("RectangleShape2D_x6wqi")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="StaticBody2D" unique_id=1078701292]
+position = Vector2(2015, 500)
+shape = SubResource("RectangleShape2D_p815x")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="StaticBody2D" unique_id=1446602371]
+position = Vector2(1000, 1005)
+shape = SubResource("RectangleShape2D_85pjd")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="StaticBody2D" unique_id=2006518934]
+position = Vector2(-13.5, 500)
+shape = SubResource("RectangleShape2D_kg8lr")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1977542816]
+color = Color(0, 0, 0, 0.972549)
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1449581141]
+position = Vector2(200, 242)
+scale = Vector2(1.164, 0.664)
+color = Color(1, 1, 1, 0.5921569)
+texture = ExtResource("9_85pjd")
+
+[node name="PointLight2D6" type="PointLight2D" parent="." unique_id=323465880]
+position = Vector2(1947, 444)
+scale = Vector2(3.7540002, 3.0640001)
+color = Color(1, 1, 1, 0.5921569)
+texture = ExtResource("9_85pjd")
+
+[node name="PointLight2D2" type="PointLight2D" parent="." unique_id=1696862996]
+position = Vector2(706.75, 199.5)
+scale = Vector2(1.9699998, 1.516)
+color = Color(1, 1, 1, 0.5921569)
+energy = 1.18
+shadow_enabled = true
+shadow_color = Color(0.69803923, 0.69803923, 0.69803923, 0)
+shadow_filter_smooth = 21.6
+texture = ExtResource("9_85pjd")
+
+[node name="PointLight2D3" type="PointLight2D" parent="." unique_id=1114913326]
+position = Vector2(381, 720.00006)
+scale = Vector2(0.9929999, 1.9020001)
+color = Color(1, 1, 1, 0.5921569)
+energy = 1.18
+shadow_enabled = true
+shadow_color = Color(0.69803923, 0.69803923, 0.69803923, 0)
+shadow_filter_smooth = 21.6
+texture = ExtResource("9_85pjd")
+
+[node name="PointLight2D4" type="PointLight2D" parent="." unique_id=1213234036]
+position = Vector2(1012, 563)
+scale = Vector2(0.9929999, 1.9020001)
+color = Color(1, 1, 1, 0.5921569)
+energy = 1.18
+shadow_enabled = true
+shadow_color = Color(0.69803923, 0.69803923, 0.69803923, 0)
+shadow_filter_smooth = 21.6
+texture = ExtResource("9_85pjd")
+
+[node name="PointLight2D5" type="PointLight2D" parent="." unique_id=2023688161]
+position = Vector2(1285, 740.00006)
+rotation = -0.6815854
+scale = Vector2(2.2845001, 1.1519748)
+color = Color(1, 1, 1, 0.5921569)
+energy = 1.18
+shadow_enabled = true
+shadow_color = Color(0.69803923, 0.69803923, 0.69803923, 0)
+shadow_filter_smooth = 21.6
+texture = ExtResource("9_85pjd")
+
+[node name="enemy" parent="." unique_id=1234975233 instance=ExtResource("10_85pjd")]
+position = Vector2(819, 126)
+scale = Vector2(0.5, 0.5)
+
+[node name="enemy2" parent="." unique_id=414457943 instance=ExtResource("10_85pjd")]
+position = Vector2(605, 497)
+rotation = -1.5820293
+scale = Vector2(0.5, 0.5)
+
+[node name="enemy3" parent="." unique_id=1622801845 instance=ExtResource("10_85pjd")]
+position = Vector2(1074, 558)
+rotation = -2.6088617
+scale = Vector2(0.5, 0.5)
+
+[connection signal="body_entered" from="Player/DetectionZone" to="Player" method="_on_detection_zone_body_entered"]
+[connection signal="body_exited" from="Player/DetectionZone" to="Player" method="_on_detection_zone_body_exited"]

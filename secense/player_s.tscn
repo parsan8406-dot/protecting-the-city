@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://bkp8o17ycfsvp"]
+
+[ext_resource type="Script" uid="uid://cysyo5tcru5v3" path="res://scripts/player_s.gd" id="1_btbqs"]
+[ext_resource type="PackedScene" uid="uid://brxyuq5vjtb6b" path="res://secense/bullet.tscn" id="2_j21v7"]
+[ext_resource type="Texture2D" uid="uid://b6hur5ciwas84" path="res://assets/light.png" id="3_d45xh"]
+[ext_resource type="Texture2D" uid="uid://dd8n05yadjabr" path="res://assets/shoot.png" id="4_f1so6"]
+[ext_resource type="AudioStream" uid="uid://djhvkfn0eqg4d" path="res://assets/shootsound.mp3" id="5_8gd0l"]
+[ext_resource type="AudioStream" uid="uid://b255585q1q0pv" path="res://assets/breechblock.mp3" id="6_tfkpm"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="7_xxx6t"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bv25o"]
+radius = 58.549126
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_s6rjh"]
+light_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0fw10"]
+particle_flag_disable_z = true
+direction = Vector3(0, 0, 0)
+spread = 30.0
+initial_velocity_min = 200.0
+initial_velocity_max = 300.0
+scale_min = 2.0
+scale_max = 2.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_n3vbo"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_8ktam"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_7uykf"]
+light_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_btbqs"]
+light_mode = 1
+
+[node name="PlayerOther" type="CharacterBody2D" unique_id=2062629292]
+scale = Vector2(0.5, 0.5)
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_btbqs")
+bullet_scene = ExtResource("2_j21v7")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2146798271]
+rotation = 3.1415927
+scale = Vector2(0.355, 0.355)
+
+[node name="gun" type="Sprite2D" parent="." unique_id=181178474]
+rotation = 3.1415927
+scale = Vector2(0.3, 0.3)
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="." unique_id=1036166919]
+shape = SubResource("CircleShape2D_bv25o")
+
+[node name="VisionZone" type="Area2D" parent="." unique_id=1708276422]
+rotation = 3.1415927
+
+[node name="PointLight2D" type="PointLight2D" parent="VisionZone" unique_id=781464123]
+position = Vector2(9.490595, 210)
+rotation = -3.1415925
+scale = Vector2(0.7165503, 0.62)
+color = Color(1, 0.57691324, 0.5152409, 1)
+texture = ExtResource("3_d45xh")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="VisionZone" unique_id=1707288991 groups=["enemy"]]
+polygon = PackedVector2Array(-79, 369, 93, 367, 8, 59)
+
+[node name="MuzzleFlash" type="GPUParticles2D" parent="." unique_id=2079356364]
+material = SubResource("CanvasItemMaterial_s6rjh")
+position = Vector2(-4, -120)
+emitting = false
+amount = 3
+texture = ExtResource("4_f1so6")
+lifetime = 0.1
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_0fw10")
+
+[node name="ShootSound" type="AudioStreamPlayer" parent="." unique_id=293041087]
+stream = ExtResource("5_8gd0l")
+volume_db = -7.5
+max_polyphony = 5
+
+[node name="ReloadAmmo" type="AudioStreamPlayer" parent="." unique_id=132582409]
+stream = ExtResource("6_tfkpm")
+volume_db = -7.0
+
+[node name="HealthBar" type="Node2D" parent="." unique_id=2129684262]
+z_index = 10
+material = SubResource("CanvasItemMaterial_n3vbo")
+position = Vector2(-38, 64)
+
+[node name="Background" type="ColorRect" parent="HealthBar" unique_id=385791362]
+material = SubResource("CanvasItemMaterial_8ktam")
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -5.0
+offset_right = 60.0
+offset_bottom = 5.0
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+color = Color(1, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="HealthBar" unique_id=147631539]
+material = SubResource("CanvasItemMaterial_7uykf")
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -5.0
+offset_right = 60.0
+offset_bottom = 5.0
+grow_vertical = 2
+color = Color(0, 0.6404326, 0.33560532, 1)
+
+[node name="HealthLabel" type="Label" parent="HealthBar" unique_id=82767754]
+material = SubResource("CanvasItemMaterial_btbqs")
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 13.0
+grow_vertical = 2
+pivot_offset = Vector2(20, 13)
+size_flags_vertical = 1
+theme_override_fonts/font = ExtResource("7_xxx6t")
+theme_override_font_sizes/font_size = 12
+text = "100"
+horizontal_alignment = 1
+vertical_alignment = 1

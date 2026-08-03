@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b325qctubuq27"]
+
+[ext_resource type="Texture2D" uid="uid://c3ge0587xpsrt" path="res://assets/Bomb.png" id="1_uuxgi"]
+
+[node name="Bomb" type="Node2D" unique_id=1595046348]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=699654781]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("1_uuxgi")

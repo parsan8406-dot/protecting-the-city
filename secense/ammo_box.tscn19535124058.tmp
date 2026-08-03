@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://wctrba23n0y1"]
+
+[ext_resource type="Texture2D" uid="uid://dpm8llj1dqr3h" path="res://assets/AmmoRecive.png" id="1_2nyns"]
+[ext_resource type="Script" uid="uid://dny6aeuccg33c" path="res://scripts/ammo_box.gd" id="1_q7ca6"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_q7ca6"]
+light_mode = 1
+
+[node name="AmmoBox" type="Area2D" unique_id=469495531]
+script = ExtResource("1_q7ca6")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=692293144]
+material = SubResource("CanvasItemMaterial_q7ca6")
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_2nyns")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=779727452]
+
+[node name="RespawnTimer" type="Timer" parent="." unique_id=570722596]
+wait_time = 20.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="RespawnTimer" to="." method="_on_respawn_timer_timeout"]

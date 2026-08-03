@@ -1,0 +1,297 @@
+[gd_scene format=3 uid="uid://c3vt1lghwnm3i"]
+
+[ext_resource type="Texture2D" uid="uid://c2fclomt8gwfl" path="res://assets/bg.png" id="1_jlvir"]
+[ext_resource type="Script" uid="uid://dpq2e8nu14f8m" path="res://scripts/shop.gd" id="1_rpouk"]
+[ext_resource type="Texture2D" uid="uid://dhx4kyfi7he43" path="res://assets/startmenu_coin.png" id="2_rpouk"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_3iium"]
+[ext_resource type="Texture2D" uid="uid://c4s1vg5bglqce" path="res://assets/startmenu_plus.png" id="4_7peon"]
+[ext_resource type="Texture2D" uid="uid://dnksfro2dqvqp" path="res://assets/startmenu_gem.png" id="5_1l5d0"]
+[ext_resource type="Texture2D" uid="uid://tc8q4cq8la2p" path="res://assets/startmenu_level.png" id="6_ojt7c"]
+[ext_resource type="Texture2D" uid="uid://b47hg0qi8i1so" path="res://assets/btn.png" id="7_5dafp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4j0ux"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xv5pr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kcmfy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gi2vf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3aa20"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p8740"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nowb6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xegaw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g10o2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t0t3w"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jlvir"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rpouk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3iium"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7peon"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1l5d0"]
+
+[node name="Control" type="Control" unique_id=75243930]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rpouk")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1082793544]
+layout_mode = 0
+offset_right = 1169.0
+offset_bottom = 657.0
+texture = ExtResource("1_jlvir")
+expand_mode = 1
+
+[node name="VBoxContainer" type="HBoxContainer" parent="." unique_id=147986656]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 11.0
+offset_right = 674.0
+offset_bottom = 61.0
+theme_override_constants/separation = 18
+
+[node name="CoinsPanel" type="TextureRect" parent="VBoxContainer" unique_id=1259418802]
+custom_minimum_size = Vector2(200, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("2_rpouk")
+expand_mode = 1
+
+[node name="CoinsLabel" type="Label" parent="VBoxContainer/CoinsPanel" unique_id=514794326]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 62.0
+offset_top = 6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+vertical_alignment = 1
+
+[node name="AddCoinButton" type="Button" parent="VBoxContainer/CoinsPanel" unique_id=81669987]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -20.0
+offset_bottom = 19.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4j0ux")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xv5pr")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_kcmfy")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_gi2vf")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_3aa20")
+icon = ExtResource("4_7peon")
+expand_icon = true
+
+[node name="GemsPanel" type="TextureRect" parent="VBoxContainer" unique_id=764655844]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+texture = ExtResource("5_1l5d0")
+expand_mode = 1
+
+[node name="GemsLabel" type="Label" parent="VBoxContainer/GemsPanel" unique_id=1893794215]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 67.0
+offset_top = 7.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+vertical_alignment = 1
+
+[node name="AddGemButton" type="Button" parent="VBoxContainer/GemsPanel" unique_id=1926937860]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -37.0
+offset_top = -17.0
+offset_bottom = 21.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4j0ux")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xv5pr")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_kcmfy")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_gi2vf")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_3aa20")
+icon = ExtResource("4_7peon")
+expand_icon = true
+
+[node name="LevelPanel" type="TextureRect" parent="VBoxContainer" unique_id=905322148]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+texture = ExtResource("6_ojt7c")
+expand_mode = 1
+
+[node name="LevelLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=133113813]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = -11.0
+offset_right = 20.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+vertical_alignment = 1
+
+[node name="XPLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=1501476152]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 71.0
+offset_top = 6.0
+offset_right = 1.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+vertical_alignment = 1
+
+[node name="ProgressBar" type="TextureProgressBar" parent="VBoxContainer/LevelPanel" unique_id=1821923859]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=630250224]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2144486331]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -445.25
+offset_top = -99.0
+offset_right = 445.25
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 28
+
+[node name="WeaponsTab" type="Button" parent="HBoxContainer" unique_id=2001616421]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
+text = "اسلحه ها "
+icon = ExtResource("7_5dafp")
+icon_alignment = 1
+expand_icon = true
+
+[node name="CharactersTab" type="Button" parent="HBoxContainer" unique_id=784129553]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
+text = "کاراکتر ها"
+icon = ExtResource("7_5dafp")
+icon_alignment = 1
+expand_icon = true
+
+[node name="CoinsTab" type="Button" parent="HBoxContainer" unique_id=1342711909]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
+text = "سکه ها"
+icon = ExtResource("7_5dafp")
+icon_alignment = 1
+expand_icon = true
+
+[node name="GemsTab" type="Button" parent="HBoxContainer" unique_id=805345104]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
+text = "قلب ها"
+icon = ExtResource("7_5dafp")
+icon_alignment = 1
+expand_icon = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1509777873]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -421.0
+offset_top = -199.0
+offset_right = 457.0
+offset_bottom = 215.0
+grow_horizontal = 2
+grow_vertical = 2
+vertical_scroll_mode = 0
+
+[node name="ItemsRow" type="HBoxContainer" parent="ScrollContainer" unique_id=222867422]
+layout_mode = 2
+theme_override_constants/separation = 25
+
+[node name="ShopHTTPRequest" type="HTTPRequest" parent="." unique_id=1426028579]
+
+[node name="BuyHTTPRequest" type="HTTPRequest" parent="." unique_id=827195105]
+
+[node name="BackButton" type="Button" parent="." unique_id=1232871779]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 28.0
+offset_right = -31.0
+offset_bottom = 70.0
+grow_horizontal = 0
+pivot_offset = Vector2(35, 22)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = SubResource("StyleBoxEmpty_jlvir")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rpouk")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_3iium")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_7peon")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1l5d0")
+text = "بازگشت"
+
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

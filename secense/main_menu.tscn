@@ -1,0 +1,353 @@
+[gd_scene format=3 uid="uid://e4n07u2xh3f5"]
+
+[ext_resource type="Script" uid="uid://ldqsskj6srkt" path="res://scripts/main_menu.gd" id="1_prdn3"]
+[ext_resource type="Texture2D" uid="uid://klngul6xt42f" path="res://assets/startmenu_bg.png" id="2_ruxmj"]
+[ext_resource type="Texture2D" uid="uid://hik0ssacjq5e" path="res://assets/startmenu_select.png" id="3_tqs1h"]
+[ext_resource type="Texture2D" uid="uid://d02xlkqc47trm" path="res://assets/startmenu_start.png" id="4_xdxr3"]
+[ext_resource type="Texture2D" uid="uid://dhx4kyfi7he43" path="res://assets/startmenu_coin.png" id="5_2o872"]
+[ext_resource type="Texture2D" uid="uid://dnksfro2dqvqp" path="res://assets/startmenu_gem.png" id="6_crvna"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="6_itgdb"]
+[ext_resource type="Texture2D" uid="uid://tc8q4cq8la2p" path="res://assets/startmenu_level.png" id="7_itgdb"]
+[ext_resource type="Texture2D" uid="uid://c4s1vg5bglqce" path="res://assets/startmenu_plus.png" id="7_lsguj"]
+[ext_resource type="Texture2D" uid="uid://2usngya14cbm" path="res://assets/startmenu_setting.png" id="10_kqkpe"]
+[ext_resource type="Texture2D" uid="uid://dq46r6pyv1epf" path="res://assets/startmenu_account.png" id="11_icdhx"]
+[ext_resource type="Texture2D" uid="uid://dokya3ym6151l" path="res://assets/startmenu_shop.png" id="12_icdhx"]
+[ext_resource type="Texture2D" uid="uid://dmn81k2wm8462" path="res://assets/startmenu_chat.png" id="13_wj25d"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_itgdb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lsguj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kqkpe"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icdhx"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wj25d"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tqs1h"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xdxr3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7gm40"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2o872"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_crvna"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_iank1"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jvv0a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5c1lc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2x2q0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2rfn5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a4aoj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m34fa"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qxx26"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_666dn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fn8dy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_b75bm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l5lhe"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_offnm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7epwv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1d8i2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_eky0e"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2vn1i"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_acbec"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbsxf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mphty"]
+
+[node name="MainMenu" type="Control" unique_id=1932397312]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_prdn3")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1132923271]
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1695635629]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -26.0
+offset_top = -21.0
+offset_right = 8.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ruxmj")
+expand_mode = 1
+
+[node name="CharSelectBtn" type="Button" parent="." unique_id=1851584254]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -257.0
+offset_top = 34.0
+offset_right = 258.0
+offset_bottom = 519.0
+grow_horizontal = 2
+pivot_offset = Vector2(247, 228)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_itgdb")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_lsguj")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_kqkpe")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_icdhx")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_wj25d")
+icon = ExtResource("3_tqs1h")
+icon_alignment = 1
+expand_icon = true
+
+[node name="TextureRect" type="TextureRect" parent="CharSelectBtn" unique_id=1749331837]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="StartBtn" type="Button" parent="." unique_id=1838315918]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -268.0
+offset_top = 135.0
+offset_right = 268.01782
+offset_bottom = 257.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(272, 62)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_tqs1h")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xdxr3")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_7gm40")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_2o872")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_crvna")
+icon = ExtResource("4_xdxr3")
+expand_icon = true
+
+[node name="VBoxContainer" type="HBoxContainer" parent="." unique_id=1453624530]
+layout_mode = 1
+offset_left = 19.0
+offset_top = 11.0
+offset_right = 674.0
+offset_bottom = 61.0
+theme_override_constants/separation = 18
+
+[node name="CoinsPanel" type="TextureRect" parent="VBoxContainer" unique_id=905327197]
+custom_minimum_size = Vector2(200, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("5_2o872")
+expand_mode = 1
+
+[node name="CoinsLabel" type="Label" parent="VBoxContainer/CoinsPanel" unique_id=128574436]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 62.0
+offset_top = 6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_itgdb")
+vertical_alignment = 1
+
+[node name="AddCoinButton" type="Button" parent="VBoxContainer/CoinsPanel" unique_id=1327488922]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -38.0
+offset_top = -20.0
+offset_bottom = 19.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset = Vector2(18, 20)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_iank1")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_jvv0a")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_5c1lc")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_2x2q0")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2rfn5")
+icon = ExtResource("7_lsguj")
+expand_icon = true
+
+[node name="GemsPanel" type="TextureRect" parent="VBoxContainer" unique_id=247262246]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+texture = ExtResource("6_crvna")
+expand_mode = 1
+
+[node name="GemsLabel" type="Label" parent="VBoxContainer/GemsPanel" unique_id=1920713500]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 67.0
+offset_top = 7.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_itgdb")
+vertical_alignment = 1
+
+[node name="AddGemButton" type="Button" parent="VBoxContainer/GemsPanel" unique_id=304241489]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -37.0
+offset_top = -17.0
+offset_bottom = 21.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset = Vector2(19, 19)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_iank1")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_jvv0a")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_5c1lc")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_2x2q0")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_2rfn5")
+icon = ExtResource("7_lsguj")
+expand_icon = true
+
+[node name="LevelPanel" type="TextureRect" parent="VBoxContainer" unique_id=934022106]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+texture = ExtResource("7_itgdb")
+expand_mode = 1
+
+[node name="LevelLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=1017120871]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = -11.0
+offset_right = 20.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_itgdb")
+vertical_alignment = 1
+
+[node name="XPLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=74010488]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 71.0
+offset_top = 6.0
+offset_right = 1.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_itgdb")
+vertical_alignment = 1
+
+[node name="ProgressBar" type="TextureProgressBar" parent="VBoxContainer/LevelPanel" unique_id=726178992]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=476809903]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1679877056]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -152.0
+offset_top = 7.0
+offset_right = -18.0
+offset_bottom = 75.0
+grow_horizontal = 0
+theme_override_constants/separation = 16
+
+[node name="Button" type="Button" parent="HBoxContainer" unique_id=2108579722]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_a4aoj")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_m34fa")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_qxx26")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_666dn")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_fn8dy")
+icon = ExtResource("10_kqkpe")
+expand_icon = true
+
+[node name="Button2" type="Button" parent="HBoxContainer" unique_id=1475676340]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxEmpty_b75bm")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_l5lhe")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_offnm")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_7epwv")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_1d8i2")
+icon = ExtResource("11_icdhx")
+expand_icon = true
+
+[node name="ShopButton" type="Button" parent="." unique_id=1918660808]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -127.0
+offset_top = -122.0
+offset_right = -27.0
+offset_bottom = -22.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(49, 50)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_eky0e")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_2vn1i")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_acbec")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_tbsxf")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_mphty")
+icon = ExtResource("12_icdhx")
+expand_icon = true
+
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=109722327]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -703.0
+offset_top = -400.0
+offset_right = 97.0
+offset_bottom = 400.0
+grow_vertical = 2
+texture = ExtResource("13_wj25d")
+expand_mode = 1
+
+[connection signal="pressed" from="CharSelectBtn" to="." method="_on_char_select_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/CoinsPanel/AddCoinButton" to="." method="_on_add_coin_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/GemsPanel/AddGemButton" to="." method="_on_add_gem_button_pressed"]
+[connection signal="pressed" from="ShopButton" to="." method="_on_shop_button_pressed"]

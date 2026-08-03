@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@qwen-code/sdk": "^0.1.8",
+    "https-proxy-agent": "^9.1.0"
+  }
+}
