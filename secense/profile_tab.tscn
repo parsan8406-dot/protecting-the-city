@@ -1,0 +1,594 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/profile_tab.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_namefont"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_edit.svg" id="4_edit"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_rank_badge.svg" id="13_rank"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_clan.svg" id="15_clan"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/weapon_card_bg.svg" id="16_weaponbg"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.078, 0.078, 0.086, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.42, 0.45, 0.42)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_header"]
+bg_color = Color(0.1, 0.06, 0.06, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 4
+border_width_bottom = 1
+border_color = Color(0.85, 0.043, 0.075, 0.75)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_slot"]
+bg_color = Color(0.13, 0.13, 0.14, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.53, 0.14, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.24, 0.24, 0.26, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.85, 0.043, 0.075, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_gold"]
+bg_color = Color(1, 0.8, 0.26, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="ProfileTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="MainColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.25
+theme_override_constants/separation = 8
+
+[node name="HeaderPanel" type="PanelContainer" parent="Columns/MainColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_header")
+
+[node name="Margin" type="MarginContainer" parent="Columns/MainColumn/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Row" type="HBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Info" type="VBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameRow" type="HBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AccountBadge" type="Button" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/NameRow"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "مهمان — اتصال به گوگل"
+
+[node name="Spacer" type="Control" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="RenameButton" type="TextureButton" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/NameRow"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_vertical = 4
+texture_normal = ExtResource("4_edit")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/NameRow"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 28
+text = "Player"
+horizontal_alignment = 2
+
+[node name="IdRow" type="HBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CopyIdButton" type="Button" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/IdRow"]
+custom_minimum_size = Vector2(82, 44)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "کپی آیدی"
+
+[node name="Spacer" type="Control" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/IdRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="IdLabel" type="Label" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/IdRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.66, 0.7, 1)
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 18
+text = "ID : —"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="LevelRow" type="HBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="XpLabel" type="Label" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/LevelRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.64, 1)
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 14
+text = "0 / 100"
+vertical_alignment = 1
+
+[node name="XpBar" type="ProgressBar" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/LevelRow"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+value = 0.0
+show_percentage = false
+
+[node name="LevelLabel" type="Label" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info/LevelRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "سطح ۱"
+vertical_alignment = 1
+
+[node name="QuickStats" type="HBoxContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AvatarSlot" type="PanelContainer" parent="Columns/MainColumn/HeaderPanel/Margin/Row"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot")
+
+[node name="AvatarButton" type="TextureButton" parent="Columns/MainColumn/HeaderPanel/Margin/Row/AvatarSlot"]
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="EditBadge" type="TextureRect" parent="Columns/MainColumn/HeaderPanel/Margin/Row/AvatarSlot/AvatarButton"]
+modulate = Color(1, 0.8, 0.26, 1)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -28.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = 28.0
+grow_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("4_edit")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatsPanel" type="PanelContainer" parent="Columns/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/MainColumn/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Columns/MainColumn/StatsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FormRow" type="HBoxContainer" parent="Columns/MainColumn/StatsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FormDots" type="HBoxContainer" parent="Columns/MainColumn/StatsPanel/Margin/Body/FormRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+theme_override_constants/separation = 4
+
+[node name="FormTitle" type="Label" parent="Columns/MainColumn/StatsPanel/Margin/Body/FormRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.72, 0.74, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "فرم اخیر"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Grid" type="GridContainer" parent="Columns/MainColumn/StatsPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="ClanPanel" type="PanelContainer" parent="Columns/MainColumn"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/MainColumn/ClanPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Row" type="HBoxContainer" parent="Columns/MainColumn/ClanPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ViewButton" type="Button" parent="Columns/MainColumn/ClanPanel/Margin/Row"]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "مشاهده"
+
+[node name="ClanInfo" type="VBoxContainer" parent="Columns/MainColumn/ClanPanel/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Columns/MainColumn/ClanPanel/Margin/Row/ClanInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "شهر"
+horizontal_alignment = 2
+
+[node name="ClanNameLabel" type="Label" parent="Columns/MainColumn/ClanPanel/Margin/Row/ClanInfo"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "—"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="ClanDetailLabel" type="Label" parent="Columns/MainColumn/ClanPanel/Margin/Row/ClanInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 2
+
+[node name="ClanIconSlot" type="PanelContainer" parent="Columns/MainColumn/ClanPanel/Margin/Row"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot")
+
+[node name="ClanIcon" type="TextureRect" parent="Columns/MainColumn/ClanPanel/Margin/Row/ClanIconSlot"]
+modulate = Color(0.7, 0.7, 0.72, 1)
+layout_mode = 2
+texture = ExtResource("15_clan")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SideColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SeasonPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/SeasonPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/SeasonPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Row" type="HBoxContainer" parent="Columns/SideColumn/SeasonPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RankIconSlot" type="PanelContainer" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row"]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot")
+
+[node name="RankIcon" type="TextureRect" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row/RankIconSlot"]
+modulate = Color(0.85, 0.043, 0.075, 1)
+layout_mode = 2
+texture = ExtResource("13_rank")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RankInfo" type="VBoxContainer" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row/RankInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "رنک فصل"
+horizontal_alignment = 2
+
+[node name="TierLabel" type="Label" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row/RankInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.3, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 25
+text = "—"
+horizontal_alignment = 2
+
+[node name="BestLabel" type="Label" parent="Columns/SideColumn/SeasonPanel/Margin/Body/Row/RankInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.72, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "بهترین رنک : —"
+horizontal_alignment = 2
+
+[node name="RankBar" type="ProgressBar" parent="Columns/SideColumn/SeasonPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_gold")
+value = 0.0
+show_percentage = false
+
+[node name="PointsLabel" type="Label" parent="Columns/SideColumn/SeasonPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 2
+
+[node name="AchievementsPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/AchievementsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/AchievementsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderRow" type="HBoxContainer" parent="Columns/SideColumn/AchievementsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AllButton" type="Button" parent="Columns/SideColumn/AchievementsPanel/Margin/Body/HeaderRow"]
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "همه"
+
+[node name="CountLabel" type="Label" parent="Columns/SideColumn/AchievementsPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.83, 0.3, 1)
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 18
+text = "0 / 0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="Columns/SideColumn/AchievementsPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.88, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "دستاوردها"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Slots" type="HBoxContainer" parent="Columns/SideColumn/AchievementsPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 6
+
+[node name="EmptyLabel" type="Label" parent="Columns/SideColumn/AchievementsPanel/Margin/Body"]
+visible = false
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.54, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "اولین دستاوردت با اولین مسابقه باز می‌شود"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="NextLabel" type="Label" parent="Columns/SideColumn/AchievementsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "هدف بعدی : —"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="NextBar" type="ProgressBar" parent="Columns/SideColumn/AchievementsPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_gold")
+value = 0.0
+show_percentage = false
+
+[node name="WeaponPanel" type="Control" parent="Columns/SideColumn"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Background" type="TextureRect" parent="Columns/SideColumn/WeaponPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("16_weaponbg")
+expand_mode = 1
+
+[node name="WeaponTexture" type="TextureRect" parent="Columns/SideColumn/WeaponPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 30.0
+offset_right = -20.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Columns/SideColumn/WeaponPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 10.0
+offset_top = 6.0
+offset_right = -10.0
+offset_bottom = 28.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "آخرین سلاح مورد استفاده"
+horizontal_alignment = 2
+
+[node name="WeaponNameLabel" type="Label" parent="Columns/SideColumn/WeaponPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -30.0
+offset_right = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.75, 1)
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 18
+text = ""
+
+[node name="WeaponSubLabel" type="Label" parent="Columns/SideColumn/WeaponPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -30.0
+offset_right = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.74, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 2

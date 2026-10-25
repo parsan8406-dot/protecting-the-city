@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#ff3b30"/>
+      <stop offset="0.3" stop-color="#d90f1e"/>
+      <stop offset="0.68" stop-color="#8d0713"/>
+      <stop offset="1" stop-color="#43020a"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="0.42" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="0.62" stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.42"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.20"/>
+      <stop offset="0.5" stop-color="#000000" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.30"/>
+    </linearGradient>
+  </defs>
+
+  <!-- بدنه: تا لبه‌ی کادر پر شده، فقط بریدگی‌های کوچک برای حس پارگی -->
+  <path
+    d="M0 7 L18 0 L88 5 L158 0 L230 4 L286 0 L300 11 L296 50 L300 89 L270 100 L202 95 L132 100 L64 94 L14 100 L0 85 L4 46 Z"
+    fill="url(#body)" stroke="#2a0004" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- سیلوئت تفنگ (رو به راست) -->
+  <g fill="url(#steel)">
+    <path d="M34 38 L62 33 L66 51 L38 58 Z"/>
+    <path d="M62 39 L184 39 L184 59 L62 59 Z"/>
+    <path d="M176 32 L190 32 L190 40 L176 40 Z"/>
+    <path d="M186 43 L270 43 L270 52 L186 52 Z"/>
+    <path d="M188 41 L234 41 L234 58 L188 58 Z"/>
+    <path d="M252 34 L261 34 L261 44 L252 44 Z"/>
+    <path d="M268 41 L284 41 L284 54 L268 54 Z"/>
+    <path d="M96 59 L116 59 L109 80 L88 80 Z"/>
+    <path d="M124 59 L152 59 L160 86 L132 86 Z"/>
+    <path d="M118 59 L128 59 L126 68 L116 68 Z"/>
+  </g>
+
+  <!-- لبه‌ی روشن روی تفنگ -->
+  <g fill="none" stroke="#ff9a90" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round">
+    <path d="M64 38 L182 38"/>
+    <path d="M188 43 L268 43"/>
+    <path d="M36 38 L62 33"/>
+  </g>
+
+  <!-- سایه/براقی روی کل بدنه -->
+  <path
+    d="M0 7 L18 0 L88 5 L158 0 L230 4 L286 0 L300 11 L296 50 L300 89 L270 100 L202 95 L132 100 L64 94 L14 100 L0 85 L4 46 Z"
+    fill="url(#sheen)"/>
+
+  <!-- لبه‌ی براق سمت چپ -->
+  <path d="M4 46 L0 7 L18 0" fill="none" stroke="#ff7d70" stroke-opacity="0.65" stroke-width="3" stroke-linecap="round"/>
+  <path d="M0 85 L4 46" fill="none" stroke="#ff5a4c" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- خط‌خش‌های تیره -->
+  <g stroke="#3d0208" stroke-opacity="0.35" stroke-width="1.5" stroke-linecap="round">
+    <path d="M50 12 L42 26"/>
+    <path d="M214 78 L206 90"/>
+    <path d="M156 10 L148 20"/>
+  </g>
+</svg>

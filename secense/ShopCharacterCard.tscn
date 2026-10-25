@@ -1,0 +1,143 @@
+[gd_scene format=3 uid="uid://bd083hpcnqah7"]
+
+[ext_resource type="Script" uid="uid://dqg1n5e55m1mb" path="res://scripts/_shop_character_card.gd" id="1_8e13w"]
+[ext_resource type="Texture2D" uid="uid://bhindjlqc42e6" path="res://assets/sugUp_rarety.png" id="2_02a1f"]
+[ext_resource type="Texture2D" uid="uid://cun83e2ixequg" path="res://assets/items/skin_default.png" id="3_m2mvs"]
+[ext_resource type="Texture2D" uid="uid://8o276pugfftn" path="res://assets/ui/coin_icon.png" id="4_is7f8"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="5_vuvyh"]
+
+[sub_resource type="Gradient" id="Gradient_4ji8a"]
+offsets = PackedFloat32Array(0, 0.41513762, 1)
+colors = PackedColorArray(0, 0.5210146, 0.5746772, 1, 7.70092e-07, 0.48528486, 0.4156978, 1, 1.3536774e-07, 0.11872967, 0.096689634, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wrbhv"]
+gradient = SubResource("Gradient_4ji8a")
+fill_to = Vector2(1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l0oox"]
+bg_color = Color(0.18, 0.18, 0.18, 0.74509805)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fc3su"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_je8us"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wrbhv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xmksa"]
+
+[node name="ShopCharacterCard" type="Control" unique_id=1759230186]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 140.0
+offset_bottom = 176.0
+script = ExtResource("1_8e13w")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1445201878]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_wrbhv")
+
+[node name="CharacterImage" type="TextureRect" parent="." unique_id=1714657884]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_m2mvs")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ReferenceRect" type="ReferenceRect" parent="." unique_id=1301263594]
+z_index = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0, 0.64213955, 0.5544694, 1)
+border_width = 4.1
+
+[node name="BuyButton" type="Button" parent="." unique_id=1411491887]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -41.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_l0oox")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fc3su")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_je8us")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_wrbhv")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_xmksa")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BuyButton" unique_id=1928481173]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.5
+offset_top = -20.0
+offset_right = 35.5
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TypeIcon" type="TextureRect" parent="BuyButton/HBoxContainer" unique_id=622761677]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("4_is7f8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AmountLabel" type="Label" parent="BuyButton/HBoxContainer" unique_id=1560458382]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.59607846)
+theme_override_fonts/font = ExtResource("5_vuvyh")
+theme_override_font_sizes/font_size = 23
+text = "2000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="." unique_id=1839304558]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -78.0
+offset_top = 6.0
+offset_right = -5.0
+offset_bottom = 29.0
+grow_horizontal = 0
+theme_override_colors/font_shadow_color = Color(0.11, 0.11, 0.11, 0.6862745)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("5_vuvyh")
+text = "اسکین ویژه"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="RartyIcon" type="TextureRect" parent="." unique_id=624154485]
+z_index = 1
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 25.0
+offset_bottom = 25.0
+texture = ExtResource("2_02a1f")
+expand_mode = 1
+stretch_mode = 5

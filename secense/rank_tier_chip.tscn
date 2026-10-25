@@ -1,0 +1,118 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/rank_tier_chip.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_cup.png" id="4_cup"]
+
+[sub_resource type="StyleBoxFlat" id="SB_current"]
+bg_color = Color(0.06, 0.2, 0.42, 0.35)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.62, 1, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 1
+shadow_color = Color(0.15, 0.5, 1, 0.35)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_divider"]
+bg_color = Color(0.3, 0.42, 0.6, 0.35)
+
+[node name="RankTierChip" type="PanelContainer"]
+self_modulate = Color(1, 1, 1, 0)
+offset_right = 140.0
+offset_bottom = 220.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="CurrentFrame" type="Panel" parent="."]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_current")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Body" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="BadgeSlot" type="Control" parent="Margin/Body"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Badge" type="TextureRect" parent="Margin/Body/BadgeSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "برنز"
+horizontal_alignment = 1
+
+[node name="RangeRow" type="HBoxContainer" parent="Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="CupIcon" type="TextureRect" parent="Margin/Body/RangeRow"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("4_cup")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RangeLabel" type="Label" parent="Margin/Body/RangeRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.86, 0.9, 0.97, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 15
+text = "(۱ - ۱۰۰۰)"
+vertical_alignment = 1
+
+[node name="Divider" type="Panel" parent="Margin/Body"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="SubLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 1
+text_overrun_behavior = 3

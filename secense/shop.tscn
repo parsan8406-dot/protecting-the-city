@@ -1,43 +1,238 @@
 [gd_scene format=3 uid="uid://c3vt1lghwnm3i"]
 
-[ext_resource type="Texture2D" uid="uid://c2fclomt8gwfl" path="res://assets/bg.png" id="1_jlvir"]
 [ext_resource type="Script" uid="uid://dpq2e8nu14f8m" path="res://scripts/shop.gd" id="1_rpouk"]
-[ext_resource type="Texture2D" uid="uid://dhx4kyfi7he43" path="res://assets/startmenu_coin.png" id="2_rpouk"]
+[ext_resource type="Texture2D" uid="uid://biu274pla2bis" path="res://assets/ChatGPT Image Aug 14, 2026, 09_50_52 PM.png" id="2_431e4"]
+[ext_resource type="PackedScene" uid="uid://bkj2g4io8oq6w" path="res://secense/weapon_card.tscn" id="2_iq8en"]
 [ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_3iium"]
-[ext_resource type="Texture2D" uid="uid://c4s1vg5bglqce" path="res://assets/startmenu_plus.png" id="4_7peon"]
-[ext_resource type="Texture2D" uid="uid://dnksfro2dqvqp" path="res://assets/startmenu_gem.png" id="5_1l5d0"]
-[ext_resource type="Texture2D" uid="uid://tc8q4cq8la2p" path="res://assets/startmenu_level.png" id="6_ojt7c"]
-[ext_resource type="Texture2D" uid="uid://b47hg0qi8i1so" path="res://assets/btn.png" id="7_5dafp"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="3_pescl"]
+[ext_resource type="Texture2D" uid="uid://c20hek0tfsjg5" path="res://assets/startmenu_plus.png" id="4_7peon"]
+[ext_resource type="Texture2D" uid="uid://b8210jltvcc1q" path="res://assets/ChatGPT Image Aug 14, 2026, 09_51_19 PM (1).png" id="4_jf422"]
+[ext_resource type="Texture2D" uid="uid://b22s27j33vwce" path="res://assets/startmenu_rect69.png" id="5_3aa20"]
+[ext_resource type="Texture2D" uid="uid://c1fq1ew3kakto" path="res://assets/sugUp_star.png" id="7_iodwl"]
+[ext_resource type="Texture2D" uid="uid://jl2hkrd1fjh1" path="res://assets/startmenu_edit.png" id="8_nowb6"]
+[ext_resource type="Texture2D" uid="uid://cwy4iafdjqcql" path="res://assets/sugUp_char.png" id="8_w2xyw"]
+[ext_resource type="Texture2D" uid="uid://beg6amxnyv6l0" path="res://assets/sugUp_gun.png" id="9_431e4"]
+[ext_resource type="Texture2D" uid="uid://bhp45ytckvj3u" path="res://assets/startmenu_rect48.png" id="9_xegaw"]
+[ext_resource type="Texture2D" uid="uid://ceh7gumlyesqs" path="res://assets/startmenu_rect37-3-1-5.png" id="10_g10o2"]
+[ext_resource type="Texture2D" uid="uid://braxka2iwydmn" path="res://assets/sugUp_coin.png" id="10_jf422"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="11_t0t3w"]
+[ext_resource type="Texture2D" uid="uid://c5cu261jto6qm" path="res://assets/items/ak47.png" id="14_431e4"]
+[ext_resource type="Texture2D" uid="uid://cisbuh0p57tsw" path="res://assets/startmenu_messages.png" id="15_rqxp1"]
+[ext_resource type="Texture2D" uid="uid://bpujodpf8yh7e" path="res://assets/startmenu_path65.png" id="16_khpqw"]
+[ext_resource type="Texture2D" uid="uid://befw85nw8wrh1" path="res://assets/startmenu_friends.png" id="17_bav1l"]
+[ext_resource type="Texture2D" uid="uid://b7ntxpvmh8oro" path="res://assets/chanceui.png" id="17_w2xyw"]
+[ext_resource type="Texture2D" uid="uid://dbjruw4axl0vo" path="res://assets/startmenu_setting.png" id="18_iodwl"]
+[ext_resource type="Texture2D" uid="uid://hilrpqu2ox3y" path="res://assets/gemsandcoins_rect1.png" id="19_t0t3w"]
+[ext_resource type="Texture2D" uid="uid://dswfyjvgb4r2s" path="res://assets/characters/skin_default.png" id="22_8rjed"]
+[ext_resource type="Texture2D" uid="uid://bhindjlqc42e6" path="res://assets/sugUp_rarety.png" id="22_iq8en"]
+[ext_resource type="Texture2D" uid="uid://8o276pugfftn" path="res://assets/ui/coin_icon.png" id="23_8rjed"]
+[ext_resource type="Texture2D" uid="uid://db8adxlge3fdl" path="res://assets/sugUp_bg.png" id="24_ut7mi"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/bg_card.png" id="60_arzbg"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/coins1.png" id="25_nkmtg"]
+[ext_resource type="Texture2D" uid="uid://dxajjc8om8hp4" path="res://assets/sugUp_percentageAmount.png" id="25_rqxp1"]
+[ext_resource type="Texture2D" uid="uid://bi6xs5bxxypbd" path="res://assets/ChatGPT Image Aug 18, 2026, 09_22_25 PM.png" id="25_sb8kn"]
+[ext_resource type="Texture2D" uid="uid://bgqdjf24u0ryf" path="res://assets/sugUp_amount.png" id="26_khpqw"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/coins2.png" id="26_le88e"]
+[ext_resource type="Texture2D" uid="uid://7cyd1pp4ubmy" path="res://assets/ChatGPT Image Aug 18, 2026, 09_07_26 PM.png" id="26_vxisy"]
+[ext_resource type="Texture2D" uid="uid://o4i10ionl7y8" path="res://assets/ChatGPT Image Aug 18, 2026, 09_07_33 PM.png" id="27_rqt25"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/coins3.png" id="27_w1ny7"]
+[ext_resource type="Texture2D" uid="uid://b4xn6vdwa08cn" path="res://assets/sugUp_bgsec.png" id="28_iodwl"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/coins4.png" id="28_uvxeq"]
+[ext_resource type="Texture2D" uid="uid://gfm0pltifpvb" path="res://assets/sugUp_bgbottom.png" id="29_612nc"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/gems1.png" id="29_w1ny7"]
+[ext_resource type="Texture2D" uid="uid://dkwjqjst41cyj" path="res://assets/ui/gem_icon.png" id="30_uvxeq"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/gems2.png" id="31_kppcv"]
+[ext_resource type="Texture2D" uid="uid://cutkqnxidp1mo" path="res://assets/sugUp_arzbg.png" id="31_w2xyw"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/gems3.png" id="32_igbub"]
+[ext_resource type="Texture2D" uid="uid://dect6o62sfv24" path="res://assets/sugUp_arzbutton.png" id="32_w2xyw"]
+[ext_resource type="Texture2D" path="res://assets/ui/Arz/gems4.png" id="33_8u7hg"]
+[ext_resource type="Texture2D" uid="uid://dlg4m2u5fcgdp" path="res://assets/sugUp_home.png" id="49_igbub"]
+[ext_resource type="PackedScene" path="res://secense/top_bar.tscn" id="50_topbar"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4j0ux"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_jlvir"]
+light_mode = 1
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xv5pr"]
+[sub_resource type="Animation" id="Animation_ywn7r"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-77.00001, -174.00002)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.54352754]
+}
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kcmfy"]
+[sub_resource type="Animation" id="Animation_cf44g"]
+resource_name = "light_move"
+length = 7.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.02, 6.99, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(-2976, 1447), Vector2(-2537, 3182), Vector2(-2537, 3182), Vector2(-2976, 1447)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.01, 1, 1.02, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.54352754, -0.54352754, -0.54352754, -0.54352754, -0.54352754]
+}
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gi2vf"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_gbxyk"]
+_data = {
+&"RESET": SubResource("Animation_ywn7r"),
+&"light_move": SubResource("Animation_cf44g")
+}
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3aa20"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_431e4"]
+bg_color = Color(0.21471205, 0.08251385, 0.07957605, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p8740"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xmksa"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nowb6"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_je8us"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xegaw"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fc3su"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g10o2"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l0oox"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t0t3w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2xyw"]
+bg_color = Color(0.2, 0.2, 0.2, 0.43137255)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jlvir"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jf422"]
+bg_color = Color(0.2, 0.2, 0.2, 0.43137255)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rpouk"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8rjed"]
+bg_color = Color(0.2, 0.2, 0.2, 0.43137255)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3iium"]
+[sub_resource type="Gradient" id="Gradient_w2xyw"]
+offsets = PackedFloat32Array(0.22146119, 1)
+colors = PackedColorArray(0, 0.3835001, 0.39, 1, 0, 0, 0, 0.59607846)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7peon"]
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w2xyw"]
+gradient = SubResource("Gradient_w2xyw")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1l5d0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wrbhv"]
+bg_color = Color(0.53, 0, 0.0265001, 0.827451)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0, 0, 1)
+border_blend = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_woctq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ava33"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v2d5m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8i5mh"]
+
+[sub_resource type="Gradient" id="Gradient_8rjed"]
+colors = PackedColorArray(0, 0.4199239, 0.7404572, 1, 0, 0, 0, 0.84313726)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wrbhv"]
+gradient = SubResource("Gradient_8rjed")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xmksa"]
+bg_color = Color(0.47, 0, 0, 0.7411765)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.8, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wu28h"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_67fxp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_sd7f7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kkmuj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_je8us"]
+bg_color = Color(0.31, 0.26866668, 0, 0.7647059)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.92775494, 0.79600245, 1.540184e-06, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fyt36"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ayq26"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fgxbe"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hctgt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fc3su"]
+bg_color = Color(0.47312337, 0, 0.18029767, 0.7254902)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7878224, 0, 0.34713176, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8yfau"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f8vdn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kppcv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_chqc6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oq0vd"]
 
 [node name="Control" type="Control" unique_id=75243930]
 layout_mode = 3
@@ -47,251 +242,2435 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rpouk")
+shop_weapon_card_scene = ExtResource("2_iq8en")
 
-[node name="Background" type="TextureRect" parent="." unique_id=1082793544]
-layout_mode = 0
-offset_right = 1169.0
-offset_bottom = 657.0
-texture = ExtResource("1_jlvir")
-expand_mode = 1
-
-[node name="VBoxContainer" type="HBoxContainer" parent="." unique_id=147986656]
-layout_mode = 0
-offset_left = 19.0
-offset_top = 11.0
-offset_right = 674.0
-offset_bottom = 61.0
-theme_override_constants/separation = 18
-
-[node name="CoinsPanel" type="TextureRect" parent="VBoxContainer" unique_id=1259418802]
-custom_minimum_size = Vector2(200, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-texture = ExtResource("2_rpouk")
-expand_mode = 1
-
-[node name="CoinsLabel" type="Label" parent="VBoxContainer/CoinsPanel" unique_id=514794326]
+[node name="BackgroundAction" type="Control" parent="." unique_id=1842740688]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 62.0
-offset_top = 6.0
-offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_3iium")
-vertical_alignment = 1
 
-[node name="AddCoinButton" type="Button" parent="VBoxContainer/CoinsPanel" unique_id=81669987]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -38.0
-offset_top = -20.0
-offset_bottom = 19.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_4j0ux")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_xv5pr")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_kcmfy")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_gi2vf")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_3aa20")
-icon = ExtResource("4_7peon")
-expand_icon = true
-
-[node name="GemsPanel" type="TextureRect" parent="VBoxContainer" unique_id=764655844]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-texture = ExtResource("5_1l5d0")
-expand_mode = 1
-
-[node name="GemsLabel" type="Label" parent="VBoxContainer/GemsPanel" unique_id=1893794215]
+[node name="RedBG" type="TextureRect" parent="BackgroundAction" unique_id=527721870]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 67.0
-offset_top = 7.0
-offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_3iium")
-vertical_alignment = 1
-
-[node name="AddGemButton" type="Button" parent="VBoxContainer/GemsPanel" unique_id=1926937860]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -37.0
-offset_top = -17.0
-offset_bottom = 21.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_4j0ux")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_xv5pr")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_kcmfy")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_gi2vf")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_3aa20")
-icon = ExtResource("4_7peon")
-expand_icon = true
-
-[node name="LevelPanel" type="TextureRect" parent="VBoxContainer" unique_id=905322148]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-texture = ExtResource("6_ojt7c")
+texture = ExtResource("2_431e4")
 expand_mode = 1
 
-[node name="LevelLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=133113813]
+[node name="LavaLight" type="TextureRect" parent="BackgroundAction" unique_id=1475158774]
+modulate = Color(1, 0.7696696, 0.73171073, 1)
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = 20.0
-offset_top = -11.0
-offset_right = 20.0
-offset_bottom = 12.0
+offset_left = -77.00001
+offset_top = -498.0
+offset_right = -77.0
+offset_bottom = -118.72743
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_3iium")
-vertical_alignment = 1
+rotation = -0.54352754
+scale = Vector2(12.219881, 0.106689215)
+texture = ExtResource("3_pescl")
 
-[node name="XPLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=1501476152]
+[node name="ColorRect" type="ColorRect" parent="BackgroundAction" unique_id=1018986414]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 71.0
-offset_top = 6.0
-offset_right = 1.0
-offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_3iium")
-vertical_alignment = 1
+color = Color(0.29463828, 1.8349849e-07, 4.813075e-08, 0.5254902)
 
-[node name="ProgressBar" type="TextureProgressBar" parent="VBoxContainer/LevelPanel" unique_id=1821923859]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=630250224]
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2144486331]
+[node name="MoltenRocks" type="TextureRect" parent="BackgroundAction" unique_id=1954609528]
+modulate = Color(0.24985075, 0.24985075, 0.24985075, 1)
+material = SubResource("CanvasItemMaterial_jlvir")
 layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -445.25
-offset_top = -99.0
-offset_right = 445.25
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_jf422")
+expand_mode = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1081270750]
+libraries/ = SubResource("AnimationLibrary_gbxyk")
+autoplay = &"light_move"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1566546512]
+
+[node name="AllAboveButtons" type="Control" parent="." unique_id=1309642841]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 108.0
+grow_horizontal = 2
+
+[node name="TextureRect" type="TextureRect" parent="AllAboveButtons" unique_id=652677880]
+custom_minimum_size = Vector2(1200, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("19_t0t3w")
+expand_mode = 1
+
+[node name="AboveButtons" type="HBoxContainer" parent="AllAboveButtons" unique_id=251332680]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -48.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 28
+theme_override_constants/separation = 9
+alignment = 1
 
-[node name="WeaponsTab" type="Button" parent="HBoxContainer" unique_id=2001616421]
-custom_minimum_size = Vector2(200, 50)
+[node name="specialButton" type="Button" parent="AllAboveButtons/AboveButtons" unique_id=1977374248]
+custom_minimum_size = Vector2(150, 48)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
-text = "اسلحه ها "
-icon = ExtResource("7_5dafp")
-icon_alignment = 1
-expand_icon = true
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_431e4")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_je8us")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fc3su")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_l0oox")
 
-[node name="CharactersTab" type="Button" parent="HBoxContainer" unique_id=784129553]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
-text = "کاراکتر ها"
-icon = ExtResource("7_5dafp")
-icon_alignment = 1
-expand_icon = true
-
-[node name="CoinsTab" type="Button" parent="HBoxContainer" unique_id=1342711909]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
-text = "سکه ها"
-icon = ExtResource("7_5dafp")
-icon_alignment = 1
-expand_icon = true
-
-[node name="GemsTab" type="Button" parent="HBoxContainer" unique_id=805345104]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxEmpty_p8740")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_nowb6")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_xegaw")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_g10o2")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_t0t3w")
-text = "قلب ها"
-icon = ExtResource("7_5dafp")
-icon_alignment = 1
-expand_icon = true
-
-[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1509777873]
+[node name="HBoxContainer" type="HBoxContainer" parent="AllAboveButtons/AboveButtons/specialButton" unique_id=733699904]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -421.0
-offset_top = -199.0
-offset_right = 457.0
-offset_bottom = 215.0
+offset_left = -37.5
+offset_top = -20.0
+offset_right = 37.5
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-vertical_scroll_mode = 0
 
-[node name="ItemsRow" type="HBoxContainer" parent="ScrollContainer" unique_id=222867422]
+[node name="TextureRect" type="TextureRect" parent="AllAboveButtons/AboveButtons/specialButton/HBoxContainer" unique_id=1838057708]
+custom_minimum_size = Vector2(40, 20)
 layout_mode = 2
-theme_override_constants/separation = 25
+texture = ExtResource("7_iodwl")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="ShopHTTPRequest" type="HTTPRequest" parent="." unique_id=1426028579]
+[node name="Label" type="Label" parent="AllAboveButtons/AboveButtons/specialButton/HBoxContainer" unique_id=749903846]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "ویژه"
 
-[node name="BuyHTTPRequest" type="HTTPRequest" parent="." unique_id=827195105]
+[node name="CharacterButton" type="Button" parent="AllAboveButtons/AboveButtons" unique_id=283051692]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_w2xyw")
 
-[node name="BackButton" type="Button" parent="." unique_id=1232871779]
+[node name="HBoxContainer" type="HBoxContainer" parent="AllAboveButtons/AboveButtons/CharacterButton" unique_id=601590353]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -20.0
+offset_right = 37.5
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="AllAboveButtons/AboveButtons/CharacterButton/HBoxContainer" unique_id=372128399]
+custom_minimum_size = Vector2(40, 20)
+layout_mode = 2
+texture = ExtResource("8_w2xyw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="AllAboveButtons/AboveButtons/CharacterButton/HBoxContainer" unique_id=1316898663]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "کارکتر ها"
+
+[node name="WeaponButton" type="Button" parent="AllAboveButtons/AboveButtons" unique_id=1445258762]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_jf422")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AllAboveButtons/AboveButtons/WeaponButton" unique_id=2094751567]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -20.0
+offset_right = 37.5
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="AllAboveButtons/AboveButtons/WeaponButton/HBoxContainer" unique_id=1884563754]
+custom_minimum_size = Vector2(40, 20)
+layout_mode = 2
+texture = ExtResource("9_431e4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="AllAboveButtons/AboveButtons/WeaponButton/HBoxContainer" unique_id=495008213]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "تفنگ ها"
+
+[node name="CoingemButton" type="Button" parent="AllAboveButtons/AboveButtons" unique_id=533298170]
+custom_minimum_size = Vector2(150, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_8rjed")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AllAboveButtons/AboveButtons/CoingemButton" unique_id=95660908]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -20.0
+offset_right = 37.5
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="AllAboveButtons/AboveButtons/CoingemButton/HBoxContainer" unique_id=1450591143]
+custom_minimum_size = Vector2(40, 20)
+layout_mode = 2
+texture = ExtResource("10_jf422")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="AllAboveButtons/AboveButtons/CoingemButton/HBoxContainer" unique_id=1384700313]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "سکه و قلب"
+
+[node name="SectionMenu" type="Control" parent="." unique_id=1972178302]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 23.0
+offset_top = 104.0
+offset_right = -25.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SpecialTab" type="Control" parent="SectionMenu" unique_id=1077499662]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SuggestUp" type="Control" parent="SectionMenu/SpecialTab" unique_id=700000002]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.655
+anchor_bottom = 0.27
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="TextureRect" parent="SectionMenu/SpecialTab/SuggestUp" unique_id=700000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("24_ut7mi")
+expand_mode = 1
+
+[node name="PercentBg" type="TextureRect" parent="SectionMenu/SpecialTab/SuggestUp" unique_id=700000004]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.885
+anchor_top = 0.1
+anchor_right = 0.972
+anchor_bottom = 0.4
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("25_rqxp1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/SpecialTab/SuggestUp/PercentBg" unique_id=700000005]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 17
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BuyButton" type="TextureButton" parent="SectionMenu/SpecialTab/SuggestUp" unique_id=700000006]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.775
+anchor_top = 0.58
+anchor_right = 0.968
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("26_khpqw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="FirstamountLabel" type="RichTextLabel" parent="SectionMenu/SpecialTab/SuggestUp/BuyButton" unique_id=700000007]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.27
+anchor_right = 0.37
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 0.45, 0.45, 0.65)
+theme_override_fonts/normal_font = ExtResource("3_3iium")
+theme_override_font_sizes/normal_font_size = 15
+text = ""
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+autowrap_mode = 0
+
+[node name="LastamountLabel" type="Label" parent="SectionMenu/SpecialTab/SuggestUp/BuyButton" unique_id=700000009]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.06
+anchor_right = 0.68
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 23
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/SpecialTab/SuggestUp" unique_id=700000010]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.022
+anchor_top = 0.04
+anchor_right = 0.4
+anchor_bottom = 0.66
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/SpecialTab/SuggestUp/VBoxContainer" unique_id=700000011]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 29
+text = "بسته ویژه "
+clip_text = true
+
+[node name="NameLabel" type="Label" parent="SectionMenu/SpecialTab/SuggestUp/VBoxContainer" unique_id=700000012]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "ak-47 ویژه"
+clip_text = true
+
+[node name="ItemImg" type="TextureRect" parent="SectionMenu/SpecialTab/SuggestUp" unique_id=700000013]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4
+anchor_top = 0.03
+anchor_right = 0.88
+anchor_bottom = 0.97
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("14_431e4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SuggestSec" type="Control" parent="SectionMenu/SpecialTab" unique_id=700000014]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.295
+anchor_right = 0.655
+anchor_bottom = 0.615
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="TextureRect" parent="SectionMenu/SpecialTab/SuggestSec" unique_id=700000015]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("28_iodwl")
+expand_mode = 1
+
+[node name="Label2" type="Label" parent="SectionMenu/SpecialTab/SuggestSec" unique_id=700000016]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.016
+anchor_top = 0.02
+anchor_right = 0.145
+anchor_bottom = 0.19
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 16
+text = " روز تا اتمام"
+vertical_alignment = 1
+clip_text = true
+
+[node name="Label" type="Label" parent="SectionMenu/SpecialTab/SuggestSec" unique_id=700000017]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.145
+anchor_top = 0.02
+anchor_right = 0.19
+anchor_bottom = 0.19
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.25, 0.25, 1)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 16
+text = "7"
+vertical_alignment = 1
+clip_text = true
+
+[node name="WeeklyContainer" type="HBoxContainer" parent="SectionMenu/SpecialTab/SuggestSec" unique_id=700000018]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.015
+anchor_top = 0.21
+anchor_right = 0.985
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="SuggestBottom" type="Control" parent="SectionMenu/SpecialTab" unique_id=700000019]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.64
+anchor_right = 0.655
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="TextureRect" parent="SectionMenu/SpecialTab/SuggestBottom" unique_id=700000020]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("29_612nc")
+expand_mode = 1
+
+[node name="SpecialContainer" type="HBoxContainer" parent="SectionMenu/SpecialTab/SuggestBottom" unique_id=700000021]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.022
+anchor_top = 0.06
+anchor_right = 0.705
+anchor_bottom = 0.94
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="VipControl" type="Control" parent="SectionMenu/SpecialTab" unique_id=700000022]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.45
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="TextureRect" parent="SectionMenu/SpecialTab/VipControl" unique_id=700000023]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("17_w2xyw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/SpecialTab/VipControl/Bg" unique_id=700000024]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.805
+anchor_right = 0.48
+anchor_bottom = 0.945
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 26
+text = "200"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="OpenButton" type="Button" parent="SectionMenu/SpecialTab/VipControl" unique_id=700000090]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_xmksa")
+
+[node name="GemControl" type="Control" parent="SectionMenu/SpecialTab" unique_id=700000025]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.47
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bg" type="TextureRect" parent="SectionMenu/SpecialTab/GemControl" unique_id=700000026]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("31_w2xyw")
+expand_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/SpecialTab/GemControl" unique_id=700000027]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.04
+anchor_top = 0.06
+anchor_right = 0.96
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Pack1" type="TextureButton" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer" unique_id=700000028]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+texture_normal = ExtResource("32_w2xyw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CountLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack1" unique_id=700000029]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.08
+anchor_right = 0.32
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 17
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BonusLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack1" unique_id=700000030]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.12
+anchor_right = 0.45
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.21, 1)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="OldPriceLabel" type="RichTextLabel" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack1" unique_id=700000031]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46
+anchor_top = 0.3
+anchor_right = 0.66
+anchor_bottom = 0.78
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 0.62)
+theme_override_fonts/normal_font = ExtResource("3_3iium")
+theme_override_font_sizes/normal_font_size = 12
+text = ""
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+autowrap_mode = 0
+
+[node name="PriceLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack1" unique_id=700000033]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.08
+anchor_right = 0.98
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="Pack2" type="TextureButton" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer" unique_id=700000034]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+texture_normal = ExtResource("32_w2xyw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CountLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack2" unique_id=700000035]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.08
+anchor_right = 0.32
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 17
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BonusLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack2" unique_id=700000036]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.12
+anchor_right = 0.45
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.21, 1)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="OldPriceLabel" type="RichTextLabel" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack2" unique_id=700000037]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46
+anchor_top = 0.3
+anchor_right = 0.66
+anchor_bottom = 0.78
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 0.62)
+theme_override_fonts/normal_font = ExtResource("3_3iium")
+theme_override_font_sizes/normal_font_size = 12
+text = ""
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+autowrap_mode = 0
+
+[node name="PriceLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack2" unique_id=700000039]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.08
+anchor_right = 0.98
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="Pack3" type="TextureButton" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer" unique_id=700000040]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+texture_normal = ExtResource("32_w2xyw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CountLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack3" unique_id=700000041]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.08
+anchor_right = 0.32
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 17
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BonusLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack3" unique_id=700000042]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.12
+anchor_right = 0.45
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.21, 1)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="OldPriceLabel" type="RichTextLabel" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack3" unique_id=700000043]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46
+anchor_top = 0.3
+anchor_right = 0.66
+anchor_bottom = 0.78
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 0.62)
+theme_override_fonts/normal_font = ExtResource("3_3iium")
+theme_override_font_sizes/normal_font_size = 12
+text = ""
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+autowrap_mode = 0
+
+[node name="PriceLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack3" unique_id=700000045]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.08
+anchor_right = 0.98
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="Pack4" type="TextureButton" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer" unique_id=700000046]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+texture_normal = ExtResource("32_w2xyw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CountLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack4" unique_id=700000047]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.08
+anchor_right = 0.32
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 17
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="BonusLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack4" unique_id=700000048]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.33
+anchor_top = 0.12
+anchor_right = 0.45
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.21, 1)
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="OldPriceLabel" type="RichTextLabel" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack4" unique_id=700000049]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.46
+anchor_top = 0.3
+anchor_right = 0.66
+anchor_bottom = 0.78
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(1, 1, 1, 0.62)
+theme_override_fonts/normal_font = ExtResource("3_3iium")
+theme_override_font_sizes/normal_font_size = 12
+text = ""
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+autowrap_mode = 0
+
+[node name="PriceLabel" type="Label" parent="SectionMenu/SpecialTab/GemControl/VBoxContainer/Pack4" unique_id=700000051]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.67
+anchor_top = 0.08
+anchor_right = 0.98
+anchor_bottom = 0.92
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="CharactersTab" type="Control" parent="SectionMenu" unique_id=1122595219]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharacterCards" type="Control" parent="SectionMenu/CharactersTab" unique_id=1958446766]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.465
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="SectionMenu/CharactersTab/CharacterCards" unique_id=305911784]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.09, 0.09, 0.9607843)
+
+[node name="CharacterScrollView" type="ScrollContainer" parent="SectionMenu/CharactersTab/CharacterCards" unique_id=820826234]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 31.0
+offset_top = 12.0
+offset_right = -26.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="CharacterGrid" type="GridContainer" parent="SectionMenu/CharactersTab/CharacterCards/CharacterScrollView" unique_id=1822378859]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="CardShow" type="Control" parent="SectionMenu/CharactersTab" unique_id=731784385]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.49
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/CharactersTab/CardShow" unique_id=620774559]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0, 0.6500001, 1, 1)
+border_width = 3.0
+editor_only = false
+
+[node name="Background" type="TextureRect" parent="SectionMenu/CharactersTab/CardShow" unique_id=1284713959]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_w2xyw")
+
+[node name="RaretyIcon" type="TextureRect" parent="SectionMenu/CharactersTab/CardShow" unique_id=317924130]
+layout_mode = 1
+offset_left = 19.0
+offset_top = 10.0
+offset_right = 59.0
+offset_bottom = 50.0
+texture = ExtResource("22_iq8en")
+
+[node name="NameLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow" unique_id=47742378]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -100.0
-offset_top = 28.0
-offset_right = -31.0
-offset_bottom = 70.0
+offset_left = -385.0
+offset_top = 10.0
+offset_right = -19.0
+offset_bottom = 79.0
 grow_horizontal = 0
-pivot_offset = Vector2(35, 22)
-theme_override_fonts/font = ExtResource("3_3iium")
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = SubResource("StyleBoxEmpty_jlvir")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_rpouk")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_3iium")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_7peon")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_1l5d0")
-text = "بازگشت"
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 47
+text = "اسکین "
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
+[node name="CharacterImage" type="TextureRect" parent="SectionMenu/CharactersTab/CardShow" unique_id=1824722554]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -229.5
+offset_right = 287.0
+offset_bottom = 229.5
+grow_vertical = 2
+texture = ExtResource("22_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BuyButton" type="Button" parent="SectionMenu/CharactersTab/CardShow" unique_id=814623940]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 13.0
+offset_top = -78.0
+offset_right = -21.0
+offset_bottom = -13.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_wrbhv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_woctq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ava33")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_v2d5m")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8i5mh")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/BuyButton" unique_id=1183755302]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TypeIcon" type="TextureRect" parent="SectionMenu/CharactersTab/CardShow/BuyButton/HBoxContainer" unique_id=429013025]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/CharactersTab/CardShow/BuyButton/HBoxContainer" unique_id=1206812986]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 32
+text = "20000"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/CharactersTab/CardShow" unique_id=1138173949]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 221.0
+offset_top = 95.0
+offset_right = -13.0
+offset_bottom = -110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+
+[node name="MovementSpeed" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=24840992]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/MovementSpeed" unique_id=1787698265]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/MovementSpeed" unique_id=1013779815]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/MovementSpeed/ColorRect" unique_id=1946492388]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/MovementSpeed" unique_id=829464095]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "سرعت حرکت"
+
+[node name="ShootingAccuracy" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=141257424]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ShootingAccuracy" unique_id=1689410156]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ShootingAccuracy" unique_id=577688782]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ShootingAccuracy/ColorRect" unique_id=215869357]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ShootingAccuracy" unique_id=1291731104]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "دقت تیراندازی"
+
+[node name="HandSpeed" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=1134236485]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HandSpeed" unique_id=1522074745]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HandSpeed" unique_id=962763600]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HandSpeed/ColorRect" unique_id=364719077]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HandSpeed" unique_id=1366710889]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "سرعت دست"
+
+[node name="ThrowingRange" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=386113739]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ThrowingRange" unique_id=797652417]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ThrowingRange" unique_id=693052480]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ThrowingRange/ColorRect" unique_id=354549923]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/ThrowingRange" unique_id=1022830498]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "برد پرتاب"
+
+[node name="Health" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=164241762]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/Health" unique_id=2002124452]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/Health" unique_id=1421518246]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/Health/ColorRect" unique_id=619568642]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/Health" unique_id=48335397]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "جان"
+
+[node name="HealthRegen" type="HBoxContainer" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer" unique_id=1268171141]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HealthRegen" unique_id=2120882636]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HealthRegen" unique_id=783018954]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HealthRegen/ColorRect" unique_id=578092716]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/CharactersTab/CardShow/VBoxContainer/HealthRegen" unique_id=951822628]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "بازیابی جان"
+
+[node name="WeaponsTab" type="Control" parent="SectionMenu" unique_id=1542619529]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="SectionMenu/WeaponsTab" unique_id=1040681362]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.6
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control" unique_id=888235727]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.04, 0.96862745)
+
+[node name="WeaponScrollView" type="ScrollContainer" parent="SectionMenu/WeaponsTab/Control" unique_id=1911249587]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 45.0
+offset_top = 34.0
+offset_right = -63.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="WeaponGrid" type="GridContainer" parent="SectionMenu/WeaponsTab/Control/WeaponScrollView" unique_id=1441259588]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="Control2" type="Control" parent="SectionMenu/WeaponsTab" unique_id=1610312209]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.615
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2" unique_id=603480714]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.90588236)
+
+[node name="Background" type="TextureRect" parent="SectionMenu/WeaponsTab/Control2" unique_id=1921396040]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -299.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_wrbhv")
+
+[node name="WeaponImage" type="TextureRect" parent="SectionMenu/WeaponsTab/Control2" unique_id=1631238625]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = 10.0
+offset_right = -18.0
+offset_bottom = -323.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("14_431e4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/WeaponsTab/Control2" unique_id=231074109]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(1.347661e-06, 0.3468637, 0.9187199, 1)
+border_width = 4.0
+editor_only = false
+
+[node name="NameLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2" unique_id=651296943]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -302.0
+offset_top = 9.0
+offset_right = -17.0
+offset_bottom = 52.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 29
+text = "ای کی 47"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BuyButton" type="Button" parent="SectionMenu/WeaponsTab/Control2" unique_id=570586288]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -78.0
+offset_right = -13.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_xmksa")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_wu28h")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_67fxp")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_sd7f7")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_kkmuj")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/BuyButton" unique_id=1340406074]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.36455697
+anchor_top = 0.17741935
+anchor_right = 0.63544303
+anchor_bottom = 0.82258064
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="TypeIcon" type="TextureRect" parent="SectionMenu/WeaponsTab/Control2/BuyButton/HBoxContainer" unique_id=1496820420]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AmountLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/BuyButton/HBoxContainer" unique_id=1192250335]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 29
+text = "15000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/WeaponsTab/Control2" unique_id=292995905]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -192.0
+offset_top = -37.0
+offset_right = 194.0
+offset_bottom = 163.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 25
+
+[node name="Power" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer" unique_id=2093584262]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Power" unique_id=1273825862]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Power" unique_id=656807361]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Power/ColorRect" unique_id=1507538207]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Power" unique_id=1195049908]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "قدرت"
+
+[node name="Accuracy" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer" unique_id=1239589328]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Accuracy" unique_id=924725991]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Accuracy" unique_id=54788244]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Accuracy/ColorRect" unique_id=142647099]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Accuracy" unique_id=955139599]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "دقت"
+
+[node name="Range" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer" unique_id=307805503]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Range" unique_id=1957644957]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Range" unique_id=864961339]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Range/ColorRect" unique_id=1283434358]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Range" unique_id=1031748134]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "برد"
+
+[node name="Speed" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer" unique_id=1793990171]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Speed" unique_id=1150811687]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Speed" unique_id=558539473]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Speed/ColorRect" unique_id=95427283]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Speed" unique_id=148964205]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "سرعت"
+
+[node name="Control" type="HBoxContainer" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer" unique_id=95161531]
+layout_mode = 2
+
+[node name="ValueLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Control" unique_id=2047285601]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "1/100"
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Control" unique_id=333444628]
+custom_minimum_size = Vector2(300, 20)
+layout_mode = 2
+color = Color(0.08701602, 0.08701608, 0.08701607, 0.72156864)
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Control/ColorRect" unique_id=1646061502]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -193.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.43, 0, 0.035833403, 0.7372549)
+
+[node name="TitleLabel" type="Label" parent="SectionMenu/WeaponsTab/Control2/VBoxContainer/Control" unique_id=1818556611]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("11_t0t3w")
+text = "کنترل"
+
+[node name="RaretyIcon" type="TextureRect" parent="SectionMenu/WeaponsTab/Control2" unique_id=1380994971]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 11.0
+offset_right = 51.0
+offset_bottom = 51.0
+texture = ExtResource("22_iq8en")
+
+[node name="GemandcoinTab" type="Control" parent="SectionMenu" unique_id=1222238199]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="SectionMenu/GemandcoinTab" unique_id=199605276]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.62
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control" unique_id=1039713170]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.11, 0.11, 0.9411765)
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="SectionMenu/GemandcoinTab/Control" unique_id=722078242]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3" unique_id=192937033]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer" unique_id=1032465434]
+layout_mode = 2
+theme_override_colors/font_color = Color(18.892157, 18.892157, 0, 1)
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 29
+text = "طلا"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer" unique_id=1925157588]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Item1" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer" unique_id=1160068594]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=807944170]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=760000002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=815109723]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("25_nkmtg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=1716868182]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(14.581903, 8.894764, 0, 1)
+editor_only = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=1166769596]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1/HBoxContainer" unique_id=1150725990]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1/HBoxContainer" unique_id=1886891267]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "1000 سکه"
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item1" unique_id=1104411314]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_je8us")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fyt36")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ayq26")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fgxbe")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hctgt")
+text = "20 قلب"
+
+[node name="Item2" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer" unique_id=1651363162]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=2018025498]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=760000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=1218368087]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("26_le88e")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=962142723]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(14.581903, 8.894764, 0, 1)
+editor_only = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=436760046]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2/HBoxContainer" unique_id=1758430378]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2/HBoxContainer" unique_id=1002518773]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "25000 سکه"
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item2" unique_id=1934269379]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_je8us")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fyt36")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ayq26")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fgxbe")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hctgt")
+text = "35 قلب"
+
+[node name="Item3" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer" unique_id=948464353]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=2048912472]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=760000004]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=603907482]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("27_w1ny7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=204036605]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(14.581903, 8.894764, 0, 1)
+editor_only = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=789998764]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3/HBoxContainer" unique_id=1874906766]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3/HBoxContainer" unique_id=524371845]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "50000 سکه"
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item3" unique_id=595746858]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_je8us")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fyt36")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ayq26")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fgxbe")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hctgt")
+text = "70 قلب"
+
+[node name="Item4" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer" unique_id=41094024]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=1617447195]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=760000005]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=1348639394]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("28_uvxeq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=506250417]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(14.581903, 8.894764, 0, 1)
+editor_only = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=580994526]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4/HBoxContainer" unique_id=196752835]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("23_8rjed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4/HBoxContainer" unique_id=1156856676]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "10000 سکه"
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer/HBoxContainer/Item4" unique_id=163628881]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_je8us")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fyt36")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ayq26")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fgxbe")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hctgt")
+text = "120 قلب"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3" unique_id=2022720442]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2" unique_id=1568449261]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9384631, 0.12499213, 0.34191746, 1)
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 29
+text = "قلب"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2" unique_id=536810688]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Item1" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer" unique_id=1292397037]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=303582512]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=760000006]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=1962081057]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("29_w1ny7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=764909788]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1/HBoxContainer" unique_id=1597303447]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("30_uvxeq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1/HBoxContainer" unique_id=1961927722]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "100 قلب"
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=336218692]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(13.239021, 0, 6.098455, 1)
+editor_only = false
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item1" unique_id=1373697552]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_fc3su")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_8yfau")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f8vdn")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_kppcv")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_chqc6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_oq0vd")
+text = "50 هزارتومان"
+
+[node name="Item2" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer" unique_id=1268476467]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=1700539615]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=760000007]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=995437296]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("31_kppcv")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=1182450542]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2/HBoxContainer" unique_id=1586241696]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("30_uvxeq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2/HBoxContainer" unique_id=900187911]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "200 قلب"
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=458967865]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(13.239021, 0, 6.098455, 1)
+editor_only = false
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item2" unique_id=1305652411]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_fc3su")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_8yfau")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f8vdn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_chqc6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_oq0vd")
+text = "100 هزارتومان"
+
+[node name="Item3" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer" unique_id=1288722307]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=1723021591]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=760000008]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=1753065235]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("32_igbub")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=1597243468]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3/HBoxContainer" unique_id=287968064]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("30_uvxeq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3/HBoxContainer" unique_id=378925555]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "300 قلب"
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=1420901920]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(13.239021, 0, 6.098455, 1)
+editor_only = false
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item3" unique_id=716943241]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_fc3su")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_8yfau")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f8vdn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_chqc6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_oq0vd")
+text = "150 هزارتومان"
+
+[node name="Item4" type="Control" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer" unique_id=1202284236]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=1719987071]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.0935, 0, 0.5882353)
+
+[node name="CardBg" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=760000009]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("60_arzbg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="TextureButton" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=1463890393]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 30.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("33_8u7hg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=1407323407]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 28.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4/HBoxContainer" unique_id=271718280]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("30_uvxeq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4/HBoxContainer" unique_id=1385554683]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_3iium")
+text = "400 قلب"
+
+[node name="ReferenceRect" type="ReferenceRect" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=217909526]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(13.239021, 0, 6.098455, 1)
+editor_only = false
+
+[node name="BuyButton" type="Button" parent="SectionMenu/GemandcoinTab/Control/VBoxContainer3/VBoxContainer2/HBoxContainer/Item4" unique_id=488095382]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = -54.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_3iium")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_fc3su")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_8yfau")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f8vdn")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_chqc6")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_oq0vd")
+text = "200 هزارتومان"
+
+[node name="Control2" type="Control" parent="SectionMenu/GemandcoinTab" unique_id=131767613]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.635
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect2" type="ColorRect" parent="SectionMenu/GemandcoinTab/Control2" unique_id=1238461957]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.88235295)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SectionMenu/GemandcoinTab/Control2" unique_id=1158180216]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="SectionMenu/GemandcoinTab/Control2/VBoxContainer" unique_id=1525168193]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("25_sb8kn")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SectionMenu/GemandcoinTab/Control2/VBoxContainer" unique_id=2114416560]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VideoButton" type="TextureButton" parent="SectionMenu/GemandcoinTab/Control2/VBoxContainer/HBoxContainer" unique_id=2138692398]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture_normal = ExtResource("26_vxisy")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CodeButton" type="TextureButton" parent="SectionMenu/GemandcoinTab/Control2/VBoxContainer/HBoxContainer" unique_id=691347685]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+texture_normal = ExtResource("27_rqt25")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="SectionMenu/GemandcoinTab/Control2" unique_id=650587763]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -103.0
+offset_top = 13.0
+offset_right = -14.0
+offset_bottom = 39.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(15.657193, 8.143039, 0.00019713964, 1)
+theme_override_fonts/font = ExtResource("11_t0t3w")
+theme_override_font_sizes/font_size = 25
+text = "خرید ارز"
+
+[node name="TopBar" parent="." instance=ExtResource("50_topbar")]
+
+[node name="HomeButton" type="TextureButton" parent="." unique_id=245278659]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -80.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("49_igbub")
+ignore_texture_size = true
+stretch_mode = 5
+
+[connection signal="pressed" from="HomeButton" to="." method="_on_home_button_pressed"]

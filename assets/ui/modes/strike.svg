@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- عملیات ضربت: سپر + آذرخش. تک‌رنگِ سفید تا با رنگِ خودِ حالت تینت شود؛
+       جاهای کم‌رنگ‌تر بعد از تینت سایه‌ی همان رنگ می‌شوند. -->
+  <path d="M32 4 L56 12 V32 C56 46 45 56 32 60 C19 56 8 46 8 32 V12 Z"
+        fill="#fff" fill-opacity=".16"/>
+  <path d="M32 4 L56 12 V32 C56 46 45 56 32 60 C19 56 8 46 8 32 V12 Z"
+        fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M35 14 L20 35 H30 L28 50 L44 28 H33 Z" fill="#fff"/>
+</svg>

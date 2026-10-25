@@ -1,0 +1,16 @@
+# assets بازی (تصویر و صدا) ساختار پروژه نیستند — طبق CLAUDE.md وارد گراف نمی‌شوند.
+# بدون این فایل، هر graphify --update سیصد تصویر را دوباره به vision می‌فرستد.
+assets/
+fonts/
+resources/*.png
+
+# خروجی‌ها و کش‌ها
+.godot/
+graphify-out/
+node_modules/
+addons/
+
+# فایل‌های موقتِ ادیتور Godot
+*.tmp
+*.uid
+icon.svg

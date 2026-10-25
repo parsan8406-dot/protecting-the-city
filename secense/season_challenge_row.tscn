@@ -1,0 +1,112 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/season_challenge_row.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Texture2D" path="res://assets/ui/coin_icon.png" id="4_coin"]
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.086, 0.125, 0.184, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.176, 0.553, 0.878, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="SeasonChallengeRow" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+offset_right = 620.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_constants/separation = 10
+script = ExtResource("1_script")
+
+[node name="ActionButton" type="Button" parent="."]
+custom_minimum_size = Vector2(78, 30)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.4, 0.47, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/focus = SubResource("SB_focus")
+text = "رفتن"
+
+[node name="Reward" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="TextureRect" parent="Reward"]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("4_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Reward"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "—"
+vertical_alignment = 1
+
+[node name="AmountLabel" type="Label" parent="."]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 13
+text = "—"
+vertical_alignment = 1
+
+[node name="Info" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="Bar" type="ProgressBar" parent="Info"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+value = 0.0
+show_percentage = false
+
+[node name="Icon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

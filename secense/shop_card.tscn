@@ -1,0 +1,155 @@
+[gd_scene format=3 uid="uid://b8ptikdmyf8cg"]
+
+[ext_resource type="Script" uid="uid://3gtromo2xwlx" path="res://scripts/shop_card.gd" id="1_6l7j4"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_y7ksf"]
+[ext_resource type="Texture2D" uid="uid://dkwjqjst41cyj" path="res://assets/ui/gem_icon.png" id="3_7152v"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="4_lalezar"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_wrbhv"]
+
+[node name="ShopCard" type="Control" unique_id=1913788539]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 120.0
+offset_bottom = 120.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 1
+script = ExtResource("1_6l7j4")
+
+[node name="Background" type="TextureRect" parent="." unique_id=264529160]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("CanvasTexture_wrbhv")
+
+[node name="Border" type="ReferenceRect" parent="." unique_id=1126255759]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+border_color = Color(1, 1, 1, 0.8)
+border_width = 2.0
+editor_only = false
+
+[node name="ItemTexture" type="TextureRect" parent="." unique_id=931517578]
+custom_minimum_size = Vector2(120, 75)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.0
+offset_bottom = -26.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="." unique_id=1109685716]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5019608)
+theme_override_fonts/font = ExtResource("2_y7ksf")
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="DiscountBadge" type="ColorRect" parent="." unique_id=782275682]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -12.0
+offset_right = 40.0
+offset_bottom = 12.0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0, 0, 0.5294118)
+
+[node name="DiscountLabel" type="Label" parent="DiscountBadge" unique_id=1869823]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_lalezar")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PriceBar" type="PanelContainer" parent="." unique_id=1968610047]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+
+[node name="PriceContainer" type="HBoxContainer" parent="PriceBar" unique_id=857544067]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="OriginalPriceContainer" type="Control" parent="PriceBar/PriceContainer" unique_id=108237135]
+custom_minimum_size = Vector2(34, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="OldPriceLabel" type="Label" parent="PriceBar/PriceContainer/OriginalPriceContainer" unique_id=1298906500]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0, 0, 0.4509804)
+theme_override_fonts/font = ExtResource("4_lalezar")
+theme_override_font_sizes/font_size = 14
+text = "25"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StrikeThroughLine" type="ColorRect" parent="PriceBar/PriceContainer/OriginalPriceContainer" unique_id=1811580689]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0, 0, 0.53333336)
+
+[node name="FinalPriceLabel" type="Label" parent="PriceBar/PriceContainer" unique_id=765437223]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_lalezar")
+theme_override_font_sizes/font_size = 17
+
+[node name="CurrencyIcon" type="TextureRect" parent="PriceBar/PriceContainer" unique_id=168620967]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_7152v")
+expand_mode = 1
+stretch_mode = 5

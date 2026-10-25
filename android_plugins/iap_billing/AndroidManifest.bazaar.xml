@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.coffeebaz.gungame.iap.bazaar">
+
+    <uses-permission android:name="com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR" />
+
+    <!-- اندروید ۱۱+ بدون این، اپ بازار و سرویسِ پرداختش را نمی‌بیند -->
+    <queries>
+        <package android:name="com.farsitel.bazaar" />
+        <intent>
+            <action android:name="ir.cafebazaar.pardakht.InAppBillingService.BIND" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
+
+    <application>
+        <meta-data
+            android:name="org.godotengine.plugin.v2.BazaarBilling"
+            android:value="com.coffeebaz.gungame.iap.BazaarBillingPlugin" />
+
+        <!-- صفحه‌ی پرداختِ بازار از این اکتیویتیِ نامرئی باز می‌شود -->
+        <activity
+            android:name="com.coffeebaz.gungame.iap.BillingProxyActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+
+        <!-- جواب‌های بازار در مسیرِ Broadcast -->
+        <receiver
+            android:name="com.coffeebaz.gungame.iap.BillingBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.farsitel.bazaar.ping" />
+                <action android:name="com.farsitel.bazaar.purchase" />
+                <action android:name="com.farsitel.bazaar.getPurchase" />
+                <action android:name="com.farsitel.bazaar.billingSupport" />
+                <action android:name="com.farsitel.bazaar.skuDetail" />
+                <action android:name="com.farsitel.bazaar.consume" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

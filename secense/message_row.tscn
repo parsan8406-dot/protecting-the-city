@@ -1,0 +1,176 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/message_row.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_messages.svg" id="3_envelope"]
+
+[sub_resource type="StyleBoxFlat" id="SB_row_normal"]
+bg_color = Color(1, 1, 1, 0)
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.38, 0.35)
+
+[sub_resource type="StyleBoxFlat" id="SB_row_pressed"]
+bg_color = Color(1, 0.9, 0.6, 0.08)
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.38, 0.35)
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[sub_resource type="StyleBoxFlat" id="SB_selected"]
+bg_color = Color(0.13, 0.11, 0.03, 0.75)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 3
+border_width_bottom = 1
+border_color = Color(0.72, 0.53, 0.14, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_dot"]
+bg_color = Color(0.93, 0.13, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.05, 0.05, 0.06, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MessageRow" type="Button"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_row_normal")
+theme_override_styles/pressed = SubResource("SB_row_pressed")
+theme_override_styles/hover_pressed = SubResource("SB_row_pressed")
+theme_override_styles/normal = SubResource("SB_row_normal")
+script = ExtResource("1_script")
+
+[node name="SelectedFrame" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_selected")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Row" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="DismissButton" type="Button" parent="Margin/Row"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "✕"
+
+[node name="ActionButton" type="Button" parent="Margin/Row"]
+custom_minimum_size = Vector2(128, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "مشاهده"
+
+[node name="Info" type="VBoxContainer" parent="Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TopLine" type="HBoxContainer" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="TimeLabel" type="Label" parent="Margin/Row/Info/TopLine"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.52, 0.52, 0.56, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Margin/Row/Info/TopLine"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "پیام از بازی"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="PreviewLabel" type="Label" parent="Margin/Row/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.63, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "—"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="IconSlot" type="Control" parent="Margin/Row"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="TypeIcon" type="TextureRect" parent="Margin/Row/IconSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_envelope")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="UnreadDot" type="Panel" parent="Margin/Row/IconSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -3.0
+offset_right = 4.0
+offset_bottom = 11.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_dot")

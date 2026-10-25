@@ -1,0 +1,1007 @@
+[gd_scene load_steps=30 format=3]
+
+[ext_resource type="Script" path="res://scripts/city.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_display"]
+[ext_resource type="PackedScene" path="res://secense/top_bar.tscn" id="4_topbar"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/bg_missions.png" id="5_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/season_banner_bg.png" id="6_header_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/motive_bg.png" id="7_banner_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/rank/icon_arrow_back.svg" id="8_back"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_help.svg" id="9_help"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_cup.png" id="10_trophy"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_ranking.svg" id="11_ranking"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_clan.svg" id="12_city"]
+[ext_resource type="Script" path="res://scripts/city_emblem.gd" id="13_emblem"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_friends.svg" id="14_friends"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_star.svg" id="15_star"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_edit.svg" id="16_edit"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_messages.svg" id="17_requests"]
+
+[sub_resource type="Gradient" id="G_shade"]
+colors = PackedColorArray(0.01, 0.02, 0.05, 0.3, 0.01, 0.02, 0.05, 0.75)
+
+[sub_resource type="GradientTexture2D" id="GT_shade"]
+gradient = SubResource("G_shade")
+width = 16
+height = 128
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="G_tint"]
+colors = PackedColorArray(0.01, 0.03, 0.08, 0.92, 0.01, 0.03, 0.08, 0.15)
+
+[sub_resource type="GradientTexture2D" id="GT_tint"]
+gradient = SubResource("G_tint")
+width = 128
+height = 16
+fill_from = Vector2(0, 0)
+fill_to = Vector2(1, 0)
+
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.02, 0.04, 0.08, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.36, 0.58, 0.8)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.02, 0.04, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.5, 0.82, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 3
+shadow_color = Color(0.1, 0.4, 1, 0.18)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_nav"]
+bg_color = Color(0.02, 0.04, 0.08, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.32, 0.5, 0.7)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+corner_detail = 1
+content_margin_left = 14.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="SB_nav_pressed"]
+bg_color = Color(0.05, 0.14, 0.3, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.6, 1, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+corner_detail = 1
+content_margin_left = 14.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="SB_icon_box"]
+bg_color = Color(0.02, 0.05, 0.1, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.5, 0.85, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 1
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_icon_box_pressed"]
+bg_color = Color(0.06, 0.18, 0.38, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.35, 0.7, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 1
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_badge"]
+bg_color = Color(0.9, 0.12, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.6, 0.55, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 3
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="CityScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_script")
+
+[node name="Base" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.03, 0.06, 1)
+
+[node name="BgImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("5_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Shade" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GT_shade")
+expand_mode = 1
+
+[node name="TopBar" parent="." instance=ExtResource("4_topbar")]
+
+[node name="HeaderLeft" type="HBoxContainer" parent="."]
+layout_mode = 1
+offset_left = 12.0
+offset_top = 5.0
+offset_right = 260.0
+offset_bottom = 51.0
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="BackButton" type="Button" parent="HeaderLeft"]
+custom_minimum_size = Vector2(60, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_icon_box")
+theme_override_styles/pressed = SubResource("SB_icon_box_pressed")
+theme_override_styles/normal = SubResource("SB_icon_box")
+icon = ExtResource("8_back")
+icon_alignment = 1
+expand_icon = true
+
+[node name="TitleLabel" type="Label" parent="HeaderLeft"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 34
+text = "شهرها"
+vertical_alignment = 1
+
+[node name="HelpButton" type="TextureButton" parent="HeaderLeft"]
+modulate = Color(0.72, 0.8, 0.92, 1)
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("9_help")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Content" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 64
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Sidebar" type="VBoxContainer" parent="Content/Body"]
+custom_minimum_size = Vector2(162, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="NavRank" type="Button" parent="Content/Body/Sidebar"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_nav")
+theme_override_styles/pressed = SubResource("SB_nav_pressed")
+theme_override_styles/normal = SubResource("SB_nav")
+
+[node name="Row" type="HBoxContainer" parent="Content/Body/Sidebar/NavRank"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_right = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Sidebar/NavRank/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("10_trophy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Content/Body/Sidebar/NavRank/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "رنک"
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="NavRanking" type="Button" parent="Content/Body/Sidebar"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_nav")
+theme_override_styles/pressed = SubResource("SB_nav_pressed")
+theme_override_styles/normal = SubResource("SB_nav")
+
+[node name="Row" type="HBoxContainer" parent="Content/Body/Sidebar/NavRanking"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_right = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Sidebar/NavRanking/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_ranking")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Content/Body/Sidebar/NavRanking/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "رتبه بندی"
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="NavCity" type="Button" parent="Content/Body/Sidebar"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_nav")
+theme_override_styles/pressed = SubResource("SB_nav_pressed")
+theme_override_styles/normal = SubResource("SB_nav")
+
+[node name="Row" type="HBoxContainer" parent="Content/Body/Sidebar/NavCity"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_right = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Sidebar/NavCity/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("12_city")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Content/Body/Sidebar/NavCity/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "شهر"
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Main" type="VBoxContainer" parent="Content/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 5.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="BrowsePage" type="VBoxContainer" parent="Content/Body/Main"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Toolbar" type="HBoxContainer" parent="Content/Body/Main/BrowsePage"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="SearchEdit" type="LineEdit" parent="Content/Body/Main/BrowsePage/Toolbar"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_colors/font_placeholder_color = Color(0.5, 0.56, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+placeholder_text = "جستجوی نام یا تگ شهر..."
+alignment = 2
+clear_button_enabled = true
+
+[node name="CountLabel" type="Label" parent="Content/Body/Main/BrowsePage/Toolbar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 17
+text = ""
+vertical_alignment = 1
+
+[node name="ListPanel" type="PanelContainer" parent="Content/Body/Main/BrowsePage"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Main/BrowsePage/ListPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Main/BrowsePage/ListPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Scroll" type="ScrollContainer" parent="Content/Body/Main/BrowsePage/ListPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Content/Body/Main/BrowsePage/ListPanel/Margin/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="EmptyLabel" type="Label" parent="Content/Body/Main/BrowsePage/ListPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "در حال بارگذاری..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CityPage" type="VBoxContainer" parent="Content/Body/Main"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderCard" type="PanelContainer" parent="Content/Body/Main/CityPage"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 146)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Bg" type="TextureRect" parent="Content/Body/Main/CityPage/HeaderCard"]
+modulate = Color(1, 1, 1, 0.85)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_header_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Tint" type="TextureRect" parent="Content/Body/Main/CityPage/HeaderCard"]
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("GT_tint")
+expand_mode = 1
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Main/CityPage/HeaderCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Row" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="Emblem" type="Control" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row"]
+custom_minimum_size = Vector2(108, 108)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("13_emblem")
+
+[node name="Info" type="VBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="NameRow" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="NameLabel" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/NameRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 30
+text = "—"
+vertical_alignment = 1
+
+[node name="TagLabel" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/NameRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.72, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.75)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 20
+text = ""
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SloganLabel" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = ""
+text_overrun_behavior = 3
+
+[node name="StatsRow" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="RankStat" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/RankStat"]
+modulate = Color(0.97, 0.78, 0.3, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_ranking")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Col" type="VBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/RankStat"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = -4
+
+[node name="Caption" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/RankStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "رتبه کل شهرها"
+
+[node name="Value" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/RankStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.78, 0.3, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 18
+text = "—"
+
+[node name="MembersStat" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/MembersStat"]
+modulate = Color(0.62, 0.8, 1, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("14_friends")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Col" type="VBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/MembersStat"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = -4
+
+[node name="Caption" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/MembersStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "اعضا"
+
+[node name="Value" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/MembersStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 18
+text = "—"
+
+[node name="LevelStat" type="HBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/LevelStat"]
+modulate = Color(0.62, 0.8, 1, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("15_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Col" type="VBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/LevelStat"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = -4
+
+[node name="Caption" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/LevelStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "سطح شهر"
+
+[node name="Value" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Info/StatsRow/LevelStat/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 18
+text = "—"
+
+[node name="Tools" type="VBoxContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="EditButton" type="Button" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Tools"]
+custom_minimum_size = Vector2(52, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_icon_box")
+theme_override_styles/pressed = SubResource("SB_icon_box_pressed")
+theme_override_styles/normal = SubResource("SB_icon_box")
+icon = ExtResource("16_edit")
+icon_alignment = 1
+expand_icon = true
+
+[node name="RequestsButton" type="Button" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Tools"]
+custom_minimum_size = Vector2(52, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_icon_box")
+theme_override_styles/pressed = SubResource("SB_icon_box_pressed")
+theme_override_styles/normal = SubResource("SB_icon_box")
+icon = ExtResource("17_requests")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Badge" type="PanelContainer" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Tools/RequestsButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -14.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 14.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_badge")
+
+[node name="Count" type="Label" parent="Content/Body/Main/CityPage/HeaderCard/Margin/Row/Tools/RequestsButton/Badge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 13
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Banner" type="PanelContainer" parent="Content/Body/Main/CityPage"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Bg" type="TextureRect" parent="Content/Body/Main/CityPage/Banner"]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("7_banner_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Tint" type="TextureRect" parent="Content/Body/Main/CityPage/Banner"]
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("GT_tint")
+expand_mode = 1
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Main/CityPage/Banner"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
+
+[node name="Row" type="HBoxContainer" parent="Content/Body/Main/CityPage/Banner/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="TextCol" type="VBoxContainer" parent="Content/Body/Main/CityPage/Banner/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="TitleLabel" type="Label" parent="Content/Body/Main/CityPage/Banner/Margin/Row/TextCol"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.8)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 27
+text = "به شهر ما بپیوندید!"
+text_overrun_behavior = 3
+
+[node name="SubLabel" type="Label" parent="Content/Body/Main/CityPage/Banner/Margin/Row/TextCol"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.9, 0.97, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = ""
+text_overrun_behavior = 3
+
+[node name="ActionButton" type="Button" parent="Content/Body/Main/CityPage/Banner/Margin/Row"]
+custom_minimum_size = Vector2(210, 54)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "درخواست عضویت"
+
+[node name="MembersPanel" type="PanelContainer" parent="Content/Body/Main/CityPage"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Main/CityPage/MembersPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Main/CityPage/MembersPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="ColumnHeader" type="HBoxContainer" parent="Content/Body/Main/CityPage/MembersPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Scroll" type="ScrollContainer" parent="Content/Body/Main/CityPage/MembersPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Content/Body/Main/CityPage/MembersPanel/Margin/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="EmptyLabel" type="Label" parent="Content/Body/Main/CityPage/MembersPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "این شهر هنوز عضوی ندارد"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Side" type="VBoxContainer" parent="Content/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.4
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="RewardsPanel" type="PanelContainer" parent="Content/Body/Side"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Side/RewardsPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Side/RewardsPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Content/Body/Side/RewardsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "پاداش‌های شهر"
+horizontal_alignment = 2
+
+[node name="SubLabel" type="Label" parent="Content/Body/Side/RewardsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "با فعالیت در کنار هم‌شهری‌هایت، پاداش بگیر."
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="Tiles" type="HBoxContainer" parent="Content/Body/Side/RewardsPanel/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="InfoPanel" type="PanelContainer" parent="Content/Body/Side"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Side/InfoPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Side/InfoPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="Content/Body/Side/InfoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "اطلاعات شهر"
+horizontal_alignment = 2
+
+[node name="Rows" type="VBoxContainer" parent="Content/Body/Side/InfoPanel/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="CreatePanel" type="PanelContainer" parent="Content/Body/Side"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Side/CreatePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Side/CreatePanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="Content/Body/Side/CreatePanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "شهر خودت را بساز"
+horizontal_alignment = 2
+
+[node name="SubLabel" type="Label" parent="Content/Body/Side/CreatePanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "رهبر شهر خودت شو، نشانش را انتخاب کن و هم‌شهری جمع کن."
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="CostLabel" type="Label" parent="Content/Body/Side/CreatePanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.78, 0.3, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = ""
+horizontal_alignment = 2
+
+[node name="CreateButton" type="Button" parent="Content/Body/Side/CreatePanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "ساخت شهر"
+
+[node name="BenefitsPanel" type="PanelContainer" parent="Content/Body/Side"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_panel")
+
+[node name="Margin" type="MarginContainer" parent="Content/Body/Side/BenefitsPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Content/Body/Side/BenefitsPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Content/Body/Side/BenefitsPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "مزایای پیوستن به شهر"
+horizontal_alignment = 2
+
+[node name="Rows" type="VBoxContainer" parent="Content/Body/Side/BenefitsPanel/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="ActionHTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="RequestsHTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="RefreshTimer" type="Timer" parent="."]
+wait_time = 20.0
+
+[node name="SearchTimer" type="Timer" parent="."]
+wait_time = 0.35
+one_shot = true

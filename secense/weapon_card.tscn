@@ -1,0 +1,302 @@
+[gd_scene format=3 uid="uid://bkj2g4io8oq6w"]
+
+[ext_resource type="Texture2D" uid="uid://bhindjlqc42e6" path="res://assets/sugUp_rarety.png" id="1_4msar"]
+[ext_resource type="Script" uid="uid://b0e8qii21avn4" path="res://scripts/weapon_card.gd" id="1_8ft8x"]
+[ext_resource type="Texture2D" uid="uid://c5cu261jto6qm" path="res://assets/items/ak47.png" id="2_ro8ln"]
+[ext_resource type="Texture2D" uid="uid://dsee88o841l14" path="res://assets/fire.svg" id="2_t7i1j"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="4_gvj11"]
+[ext_resource type="Texture2D" uid="uid://8o276pugfftn" path="res://assets/ui/coin_icon.png" id="5_cfcxc"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="6_8ft8x"]
+
+[sub_resource type="Gradient" id="Gradient_inp7a"]
+colors = PackedColorArray(0.050587423, 0.06996643, 0.11767759, 1, 1.2513996e-06, 0.43924737, 0.7034014, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wrbhv"]
+gradient = SubResource("Gradient_inp7a")
+fill_to = Vector2(1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wrbhv"]
+bg_color = Color(0, 0, 0, 0.7176471)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xmksa"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_je8us"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fc3su"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l0oox"]
+
+[sub_resource type="Animation" id="Animation_cfcxc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fire:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Fire:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(207, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Fire:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("WeaponImage:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("WeaponImage:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_8ft8x"]
+resource_name = "select_card_animation"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Fire:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-0.06666667, 0.06666667, 0.13333334),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Fire:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.13333333),
+"transitions": PackedFloat32Array(1.6817931, 1),
+"update": 0,
+"values": [Vector2(207, 1), Vector2(207, -6)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Fire:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.13333333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("WeaponImage:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.099999994, 0.2, 0.4, 0.5),
+"transitions": PackedFloat32Array(1.4142138, 1, 0.5946035, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("WeaponImage:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.06666667, 0.2, 0.43333334, 0.5),
+"transitions": PackedFloat32Array(0.96593654, 1, 0.5358868, 1),
+"update": 0,
+"values": [0.0, -0.08712179, -0.08712179, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mik2f"]
+_data = {
+&"RESET": SubResource("Animation_cfcxc"),
+&"select_card_animation": SubResource("Animation_8ft8x")
+}
+
+[node name="WeaponCard" type="Control" unique_id=1242281012]
+custom_minimum_size = Vector2(160, 60)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -892.0
+offset_bottom = -489.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8ft8x")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=372996268]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_wrbhv")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="." unique_id=1243782852]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0, 0.550118, 0.81605136, 1)
+border_width = 4.0
+editor_only = false
+
+[node name="RaretyIcon" type="TextureRect" parent="." unique_id=860276708]
+layout_mode = 1
+offset_left = 6.0
+offset_top = 5.0
+offset_right = 29.0
+offset_bottom = 29.0
+texture = ExtResource("1_4msar")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WeaponImage" type="TextureRect" parent="." unique_id=1150139419]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -37.0
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ro8ln")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Fire" type="TextureRect" parent="." unique_id=1026782509]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -53.0
+offset_top = -78.5
+offset_right = 1.0
+offset_bottom = 21.5
+grow_horizontal = 0
+grow_vertical = 2
+texture = ExtResource("2_t7i1j")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="." unique_id=1314360999]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -114.0
+offset_top = 3.0
+offset_right = -4.0
+offset_bottom = 39.0
+grow_horizontal = 0
+pivot_offset = Vector2(109, 15)
+theme_override_fonts/font = ExtResource("4_gvj11")
+text = "ای کی 47"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BuyButton" type="Button" parent="." unique_id=153040228]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = -56.0
+offset_right = -7.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_wrbhv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xmksa")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_je8us")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fc3su")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_l0oox")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BuyButton" unique_id=1269041671]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -20.0
+offset_right = 35.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="BuyIcon" type="TextureRect" parent="BuyButton/HBoxContainer" unique_id=694168277]
+custom_minimum_size = Vector2(22, 0)
+layout_mode = 2
+texture = ExtResource("5_cfcxc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AmountLabel" type="Label" parent="BuyButton/HBoxContainer" unique_id=1845139862]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_8ft8x")
+theme_override_font_sizes/font_size = 26
+text = "2000"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=738620676]
+libraries/ = SubResource("AnimationLibrary_mik2f")

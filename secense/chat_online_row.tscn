@@ -1,0 +1,125 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/chat_online_row.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Script" path="res://scripts/chat_avatar.gd" id="4_avatar"]
+[ext_resource type="Texture2D" path="res://assets/chat/icons/crown.svg" id="5_crown"]
+[ext_resource type="Texture2D" path="res://assets/chat/icons/plus.svg" id="6_plus"]
+
+[sub_resource type="StyleBoxFlat" id="SB_row"]
+bg_color = Color(1, 1, 1, 0)
+border_width_bottom = 1
+border_color = Color(0.13, 0.2, 0.3, 0.85)
+
+[sub_resource type="StyleBoxFlat" id="SB_dot"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="ChatOnlineRow" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 64)
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_row")
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="Row" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="AvatarSlot" type="Control" parent="Margin/Row"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Avatar" type="TextureRect" parent="Margin/Row/AvatarSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+script = ExtResource("4_avatar")
+
+[node name="Info" type="VBoxContainer" parent="Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 1
+
+[node name="Head" type="HBoxContainer" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="Margin/Row/Info/Head"]
+layout_mode = 2
+size_flags_horizontal = 1
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.97, 1, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 17
+text = "Player"
+
+[node name="Crown" type="TextureRect" parent="Margin/Row/Info/Head"]
+visible = false
+custom_minimum_size = Vector2(17, 17)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("5_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LevelLabel" type="Label" parent="Margin/Row/Info/Head"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6, 0.66, 0.74, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "Lv.1"
+
+[node name="Status" type="HBoxContainer" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Dot" type="Panel" parent="Margin/Row/Info/Status"]
+custom_minimum_size = Vector2(9, 9)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_dot")
+
+[node name="StatusLabel" type="Label" parent="Margin/Row/Info/Status"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.2, 0.85, 0.38, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "آنلاین"
+text_overrun_behavior = 3
+
+[node name="Action" type="TextureRect" parent="Margin/Row"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_plus")
+expand_mode = 1
+stretch_mode = 5

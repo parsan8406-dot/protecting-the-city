@@ -1,0 +1,213 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ranking_row.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_display"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_crown.svg" id="4_crown"]
+[ext_resource type="Script" path="res://scripts/city_emblem.gd" id="5_emblem"]
+
+[sub_resource type="StyleBoxFlat" id="SB_avatar"]
+bg_color = Color(0.04, 0.07, 0.13, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.45, 0.68, 0.9)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_me_badge"]
+bg_color = Color(0.13, 0.52, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 1
+content_margin_left = 6.0
+content_margin_right = 6.0
+
+[node name="RankingRow" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 54)
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="Row" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="PosCell" type="HBoxContainer" parent="Margin/Row"]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 3
+alignment = 1
+
+[node name="Crown" type="TextureRect" parent="Margin/Row/PosCell"]
+visible = false
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("4_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PosLabel" type="Label" parent="Margin/Row/PosCell"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 21
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AvatarFrame" type="PanelContainer" parent="Margin/Row"]
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_avatar")
+
+[node name="Avatar" type="TextureRect" parent="Margin/Row/AvatarFrame"]
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Emblem" type="Control" parent="Margin/Row/AvatarFrame"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("5_emblem")
+
+[node name="NameCol" type="VBoxContainer" parent="Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="NameRow" type="HBoxContainer" parent="Margin/Row/NameCol"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="TopCrown" type="TextureRect" parent="Margin/Row/NameCol/NameRow"]
+visible = false
+modulate = Color(0.97, 0.78, 0.3, 1)
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("4_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MeBadge" type="PanelContainer" parent="Margin/Row/NameCol/NameRow"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_me_badge")
+
+[node name="Label" type="Label" parent="Margin/Row/NameCol/NameRow/MeBadge"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "شما"
+horizontal_alignment = 1
+
+[node name="NameLabel" type="Label" parent="Margin/Row/NameCol/NameRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "—"
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="SubLabel" type="Label" parent="Margin/Row/NameCol"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 13
+text = ""
+
+[node name="CityCell" type="HBoxContainer" parent="Margin/Row"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="CityEmblem" type="Control" parent="Margin/Row/CityCell"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("5_emblem")
+
+[node name="CityLabel" type="Label" parent="Margin/Row/CityCell"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+vertical_alignment = 1
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="PointsLabel" type="Label" parent="Margin/Row"]
+custom_minimum_size = Vector2(78, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 19
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MedalCell" type="Control" parent="Margin/Row"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Medal" type="TextureRect" parent="Margin/Row/MedalCell"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MembersLabel" type="Label" parent="Margin/Row/MedalCell"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_fonts/font = ExtResource("3_display")
+theme_override_font_sizes/font_size = 15
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1

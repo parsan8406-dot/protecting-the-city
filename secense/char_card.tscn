@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dn7loo82ygtrb"]
+[gd_scene format=3 uid="uid://crdqbaqxxv405"]
 
-[ext_resource type="Script" uid="uid://dugmv751xkspd" path="res://scripts/char_card.gd" id="1_ykj4p"]
+[ext_resource type="Script" path="res://scripts/char_card.gd" id="1_ykj4p"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ykj4p"]
 light_mode = 1

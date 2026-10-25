@@ -1,0 +1,145 @@
+[gd_scene format=3 uid="uid://cgm0dm0des001"]
+
+[ext_resource type="Script" path="res://scripts/game_modes.gd" id="1_gm001"]
+[ext_resource type="Texture2D" uid="uid://biu274pla2bis" path="res://assets/ChatGPT Image Aug 14, 2026, 09_50_52 PM.png" id="2_redbg"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="3_lavalight"]
+[ext_resource type="Texture2D" uid="uid://b8210jltvcc1q" path="res://assets/ChatGPT Image Aug 14, 2026, 09_51_19 PM (1).png" id="4_moltenrocks"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rocks"]
+light_mode = 1
+
+[sub_resource type="Animation" id="Animation_reset"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-77.00001, -174.00002)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.54352754]
+}
+
+[sub_resource type="Animation" id="Animation_lightmove"]
+resource_name = "light_move"
+length = 7.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.02, 6.99, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(-2976, 1447), Vector2(-2537, 3182), Vector2(-2537, 3182), Vector2(-2976, 1447)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.01, 1, 1.02, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.54352754, -0.54352754, -0.54352754, -0.54352754, -0.54352754]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bg"]
+_data = {
+&"RESET": SubResource("Animation_reset"),
+&"light_move": SubResource("Animation_lightmove")
+}
+
+[node name="GameModes" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_gm001")
+
+[node name="BackgroundAction" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="RedBG" type="TextureRect" parent="BackgroundAction"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_redbg")
+expand_mode = 1
+
+[node name="LavaLight" type="TextureRect" parent="BackgroundAction"]
+modulate = Color(1, 0.7696696, 0.73171073, 1)
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -77.00001
+offset_top = -498.0
+offset_right = -77.0
+offset_bottom = -118.72743
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.54352754
+scale = Vector2(12.219881, 0.106689215)
+mouse_filter = 2
+texture = ExtResource("3_lavalight")
+
+[node name="ColorRect" type="ColorRect" parent="BackgroundAction"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.29463828, 1.8349849e-07, 4.813075e-08, 0.5254902)
+
+[node name="MoltenRocks" type="TextureRect" parent="BackgroundAction"]
+modulate = Color(0.24985075, 0.24985075, 0.24985075, 1)
+material = SubResource("CanvasItemMaterial_rocks")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_moltenrocks")
+expand_mode = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("AnimationLibrary_bg")
+autoplay = &"light_move"

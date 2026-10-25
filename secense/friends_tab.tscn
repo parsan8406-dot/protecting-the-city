@@ -1,0 +1,436 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/friends_tab.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_friends.svg" id="4_friends"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.078, 0.078, 0.086, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.42, 0.45, 0.42)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_avatar"]
+bg_color = Color(0.13, 0.13, 0.14, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.53, 0.14, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_toast"]
+bg_color = Color(0.09, 0.09, 0.1, 0.96)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.043, 0.075, 1)
+content_margin_left = 16.0
+content_margin_top = 9.0
+content_margin_right = 16.0
+content_margin_bottom = 9.0
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="FriendsTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="ActionHTTPRequest" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="RefreshTimer" type="Timer" parent="."]
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ListPanel" type="PanelContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/ListPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Columns/ListPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="Columns/ListPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Filters" type="HBoxContainer" parent="Columns/ListPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AllChip" type="Button" parent="Columns/ListPanel/Margin/Body/HeaderRow/Filters"]
+custom_minimum_size = Vector2(76, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "همه"
+
+[node name="OnlineChip" type="Button" parent="Columns/ListPanel/Margin/Body/HeaderRow/Filters"]
+custom_minimum_size = Vector2(90, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "آنلاین"
+
+[node name="CountLabel" type="Label" parent="Columns/ListPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.66, 0.66, 0.7, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "..."
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Columns/ListPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "دوستان"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="RequestsBanner" type="Button" parent="Columns/ListPanel/Margin/Body"]
+visible = false
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "درخواست دوستی در انتظار — مشاهده"
+
+[node name="Scroll" type="ScrollContainer" parent="Columns/ListPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Columns/ListPanel/Margin/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="EmptyBox" type="VBoxContainer" parent="Columns/ListPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="EmptyIcon" type="TextureRect" parent="Columns/ListPanel/Margin/Body/EmptyBox"]
+modulate = Color(0.42, 0.42, 0.46, 1)
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+texture = ExtResource("4_friends")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EmptyLabel" type="Label" parent="Columns/ListPanel/Margin/Body/EmptyBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "در حال گرفتن لیست دوستان..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EmptyHint" type="Label" parent="Columns/ListPanel/Margin/Body/EmptyBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.54, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="RetryButton" type="Button" parent="Columns/ListPanel/Margin/Body/EmptyBox"]
+visible = false
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "تلاش دوباره"
+
+[node name="SideColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="DetailPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/DetailPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/DetailPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopRow" type="HBoxContainer" parent="Columns/SideColumn/DetailPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Info" type="VBoxContainer" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="NameLabel" type="Label" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 23
+text = "—"
+horizontal_alignment = 2
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="IdLabel" type="Label" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 17
+text = "ID : —"
+horizontal_alignment = 2
+
+[node name="StatusLabel" type="Label" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "—"
+horizontal_alignment = 2
+
+[node name="AvatarSlot" type="PanelContainer" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow"]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_avatar")
+
+[node name="Avatar" type="TextureRect" parent="Columns/SideColumn/DetailPanel/Margin/Body/TopRow/AvatarSlot"]
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="MetaRow" type="HBoxContainer" parent="Columns/SideColumn/DetailPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MetaLabel" type="Label" parent="Columns/SideColumn/DetailPanel/Margin/Body/MetaRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.78, 0.55, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="TierBadge" type="TextureRect" parent="Columns/SideColumn/DetailPanel/Margin/Body/MetaRow"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Actions" type="HBoxContainer" parent="Columns/SideColumn/DetailPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ProfileButton" type="Button" parent="Columns/SideColumn/DetailPanel/Margin/Body/Actions"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "پروفایل"
+
+[node name="GiftButton" type="Button" parent="Columns/SideColumn/DetailPanel/Margin/Body/Actions"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "هدیه"
+
+[node name="MessageButton" type="Button" parent="Columns/SideColumn/DetailPanel/Margin/Body/Actions"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "پیام"
+
+[node name="RemoveButton" type="Button" parent="Columns/SideColumn/DetailPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "حذف از دوستان"
+
+[node name="HintLabel" type="Label" parent="Columns/SideColumn/DetailPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.5, 0.5, 0.54, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "یک دوست را از لیست انتخاب کن"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="AddPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/AddPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/AddPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="Columns/SideColumn/AddPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.043, 0.075, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "افزودن دوست با آیدی"
+horizontal_alignment = 2
+
+[node name="AddRow" type="HBoxContainer" parent="Columns/SideColumn/AddPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddButton" type="Button" parent="Columns/SideColumn/AddPanel/Margin/Body/AddRow"]
+custom_minimum_size = Vector2(110, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "ارسال"
+
+[node name="IdEdit" type="LineEdit" parent="Columns/SideColumn/AddPanel/Margin/Body/AddRow"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 20
+placeholder_text = "آیدی عددی دوستت"
+alignment = 1
+max_length = 10
+virtual_keyboard_type = 2
+
+[node name="MyIdRow" type="HBoxContainer" parent="Columns/SideColumn/AddPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CopyButton" type="Button" parent="Columns/SideColumn/AddPanel/Margin/Body/MyIdRow"]
+custom_minimum_size = Vector2(110, 46)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "کپی آیدی"
+
+[node name="MyIdLabel" type="Label" parent="Columns/SideColumn/AddPanel/Margin/Body/MyIdRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.83, 0.16, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 20
+text = "..."
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Toast" type="PanelContainer" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -72.0
+offset_right = 280.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_toast")
+
+[node name="ToastLabel" type="Label" parent="Toast"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

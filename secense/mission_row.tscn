@@ -1,0 +1,263 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/mission_row.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Texture2D" path="res://assets/ui/coin_icon.png" id="4_coin"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_xp.png" id="5_xp"]
+[ext_resource type="Script" path="res://scripts/scroll_safe_button.gd" id="6_safebtn"]
+
+[sub_resource type="StyleBoxFlat" id="SB_row"]
+bg_color = Color(0.055, 0.086, 0.133, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.114, 0.165, 0.235, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_icon"]
+bg_color = Color(0.031, 0.055, 0.09, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.153, 0.227, 0.325, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 7.0
+content_margin_top = 7.0
+content_margin_right = 7.0
+content_margin_bottom = 7.0
+
+[sub_resource type="StyleBoxFlat" id="SB_chip_gold"]
+bg_color = Color(0.09, 0.075, 0.035, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.478, 0.396, 0.153, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="SB_chip_xp"]
+bg_color = Color(0.098, 0.055, 0.129, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.427, 0.235, 0.549, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.086, 0.125, 0.184, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
+bg_color = Color(0.176, 0.553, 0.878, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="MissionRow" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 76)
+offset_right = 780.0
+offset_bottom = 76.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_row")
+script = ExtResource("1_script")
+
+[node name="DoneFrame" type="Panel" parent="."]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 9
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 9
+
+[node name="Row" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="ActionButton" type="Button" parent="Margin/Row"]
+custom_minimum_size = Vector2(120, 58)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.42, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/focus = SubResource("SB_focus")
+text = "رفتن"
+script = ExtResource("6_safebtn")
+
+[node name="Reward" type="HBoxContainer" parent="Margin/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="XpChip" type="PanelContainer" parent="Margin/Row/Reward"]
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_chip_xp")
+
+[node name="Box" type="VBoxContainer" parent="Margin/Row/Reward/XpChip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 1
+
+[node name="Icon" type="TextureRect" parent="Margin/Row/Reward/XpChip/Box"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+self_modulate = Color(0.769, 0.51, 0.929, 1)
+texture = ExtResource("5_xp")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Margin/Row/Reward/XpChip/Box"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.847, 0.769, 0.918, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+
+[node name="CoinChip" type="PanelContainer" parent="Margin/Row/Reward"]
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_chip_gold")
+
+[node name="Box" type="VBoxContainer" parent="Margin/Row/Reward/CoinChip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 1
+
+[node name="Icon" type="TextureRect" parent="Margin/Row/Reward/CoinChip/Box"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Margin/Row/Reward/CoinChip/Box"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+
+[node name="Info" type="VBoxContainer" parent="Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="TitleLabel" type="Label" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.93, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "—"
+horizontal_alignment = 2
+
+[node name="DescLabel" type="Label" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.42, 0.478, 0.557, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 2
+text_overrun_behavior = 3
+
+[node name="BarRow" type="HBoxContainer" parent="Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 9
+
+[node name="Bar" type="ProgressBar" parent="Margin/Row/Info/BarRow"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_fill")
+value = 0.0
+show_percentage = false
+
+[node name="AmountLabel" type="Label" parent="Margin/Row/Info/BarRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 13
+text = "—"
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="IconSlot" type="PanelContainer" parent="Margin/Row"]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_icon")
+
+[node name="Icon" type="TextureRect" parent="Margin/Row/IconSlot"]
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

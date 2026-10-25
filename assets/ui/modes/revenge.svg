@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- عملیات انتقام: دو خنجرِ ضربدری. دو نفر، دو تیغه. -->
+  <g stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M14 54 L46 14" />
+    <path d="M50 54 L18 14" />
+  </g>
+  <path d="M46 8 L56 18 L48 22 L42 16 Z" fill="#fff"/>
+  <path d="M18 8 L8 18 L16 22 L22 16 Z" fill="#fff"/>
+  <path d="M10 46 L20 56 L14 60 L6 52 Z" fill="#fff" fill-opacity=".45"/>
+  <path d="M54 46 L44 56 L50 60 L58 52 Z" fill="#fff" fill-opacity=".45"/>
+  <circle cx="32" cy="34" r="5" fill="#fff"/>
+</svg>

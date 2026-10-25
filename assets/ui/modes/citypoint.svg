@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- عملیات امتیاز شهر: برجِ پرچم‌دار روی نقطه‌ی تسخیر -->
+  <ellipse cx="32" cy="52" rx="26" ry="9" fill="#fff" fill-opacity=".14"/>
+  <ellipse cx="32" cy="52" rx="26" ry="9" fill="none" stroke="#fff" stroke-width="2.5"/>
+  <ellipse cx="32" cy="52" rx="14" ry="5" fill="none" stroke="#fff"
+           stroke-width="2" stroke-opacity=".55"/>
+  <path d="M22 50 V26 H42 V50 Z" fill="#fff" fill-opacity=".22"/>
+  <path d="M22 50 V26 H42 V50" fill="none" stroke="#fff" stroke-width="3"
+        stroke-linejoin="round"/>
+  <path d="M27 34 h4 v6 h-4 Z M33 34 h4 v6 h-4 Z" fill="#fff"/>
+  <path d="M32 26 V8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M32 9 L52 15 L32 21 Z" fill="#fff"/>
+</svg>

@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/mission_bonus_node.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="2_num"]
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="MissionBonusNode" type="VBoxContainer"]
+custom_minimum_size = Vector2(52, 0)
+offset_right = 52.0
+offset_bottom = 62.0
+theme_override_constants/separation = 2
+script = ExtResource("1_script")
+
+[node name="Slot" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+
+[node name="Glow" type="Panel" parent="Slot"]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ChestButton" type="TextureButton" parent="Slot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("SB_focus")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="NeedLabel" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_num")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1

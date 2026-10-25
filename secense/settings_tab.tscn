@@ -1,0 +1,583 @@
+[gd_scene load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/settings_tab.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="PackedScene" path="res://secense/settings_slider_row.tscn" id="3_row"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_master.svg" id="4_master"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_video.svg" id="10_video"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_google.svg" id="11_google"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_account.svg" id="12_account"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_telegram.svg" id="15_telegram"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_support.svg" id="16_support"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_reset.svg" id="17_reset"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_shield_off.svg" id="18_shield"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_quality.svg" id="19_quality"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/settings_icon_vibration.svg" id="20_vibration"]
+[ext_resource type="Script" path="res://scripts/google_auth_flow.gd" id="21_flow"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.078, 0.078, 0.086, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.42, 0.45, 0.42)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_status"]
+bg_color = Color(0.16, 0.05, 0.06, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 4
+border_width_bottom = 1
+border_color = Color(0.85, 0.043, 0.075, 0.85)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_wait"]
+bg_color = Color(0.12, 0.1, 0.04, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.8, 0.26, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_toast"]
+bg_color = Color(0.09, 0.09, 0.1, 0.96)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.043, 0.075, 1)
+content_margin_left = 16.0
+content_margin_top = 9.0
+content_margin_right = 16.0
+content_margin_bottom = 9.0
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SettingsTab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="StatusHTTP" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="ActionHTTP" type="HTTPRequest" parent="."]
+timeout = 12.0
+
+[node name="GoogleFlow" type="Node" parent="."]
+script = ExtResource("21_flow")
+
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="AccountPanel" type="PanelContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/AccountPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="Body" type="VBoxContainer" parent="Columns/AccountPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleRow" type="HBoxContainer" parent="Columns/AccountPanel/Margin/Body"]
+layout_mode = 2
+
+[node name="IdLabel" type="Label" parent="Columns/AccountPanel/Margin/Body/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.55, 0.58, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "ID : —"
+vertical_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Columns/AccountPanel/Margin/Body/TitleRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "اکانت"
+horizontal_alignment = 2
+
+[node name="StatusCard" type="PanelContainer" parent="Columns/AccountPanel/Margin/Body"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_status")
+
+[node name="Margin" type="MarginContainer" parent="Columns/AccountPanel/Margin/Body/StatusCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Row" type="HBoxContainer" parent="Columns/AccountPanel/Margin/Body/StatusCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Info" type="VBoxContainer" parent="Columns/AccountPanel/Margin/Body/StatusCard/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="StatusTitle" type="Label" parent="Columns/AccountPanel/Margin/Body/StatusCard/Margin/Row/Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 21
+text = "حساب مهمان"
+horizontal_alignment = 2
+
+[node name="StatusDetail" type="Label" parent="Columns/AccountPanel/Margin/Body/StatusCard/Margin/Row/Info"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.72, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "در حال بررسی وضعیت حساب..."
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="ShieldIcon" type="TextureRect" parent="Columns/AccountPanel/Margin/Body/StatusCard/Margin/Row"]
+modulate = Color(1, 0.4, 0.4, 1)
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("18_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoogleButton" type="Button" parent="Columns/AccountPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+focus_mode = 0
+theme_override_constants/h_separation = 12
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 21
+text = "اتصال با گوگل"
+icon = ExtResource("11_google")
+alignment = 2
+icon_alignment = 2
+expand_icon = true
+
+[node name="RecoverButton" type="Button" parent="Columns/AccountPanel/Margin/Body"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+focus_mode = 0
+theme_override_constants/h_separation = 12
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "حساب دیگری داری؟ ورود با گوگل"
+icon = ExtResource("12_account")
+alignment = 2
+icon_alignment = 2
+expand_icon = true
+
+[node name="WaitingPanel" type="PanelContainer" parent="Columns/AccountPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_wait")
+
+[node name="Margin" type="MarginContainer" parent="Columns/AccountPanel/Margin/Body/WaitingPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Col" type="VBoxContainer" parent="Columns/AccountPanel/Margin/Body/WaitingPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WaitLabel" type="Label" parent="Columns/AccountPanel/Margin/Body/WaitingPanel/Margin/Col"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.6, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "صفحه‌ی گوگل در مرورگر باز شد؛ بعد از انتخاب حساب به بازی برگرد."
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Columns/AccountPanel/Margin/Body/WaitingPanel/Margin/Col"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CancelWaitButton" type="Button" parent="Columns/AccountPanel/Margin/Body/WaitingPanel/Margin/Col/Buttons"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "انصراف"
+
+[node name="ReturnedButton" type="Button" parent="Columns/AccountPanel/Margin/Body/WaitingPanel/Margin/Col/Buttons"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "برگشتم، بررسی کن"
+
+[node name="UnlinkButton" type="Button" parent="Columns/AccountPanel/Margin/Body"]
+visible = false
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "جدا کردن حساب از گوگل"
+
+[node name="Spacer" type="Control" parent="Columns/AccountPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="SupportLabel" type="Label" parent="Columns/AccountPanel/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "ارتباط با پشتیبانی"
+horizontal_alignment = 2
+
+[node name="SupportRow" type="HBoxContainer" parent="Columns/AccountPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MessageButton" type="Button" parent="Columns/AccountPanel/Margin/Body/SupportRow"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_constants/h_separation = 10
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "ارسال پیام"
+icon = ExtResource("16_support")
+icon_alignment = 2
+expand_icon = true
+
+[node name="TelegramButton" type="Button" parent="Columns/AccountPanel/Margin/Body/SupportRow"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_constants/h_separation = 10
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "تلگرام"
+icon = ExtResource("15_telegram")
+icon_alignment = 2
+expand_icon = true
+
+[node name="SideColumn" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="AudioPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/AudioPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/AudioPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="Columns/SideColumn/AudioPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Spacer" type="Control" parent="Columns/SideColumn/AudioPanel/Margin/Body/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Accent" type="ColorRect" parent="Columns/SideColumn/AudioPanel/Margin/Body/Header"]
+custom_minimum_size = Vector2(4, 22)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.85, 0.043, 0.075, 1)
+
+[node name="TitleLabel" type="Label" parent="Columns/SideColumn/AudioPanel/Margin/Body/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.043, 0.075, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 21
+text = "صدا"
+
+[node name="Icon" type="TextureRect" parent="Columns/SideColumn/AudioPanel/Margin/Body/Header"]
+modulate = Color(0.85, 0.043, 0.075, 1)
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_master")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Rows" type="VBoxContainer" parent="Columns/SideColumn/AudioPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="MasterRow" parent="Columns/SideColumn/AudioPanel/Margin/Body/Rows" instance=ExtResource("3_row")]
+layout_mode = 2
+
+[node name="SfxRow" parent="Columns/SideColumn/AudioPanel/Margin/Body/Rows" instance=ExtResource("3_row")]
+layout_mode = 2
+
+[node name="AmbientRow" parent="Columns/SideColumn/AudioPanel/Margin/Body/Rows" instance=ExtResource("3_row")]
+layout_mode = 2
+
+[node name="MusicRow" parent="Columns/SideColumn/AudioPanel/Margin/Body/Rows" instance=ExtResource("3_row")]
+layout_mode = 2
+
+[node name="VideoPanel" type="PanelContainer" parent="Columns/SideColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Columns/SideColumn/VideoPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Spacer" type="Control" parent="Columns/SideColumn/VideoPanel/Margin/Body/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Accent" type="ColorRect" parent="Columns/SideColumn/VideoPanel/Margin/Body/Header"]
+custom_minimum_size = Vector2(4, 22)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.85, 0.043, 0.075, 1)
+
+[node name="TitleLabel" type="Label" parent="Columns/SideColumn/VideoPanel/Margin/Body/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.043, 0.075, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 21
+text = "تصویر و بازی"
+
+[node name="Icon" type="TextureRect" parent="Columns/SideColumn/VideoPanel/Margin/Body/Header"]
+modulate = Color(0.85, 0.043, 0.075, 1)
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("10_video")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Rows" type="VBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BrightnessRow" parent="Columns/SideColumn/VideoPanel/Margin/Body/Rows" instance=ExtResource("3_row")]
+layout_mode = 2
+
+[node name="QualityRow" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Choices" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body/QualityRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="QualityLabel" type="Label" parent="Columns/SideColumn/VideoPanel/Margin/Body/QualityRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "کیفیت"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="QualityIcon" type="TextureRect" parent="Columns/SideColumn/VideoPanel/Margin/Body/QualityRow"]
+modulate = Color(0.78, 0.78, 0.8, 1)
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("19_quality")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VibrationRow" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VibrationToggle" type="CheckButton" parent="Columns/SideColumn/VideoPanel/Margin/Body/VibrationRow"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "روشن"
+alignment = 2
+
+[node name="VibrationLabel" type="Label" parent="Columns/SideColumn/VideoPanel/Margin/Body/VibrationRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "لرزش گوشی"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="VibrationIcon" type="TextureRect" parent="Columns/SideColumn/VideoPanel/Margin/Body/VibrationRow"]
+modulate = Color(0.78, 0.78, 0.8, 1)
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("20_vibration")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShakeRow" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ShakeToggle" type="CheckButton" parent="Columns/SideColumn/VideoPanel/Margin/Body/ShakeRow"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "روشن"
+alignment = 2
+
+[node name="ShakeLabel" type="Label" parent="Columns/SideColumn/VideoPanel/Margin/Body/ShakeRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.78, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "لرزش صفحه"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ShakeIcon" type="TextureRect" parent="Columns/SideColumn/VideoPanel/Margin/Body/ShakeRow"]
+modulate = Color(0.78, 0.78, 0.8, 1)
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("10_video")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Spacer" type="Control" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="ResetRow" type="HBoxContainer" parent="Columns/SideColumn/VideoPanel/Margin/Body"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Columns/SideColumn/VideoPanel/Margin/Body/ResetRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ResetButton" type="Button" parent="Columns/SideColumn/VideoPanel/Margin/Body/ResetRow"]
+custom_minimum_size = Vector2(210, 48)
+layout_mode = 2
+focus_mode = 0
+theme_override_constants/h_separation = 10
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "بازنشانی تنظیمات"
+icon = ExtResource("17_reset")
+icon_alignment = 2
+expand_icon = true
+
+[node name="HomeGap" type="Control" parent="Columns/SideColumn/VideoPanel/Margin/Body/ResetRow"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Toast" type="PanelContainer" parent="."]
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -96.0
+offset_right = 300.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_toast")
+
+[node name="ToastLabel" type="Label" parent="Toast"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

@@ -1,0 +1,121 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/leaderboard_podium_card.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="SB_avatar"]
+bg_color = Color(0.055, 0.055, 0.06, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.42, 0.45, 0.4)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_plate"]
+bg_color = Color(0.086, 0.086, 0.094, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.42, 0.45, 0.45)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="LeaderboardPodiumCard" type="VBoxContainer"]
+offset_right = 150.0
+offset_bottom = 190.0
+mouse_filter = 2
+theme_override_constants/separation = 3
+script = ExtResource("1_script")
+
+[node name="TopSpacer" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AvatarSlot" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_avatar")
+
+[node name="Avatar" type="TextureRect" parent="AvatarSlot"]
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Placeholder" type="Label" parent="AvatarSlot"]
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.3)
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "avatar"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "—"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="TierBadge" type="TextureRect" parent="."]
+visible = false
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TierLabel" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.65, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "—"
+horizontal_alignment = 1
+
+[node name="Plate" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_vertical = 8
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_plate")
+
+[node name="Body" type="VBoxContainer" parent="Plate"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="PositionLabel" type="Label" parent="Plate/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "۰"
+horizontal_alignment = 1
+
+[node name="PointsLabel" type="Label" parent="Plate/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.72, 0.72, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "۰"
+horizontal_alignment = 1

@@ -1,78 +1,320 @@
 [gd_scene format=3 uid="uid://e4n07u2xh3f5"]
 
 [ext_resource type="Script" uid="uid://ldqsskj6srkt" path="res://scripts/main_menu.gd" id="1_prdn3"]
-[ext_resource type="Texture2D" uid="uid://klngul6xt42f" path="res://assets/startmenu_bg.png" id="2_ruxmj"]
-[ext_resource type="Texture2D" uid="uid://hik0ssacjq5e" path="res://assets/startmenu_select.png" id="3_tqs1h"]
-[ext_resource type="Texture2D" uid="uid://d02xlkqc47trm" path="res://assets/startmenu_start.png" id="4_xdxr3"]
-[ext_resource type="Texture2D" uid="uid://dhx4kyfi7he43" path="res://assets/startmenu_coin.png" id="5_2o872"]
-[ext_resource type="Texture2D" uid="uid://dnksfro2dqvqp" path="res://assets/startmenu_gem.png" id="6_crvna"]
-[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="6_itgdb"]
-[ext_resource type="Texture2D" uid="uid://tc8q4cq8la2p" path="res://assets/startmenu_level.png" id="7_itgdb"]
-[ext_resource type="Texture2D" uid="uid://c4s1vg5bglqce" path="res://assets/startmenu_plus.png" id="7_lsguj"]
-[ext_resource type="Texture2D" uid="uid://2usngya14cbm" path="res://assets/startmenu_setting.png" id="10_kqkpe"]
-[ext_resource type="Texture2D" uid="uid://dq46r6pyv1epf" path="res://assets/startmenu_account.png" id="11_icdhx"]
-[ext_resource type="Texture2D" uid="uid://dokya3ym6151l" path="res://assets/startmenu_shop.png" id="12_icdhx"]
-[ext_resource type="Texture2D" uid="uid://dmn81k2wm8462" path="res://assets/startmenu_chat.png" id="13_wj25d"]
+[ext_resource type="Texture2D" uid="uid://drlmnb4yekubn" path="res://assets/4bafd241-48b9-43ee-bbef-7ada58727575.png" id="2_7gm40"]
+[ext_resource type="Texture2D" uid="uid://ber661yxym82v" path="res://assets/characters/upload_char.png" id="3_0l1gx"]
+[ext_resource type="Texture2D" uid="uid://bul6tmgmqhxkj" path="res://assets/startmenu_play.png" id="3_2o872"]
+[ext_resource type="Texture2D" uid="uid://ojy687jwtnbj" path="res://assets/snow_path65.png" id="4_0l1gx"]
+[ext_resource type="Texture2D" uid="uid://bgqaaqierdkdd" path="res://assets/startmenu_multiplayer.png" id="4_crvna"]
+[ext_resource type="Texture2D" uid="uid://qh1cmiobodhx" path="res://assets/startmenu_selecting.png" id="6_itgdb"]
+[ext_resource type="Texture2D" uid="uid://dutbghn2gr6e1" path="res://assets/startmenu_Start.png" id="7_2o872"]
+[ext_resource type="Texture2D" uid="uid://dku3i3wiudkl1" path="res://assets/startmenu_type.png" id="8_crvna"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="9_itgdb"]
+[ext_resource type="Texture2D" uid="uid://da4url1cne1kc" path="res://assets/startmenu_Battlepass.png" id="10_lsguj"]
+[ext_resource type="Texture2D" uid="uid://bnvgdamcrpi42" path="res://assets/startmenu_g1.png" id="11_icdhx"]
+[ext_resource type="Texture2D" uid="uid://dvfjmhithjss3" path="res://assets/startmenu_g2.png" id="11_kqkpe"]
+[ext_resource type="Texture2D" uid="uid://buvatgd211kpp" path="res://assets/startmenu_shop.png" id="12_icdhx"]
+[ext_resource type="Texture2D" uid="uid://c8pxurlx1jpdv" path="res://assets/startmenu_rect37-3.png" id="12_wj25d"]
+[ext_resource type="Texture2D" uid="uid://dkk0f1qpkho3g" path="res://assets/startmenu_dailyMissions.png" id="14_iank1"]
+[ext_resource type="Texture2D" uid="uid://bjktkpg26efdd" path="res://assets/startmenu_g43-1.png" id="16_5c1lc"]
+[ext_resource type="Texture2D" uid="uid://ceh7gumlyesqs" path="res://assets/startmenu_rect37-3-1-5.png" id="17_a4aoj"]
+[ext_resource type="Texture2D" uid="uid://cs3cdjx8ij7lt" path="res://assets/startmenu_g43-3.png" id="18_m34fa"]
+[ext_resource type="Texture2D" uid="uid://5xmx2ryds3gg" path="res://assets/startmenu_g43.png" id="19_qxx26"]
+[ext_resource type="Texture2D" uid="uid://b22s27j33vwce" path="res://assets/startmenu_rect69.png" id="20_m34fa"]
+[ext_resource type="Texture2D" uid="uid://dihyii6jjqm40" path="res://assets/startmenu_chat.png" id="21_qxx26"]
+[ext_resource type="Texture2D" uid="uid://cojvy72xgjs3b" path="res://assets/startmenu_Rank.png" id="22_b75bm"]
+[ext_resource type="Texture2D" uid="uid://cge2o2lyjb0hk" path="res://assets/startmenu_City.png" id="23_l5lhe"]
+[ext_resource type="Texture2D" uid="uid://bkihfuvf4dx14" path="res://assets/startmenu_leadboard.png" id="24_offnm"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="26_1d8i2"]
+[ext_resource type="PackedScene" path="res://secense/top_bar.tscn" id="40_topbar"]
+[ext_resource type="Script" uid="uid://d1gb35716f6qe" path="res://scripts/daily_missions_panel.gd" id="90_missions"]
+[ext_resource type="Script" uid="uid://smb8pvdncfpd" path="res://scripts/season_pass_box.gd" id="91_pass"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_itgdb"]
+[sub_resource type="Gradient" id="Gradient_li6fw"]
+colors = PackedColorArray(0.56078434, 0.56078434, 0.56078434, 0.8666667, 1, 1, 1, 0)
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lsguj"]
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_r5y1g"]
+gradient = SubResource("Gradient_li6fw")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kqkpe"]
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_r5y1g"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(200, 400, 1)
+direction = Vector3(-1, -1, 0)
+spread = 30.0
+initial_velocity_min = 100.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.5
+scale_max = 2.0
+color = Color(0.35686275, 0.35686275, 0.35686275, 0.78431374)
+color_ramp = SubResource("GradientTexture1D_r5y1g")
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icdhx"]
+[sub_resource type="StyleBoxFlat" id="SB_chat_badge"]
+bg_color = Color(0.72, 0.09, 0.09, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.83, 0.32, 0.9)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wj25d"]
+[sub_resource type="Animation" id="Animation_li6fw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.17062157]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-32, -289)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D/Bone2D:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(17, -266)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D/Bone2D:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D2:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(117, -3)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D2:rotation")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D3:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-74, 10)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D3:rotation")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tqs1h"]
+[sub_resource type="Animation" id="Animation_0l1gx"]
+resource_name = "idle"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.17062157, 0.26266718, 0.17062157]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-32, -289), Vector2(-32, -289), Vector2(-32, -289)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.122368105, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D/Bone2D:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(17, -266), Vector2(17, -266), Vector2(17, -266)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D/Bone2D/Bone2D:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.38672656, 0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D2:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(117, -3), Vector2(117, -3), Vector2(117, -3)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D2:rotation")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.12796143, 0.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D3:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-74, 10), Vector2(-74, 10), Vector2(-74, 10)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Node2D/Character/Skeleton2D/root/Bone2D3:rotation")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.08075836, 0.0]
+}
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xdxr3"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7gm40"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2o872"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_crvna"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_iank1"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jvv0a"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5c1lc"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2x2q0"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2rfn5"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a4aoj"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m34fa"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qxx26"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_666dn"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fn8dy"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_b75bm"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l5lhe"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_offnm"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7epwv"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1d8i2"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_eky0e"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2vn1i"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_acbec"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbsxf"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mphty"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0l1gx"]
+_data = {
+&"RESET": SubResource("Animation_li6fw"),
+&"idle": SubResource("Animation_0l1gx")
+}
 
 [node name="MainMenu" type="Control" unique_id=1932397312]
 layout_mode = 3
@@ -85,269 +327,632 @@ script = ExtResource("1_prdn3")
 
 [node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1132923271]
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=1695635629]
+[node name="Background" type="TextureRect" parent="." unique_id=1695635629]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -26.0
-offset_top = -21.0
-offset_right = 8.0
-offset_bottom = 9.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_ruxmj")
+texture = ExtResource("2_7gm40")
 expand_mode = 1
 
-[node name="CharSelectBtn" type="Button" parent="." unique_id=1851584254]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -257.0
-offset_top = 34.0
-offset_right = 258.0
-offset_bottom = 519.0
-grow_horizontal = 2
-pivot_offset = Vector2(247, 228)
-theme_override_styles/normal = SubResource("StyleBoxEmpty_itgdb")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_lsguj")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_kqkpe")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_icdhx")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_wj25d")
-icon = ExtResource("3_tqs1h")
-icon_alignment = 1
-expand_icon = true
+[node name="Node2D" type="Node2D" parent="." unique_id=122393432]
+position = Vector2(246, 5.9999847)
+scale = Vector2(0.3, 0.3)
 
-[node name="TextureRect" type="TextureRect" parent="CharSelectBtn" unique_id=1749331837]
+[node name="Character" type="Polygon2D" parent="Node2D" unique_id=2113467726]
+position = Vector2(568, 332)
+texture = ExtResource("3_0l1gx")
+skeleton = NodePath("Skeleton2D")
+polygon = PackedVector2Array(177.25098, 126.403564, 47.689697, 408.66214, -49.4812, 774.21014, 33.808105, 1246.1833, 154.11499, 1546.9507, 1037.9082, 1546.9507, 1232.2502, 1223.0476, 1116.5706, 709.42944, 968.5005, 205.0658, 829.6848, 10.723831, 635.3428, -40.17526, 385.4746, -40.17526, 240.96606, 1423.7607, 268.72925, 1247.9275, 301.11963, 1016.568, 301.11963, 771.3269, 254.84766, 572.3577, 473.54932, 780.58154, 492.0581, 1081.3489, 478.1765, 1386.7435, 700.2815, 1150.7567, 640.1282, 803.71747, 880.74194, 900.8885, 658.6853, 491.7409, 491.81445, 505.64682, 415.33203, 324.87006, 189.36108, 304.0112, 484.86157, 151.04622, 606.5383, 64.134315, 655.209, 213.6228, 794.2678, 345.7289, 922.89746, 620.37054, 109.4021, 773.3355)
+uv = PackedVector2Array(177.25098, 126.403564, 47.689697, 408.66214, -49.4812, 774.21014, 33.808105, 1246.1833, 154.11499, 1546.9507, 1037.9082, 1546.9507, 1232.2502, 1223.0476, 1116.5706, 709.42944, 968.5005, 205.0658, 829.6848, 10.723831, 635.3428, -40.17526, 385.4746, -40.17526, 240.96606, 1423.7607, 268.72925, 1247.9275, 301.11963, 1016.568, 301.11963, 771.3269, 254.84766, 572.3577, 473.54932, 780.58154, 492.0581, 1081.3489, 478.1765, 1386.7435, 700.2815, 1150.7567, 640.1282, 803.71747, 880.74194, 900.8885, 658.6853, 491.7409, 491.81445, 505.64682, 415.33203, 324.87006, 189.36108, 304.0112, 484.86157, 151.04622, 606.5383, 64.134315, 655.209, 213.6228, 794.2678, 345.7289, 922.89746, 620.37054, 109.4021, 773.3355)
+polygons = [PackedInt32Array(0, 26, 1), PackedInt32Array(0, 11, 26), PackedInt32Array(11, 27, 28), PackedInt32Array(11, 10, 28), PackedInt32Array(10, 9, 28), PackedInt32Array(9, 8, 30), PackedInt32Array(8, 7, 30), PackedInt32Array(7, 6, 31), PackedInt32Array(6, 5, 22), PackedInt32Array(5, 19, 20), PackedInt32Array(19, 4, 5), PackedInt32Array(4, 3, 12), PackedInt32Array(2, 32, 3), PackedInt32Array(2, 1, 32), PackedInt32Array(32, 1, 16), PackedInt32Array(1, 26, 16), PackedInt32Array(26, 11, 27), PackedInt32Array(27, 29, 28), PackedInt32Array(28, 30, 9), PackedInt32Array(29, 30, 28), PackedInt32Array(30, 31, 7), PackedInt32Array(31, 22, 6), PackedInt32Array(22, 20, 5), PackedInt32Array(12, 19, 4), PackedInt32Array(12, 3, 13), PackedInt32Array(13, 19, 12), PackedInt32Array(13, 14, 3), PackedInt32Array(14, 32, 3), PackedInt32Array(14, 32, 15), PackedInt32Array(15, 16, 32), PackedInt32Array(16, 25, 26), PackedInt32Array(25, 26, 27), PackedInt32Array(25, 29, 27), PackedInt32Array(29, 23, 30), PackedInt32Array(30, 31, 23), PackedInt32Array(23, 22, 31), PackedInt32Array(23, 21, 22), PackedInt32Array(21, 20, 22), PackedInt32Array(18, 21, 20), PackedInt32Array(18, 19, 20), PackedInt32Array(18, 13, 19), PackedInt32Array(18, 14, 13), PackedInt32Array(14, 15, 18), PackedInt32Array(17, 18, 21), PackedInt32Array(17, 15, 18), PackedInt32Array(17, 16, 15), PackedInt32Array(17, 23, 21), PackedInt32Array(17, 24, 23), PackedInt32Array(17, 16, 24), PackedInt32Array(24, 25, 16), PackedInt32Array(24, 29, 25), PackedInt32Array(24, 23, 29)]
+bones = ["root", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "root/Bone2D", PackedFloat32Array(1, 1, 1, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "root/Bone2D/Bone2D", PackedFloat32Array(1, 1, 0, 0, 0, 0.5, 0.5, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0.5, 0.5, 0, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0), "root/Bone2D/Bone2D/Bone2D", PackedFloat32Array(1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0.5, 0, 1, 1, 1, 1, 0, 0), "root/Bone2D2", PackedFloat32Array(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "root/Bone2D3", PackedFloat32Array(0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)]
+internal_vertex_count = 21
+
+[node name="Skeleton2D" type="Skeleton2D" parent="Node2D/Character" unique_id=1452897783]
+
+[node name="root" type="Bone2D" parent="Node2D/Character/Skeleton2D" unique_id=1139840597]
+position = Vector2(471, 779)
+rotation = -0.056924395
+rest = Transform2D(1, 0, 0, 1, 471, 779)
+auto_calculate_length_and_angle = false
+length = 237.287
+bone_angle = 0.0
+
+[node name="Bone2D" type="Bone2D" parent="Node2D/Character/Skeleton2D/root" unique_id=2072332154]
+rotation = 0.17062157
+scale = Vector2(0.99999964, 0.99999964)
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 248.17
+bone_angle = -89.362
+
+[node name="Bone2D" type="Bone2D" parent="Node2D/Character/Skeleton2D/root/Bone2D" unique_id=177819035]
+position = Vector2(-32, -289)
+scale = Vector2(0.99999976, 0.99999976)
+rest = Transform2D(1, 0, 0, 1, -32, -289)
+auto_calculate_length_and_angle = false
+length = 193.755
+bone_angle = -89.362
+
+[node name="Bone2D" type="Bone2D" parent="Node2D/Character/Skeleton2D/root/Bone2D/Bone2D" unique_id=556931664]
+position = Vector2(17, -266)
+rest = Transform2D(1, 0, 0, 1, 17, -266)
+auto_calculate_length_and_angle = false
+length = 141.727
+bone_angle = -53.61697
+
+[node name="Bone2D2" type="Bone2D" parent="Node2D/Character/Skeleton2D/root" unique_id=70963599]
+position = Vector2(117, -3)
+scale = Vector2(0.9999993, 0.9999993)
+rest = Transform2D(1, 0, 0, 1, 117, -3)
+auto_calculate_length_and_angle = false
+length = 251.799
+bone_angle = 94.468
+
+[node name="Bone2D3" type="Bone2D" parent="Node2D/Character/Skeleton2D/root" unique_id=1805428309]
+position = Vector2(-74, 10)
+rest = Transform2D(1, 0, 0, 1, -74, 10)
+auto_calculate_length_and_angle = false
+length = 230.032
+bone_angle = -271.39584
+
+[node name="SnowParticles" type="GPUParticles2D" parent="." unique_id=1217192378]
+position = Vector2(1232, 446)
+amount = 50
+texture = ExtResource("4_0l1gx")
+lifetime = 10.0
+process_material = SubResource("ParticleProcessMaterial_r5y1g")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=933729327]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 16.0
+offset_top = 110.0
+offset_right = 486.0
+offset_bottom = 522.0
 
-[node name="StartBtn" type="Button" parent="." unique_id=1838315918]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -268.0
-offset_top = 135.0
-offset_right = 268.01782
-offset_bottom = 257.5
-grow_horizontal = 2
-grow_vertical = 2
-pivot_offset = Vector2(272, 62)
-theme_override_styles/normal = SubResource("StyleBoxEmpty_tqs1h")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_xdxr3")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_7gm40")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_2o872")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_crvna")
-icon = ExtResource("4_xdxr3")
-expand_icon = true
-
-[node name="VBoxContainer" type="HBoxContainer" parent="." unique_id=1453624530]
-layout_mode = 1
-offset_left = 19.0
-offset_top = 11.0
-offset_right = 674.0
-offset_bottom = 61.0
-theme_override_constants/separation = 18
-
-[node name="CoinsPanel" type="TextureRect" parent="VBoxContainer" unique_id=905327197]
-custom_minimum_size = Vector2(200, 10)
+[node name="PlayButton" type="TextureButton" parent="VBoxContainer" unique_id=624735972]
+custom_minimum_size = Vector2(415, 80)
 layout_mode = 2
-size_flags_horizontal = 0
-texture = ExtResource("5_2o872")
-expand_mode = 1
+texture_normal = ExtResource("3_2o872")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="CoinsLabel" type="Label" parent="VBoxContainer/CoinsPanel" unique_id=128574436]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 62.0
-offset_top = 6.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_itgdb")
-vertical_alignment = 1
-
-[node name="AddCoinButton" type="Button" parent="VBoxContainer/CoinsPanel" unique_id=1327488922]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -38.0
-offset_top = -20.0
-offset_bottom = 19.0
-grow_horizontal = 0
-grow_vertical = 2
-pivot_offset = Vector2(18, 20)
-theme_override_styles/normal = SubResource("StyleBoxEmpty_iank1")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_jvv0a")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_5c1lc")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_2x2q0")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_2rfn5")
-icon = ExtResource("7_lsguj")
-expand_icon = true
-
-[node name="GemsPanel" type="TextureRect" parent="VBoxContainer" unique_id=247262246]
-custom_minimum_size = Vector2(200, 50)
+[node name="MatchButton" type="TextureButton" parent="VBoxContainer" unique_id=688698875]
+custom_minimum_size = Vector2(420, 80)
 layout_mode = 2
-texture = ExtResource("6_crvna")
-expand_mode = 1
+texture_normal = ExtResource("4_crvna")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="GemsLabel" type="Label" parent="VBoxContainer/GemsPanel" unique_id=1920713500]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 67.0
-offset_top = 7.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_itgdb")
-vertical_alignment = 1
-
-[node name="AddGemButton" type="Button" parent="VBoxContainer/GemsPanel" unique_id=304241489]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -37.0
-offset_top = -17.0
-offset_bottom = 21.0
-grow_horizontal = 0
-grow_vertical = 2
-pivot_offset = Vector2(19, 19)
-theme_override_styles/normal = SubResource("StyleBoxEmpty_iank1")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_jvv0a")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_5c1lc")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_2x2q0")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_2rfn5")
-icon = ExtResource("7_lsguj")
-expand_icon = true
-
-[node name="LevelPanel" type="TextureRect" parent="VBoxContainer" unique_id=934022106]
-custom_minimum_size = Vector2(200, 50)
+[node name="ShopButton" type="TextureButton" parent="VBoxContainer" unique_id=1953140302]
+custom_minimum_size = Vector2(470, 80)
 layout_mode = 2
-texture = ExtResource("7_itgdb")
-expand_mode = 1
+texture_normal = ExtResource("12_icdhx")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="LevelLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=1017120871]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = 20.0
-offset_top = -11.0
-offset_right = 20.0
-offset_bottom = 12.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_itgdb")
-vertical_alignment = 1
-
-[node name="XPLabel" type="Label" parent="VBoxContainer/LevelPanel" unique_id=74010488]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 71.0
-offset_top = 6.0
-offset_right = 1.0
-offset_bottom = -7.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_itgdb")
-vertical_alignment = 1
-
-[node name="ProgressBar" type="TextureProgressBar" parent="VBoxContainer/LevelPanel" unique_id=726178992]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="NameLabel" type="Label" parent="VBoxContainer" unique_id=476809903]
+[node name="SelectitemButton" type="TextureButton" parent="VBoxContainer" unique_id=1129265991]
+custom_minimum_size = Vector2(470, 80)
 layout_mode = 2
+texture_normal = ExtResource("6_itgdb")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1679877056]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -152.0
-offset_top = 7.0
-offset_right = -18.0
-offset_bottom = 75.0
-grow_horizontal = 0
-theme_override_constants/separation = 16
-
-[node name="Button" type="Button" parent="HBoxContainer" unique_id=2108579722]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("StyleBoxEmpty_a4aoj")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_m34fa")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_qxx26")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_666dn")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_fn8dy")
-icon = ExtResource("10_kqkpe")
-expand_icon = true
-
-[node name="Button2" type="Button" parent="HBoxContainer" unique_id=1475676340]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("StyleBoxEmpty_b75bm")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_l5lhe")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_offnm")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_7epwv")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_1d8i2")
-icon = ExtResource("11_icdhx")
-expand_icon = true
-
-[node name="ShopButton" type="Button" parent="." unique_id=1918660808]
+[node name="StartButton" type="TextureButton" parent="." unique_id=1117445855]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -127.0
-offset_top = -122.0
-offset_right = -27.0
-offset_bottom = -22.0
+offset_left = -421.0
+offset_top = -190.0
+offset_right = -21.0
+offset_bottom = -70.0
 grow_horizontal = 0
 grow_vertical = 0
-pivot_offset = Vector2(49, 50)
-theme_override_styles/normal = SubResource("StyleBoxEmpty_eky0e")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_2vn1i")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_acbec")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_tbsxf")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_mphty")
-icon = ExtResource("12_icdhx")
-expand_icon = true
+texture_normal = ExtResource("7_2o872")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="TextureRect2" type="TextureRect" parent="." unique_id=109722327]
+[node name="TypeButton" type="TextureButton" parent="." unique_id=237910441]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -421.0
+offset_top = -253.0
+offset_right = -21.0
+offset_bottom = -163.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("8_crvna")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TypeButton" unique_id=1527860243]
 layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_left = -703.0
-offset_top = -400.0
-offset_right = 97.0
-offset_bottom = 400.0
+offset_left = 73.0
+offset_top = -25.0
+offset_right = 113.0
+offset_bottom = 25.0
 grow_vertical = 2
-texture = ExtResource("13_wj25d")
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="TypeButton/VBoxContainer" unique_id=1338066192]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_itgdb")
+text = "عملیات ضربت"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TypeLabel" type="Label" parent="TypeButton/VBoxContainer" unique_id=1772476944]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 15
+text = "4 | 4"
+
+[node name="BattlepassBox" type="TextureRect" parent="." unique_id=1247559096]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -420.99994
+offset_top = -497.0
+offset_right = 222.0
+offset_bottom = -279.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.6, 0.6)
+pivot_offset = Vector2(0.10974121, 218.01096)
+texture = ExtResource("10_lsguj")
+stretch_mode = 5
+script = ExtResource("91_pass")
+
+[node name="SeeresultButton" type="TextureButton" parent="BattlepassBox" unique_id=1586160660]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -303.23984
+offset_top = -53.340652
+offset_right = 301.76013
+offset_bottom = -13.340652
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("11_icdhx")
+
+[node name="BattlepassFill" type="TextureRect" parent="BattlepassBox" unique_id=447903605]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 131.59352
+offset_top = -7.6739883
+offset_right = 141.59352
+offset_bottom = 8.992699
+grow_vertical = 2
+texture = ExtResource("12_wj25d")
 expand_mode = 1
 
-[connection signal="pressed" from="CharSelectBtn" to="." method="_on_char_select_btn_pressed"]
-[connection signal="pressed" from="VBoxContainer/CoinsPanel/AddCoinButton" to="." method="_on_add_coin_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/GemsPanel/AddGemButton" to="." method="_on_add_gem_button_pressed"]
-[connection signal="pressed" from="ShopButton" to="." method="_on_shop_button_pressed"]
+[node name="BattlepassnumberLabel" type="Label" parent="BattlepassBox" unique_id=1278493025]
+layout_mode = 0
+offset_left = 43.260193
+offset_top = 77.99271
+offset_right = 83.26019
+offset_bottom = 141.9927
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 40
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BattlepassseasonLabel" type="Label" parent="BattlepassBox" unique_id=573355911]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -91.40643
+offset_top = -0.340627
+offset_right = -46.479675
+offset_bottom = 48.659374
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 30
+text = "1"
+vertical_alignment = 1
+
+[node name="BattlepassexprienceLabel" type="Label" parent="BattlepassBox" unique_id=1558924219]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -163.07315
+offset_top = -37.673958
+offset_right = -120.07312
+offset_bottom = -14.673958
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 30
+text = "0/100"
+
+[node name="dailyMissions" type="TextureRect" parent="." unique_id=525179852]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -421.0
+offset_top = 60.0
+offset_right = -34.0
+offset_bottom = 240.0
+grow_horizontal = 0
+texture = ExtResource("14_iank1")
+expand_mode = 1
+stretch_mode = 4
+script = ExtResource("90_missions")
+
+[node name="TimeLabel" type="Label" parent="dailyMissions" unique_id=629074189]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -56.0
+offset_top = 6.0
+offset_right = -5.0
+offset_bottom = 23.0
+grow_horizontal = 0
+pivot_offset = Vector2(75, 0)
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 12
+text = "24 : 12 : 52"
+
+[node name="AllmissionsButton" type="TextureRect" parent="dailyMissions" unique_id=13125532]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.033
+anchor_top = 0.88000005
+anchor_right = 0.97
+anchor_bottom = 1.0070001
+offset_left = 0.10000038
+offset_top = -7.9600067
+offset_bottom = -7.9940186
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("11_kqkpe")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="dailyMissions" unique_id=50992648]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 25.0
+offset_right = -19.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="Mission1" type="TextureRect" parent="dailyMissions/VBoxContainer" unique_id=1116144279]
+custom_minimum_size = Vector2(280, 35)
+layout_mode = 2
+texture = ExtResource("16_5c1lc")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MissionFill" type="TextureRect" parent="dailyMissions/VBoxContainer/Mission1" unique_id=1636563429]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 0.12900001
+anchor_bottom = 0.694
+offset_left = 43.0
+offset_top = 0.5
+offset_right = 1.3989983
+offset_bottom = 1.7099991
+grow_vertical = 2
+texture = ExtResource("17_a4aoj")
+expand_mode = 1
+
+[node name="XpLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission1" unique_id=112424756]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = -6.5
+offset_bottom = 6.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "250xp"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AmountLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission1" unique_id=1477966724]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -4.5
+offset_right = -54.0
+offset_bottom = 5.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "1/20"
+
+[node name="TitleLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission1" unique_id=33440546]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 87.0
+offset_top = -11.5
+offset_right = 188.0
+offset_bottom = 11.5
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("9_itgdb")
+theme_override_font_sizes/font_size = 12
+text = "20 حریف رو حذف کن"
+
+[node name="Mission2" type="TextureRect" parent="dailyMissions/VBoxContainer" unique_id=734774487]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+texture = ExtResource("18_m34fa")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission2" unique_id=2118884211]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 87.0
+offset_top = -12.5
+offset_right = 188.0
+offset_bottom = 10.5
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("9_itgdb")
+theme_override_font_sizes/font_size = 12
+text = "20 حریف رو حذف کن"
+
+[node name="MissionFill" type="TextureRect" parent="dailyMissions/VBoxContainer/Mission2" unique_id=1279490690]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 43.0
+offset_top = 0.5
+offset_right = 49.0
+offset_bottom = 8.5
+grow_vertical = 2
+texture = ExtResource("17_a4aoj")
+expand_mode = 1
+
+[node name="XpLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission2" unique_id=779467858]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = -6.5
+offset_bottom = 6.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "250xp"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AmountLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission2" unique_id=1152835048]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -4.5
+offset_right = -54.0
+offset_bottom = 5.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "1/20"
+
+[node name="Mission3" type="TextureRect" parent="dailyMissions/VBoxContainer" unique_id=572626729]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+texture = ExtResource("19_qxx26")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission3" unique_id=478018534]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 86.0
+offset_top = -12.5
+offset_right = 187.0
+offset_bottom = 10.5
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("9_itgdb")
+theme_override_font_sizes/font_size = 12
+text = "20 حریف رو حذف کن"
+
+[node name="MissionFill" type="TextureRect" parent="dailyMissions/VBoxContainer/Mission3" unique_id=283764256]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 43.0
+offset_top = 0.5
+offset_right = 49.0
+offset_bottom = 8.5
+grow_vertical = 2
+texture = ExtResource("17_a4aoj")
+expand_mode = 1
+
+[node name="XpLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission3" unique_id=1300534947]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = -6.5
+offset_bottom = 6.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "250xp"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AmountLabel" type="Label" parent="dailyMissions/VBoxContainer/Mission3" unique_id=1067880650]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -70.0
+offset_top = -4.5
+offset_right = -54.0
+offset_bottom = 5.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("26_1d8i2")
+theme_override_font_sizes/font_size = 14
+text = "1/20"
+
+[node name="BottomMenu" type="TextureRect" parent="." unique_id=550916517]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.91400003
+anchor_right = 1.0
+anchor_bottom = 1.008
+offset_left = -2.0
+offset_top = -13.272034
+offset_right = 3.0
+offset_bottom = -0.184021
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("20_m34fa")
+expand_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomMenu" unique_id=410151196]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 17.0
+offset_right = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="ChatButton" type="TextureButton" parent="BottomMenu/HBoxContainer" unique_id=119027567]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+texture_normal = ExtResource("21_qxx26")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Badge" type="Panel" parent="BottomMenu/HBoxContainer/ChatButton" unique_id=33159177]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -18.0
+offset_top = -6.0
+offset_right = 8.0
+offset_bottom = 20.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_chat_badge")
+
+[node name="Count" type="Label" parent="BottomMenu/HBoxContainer/ChatButton/Badge" unique_id=743475601]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="BottomMenu/HBoxContainer" unique_id=1584203317]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BottomMenu/HBoxContainer" unique_id=599336802]
+layout_mode = 2
+alignment = 2
+
+[node name="RankButton" type="TextureButton" parent="BottomMenu/HBoxContainer/HBoxContainer" unique_id=246307187]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+texture_normal = ExtResource("22_b75bm")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CityButton" type="TextureButton" parent="BottomMenu/HBoxContainer/HBoxContainer" unique_id=1926762192]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+texture_normal = ExtResource("23_l5lhe")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="LeadboardButton" type="TextureButton" parent="BottomMenu/HBoxContainer/HBoxContainer" unique_id=146349429]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+texture_normal = ExtResource("24_offnm")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TopBar" parent="." unique_id=517182497 instance=ExtResource("40_topbar")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=17368209]
+libraries/ = SubResource("AnimationLibrary_0l1gx")
+autoplay = &"idle"

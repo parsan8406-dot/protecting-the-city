@@ -1,0 +1,148 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/rename_dialog.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_namefont"]
+
+[sub_resource type="StyleBoxFlat" id="SB_dialog"]
+bg_color = Color(0.086, 0.086, 0.094, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.043, 0.075, 0.7)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_btn"]
+bg_color = Color(0.2, 0.2, 0.22, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.62, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_accent"]
+bg_color = Color(0.72, 0.04, 0.07, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="RenameDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.68)
+
+[node name="Dialog" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(440, 240)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -120.0
+offset_right = 220.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(220, 120)
+theme_override_styles/panel = SubResource("SB_dialog")
+
+[node name="Margin" type="MarginContainer" parent="Dialog"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="Body" type="VBoxContainer" parent="Dialog/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Dialog/Margin/Body"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 20
+text = "تغییر نام کاربری"
+horizontal_alignment = 2
+
+[node name="NameEdit" type="LineEdit" parent="Dialog/Margin/Body"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_namefont")
+theme_override_font_sizes/font_size = 22
+max_length = 20
+placeholder_text = "نام جدید"
+alignment = 1
+caret_blink = true
+
+[node name="HintLabel" type="Label" parent="Dialog/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.52, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "بین ۳ تا ۲۰ کاراکتر — فقط حروف انگلیسی، عدد و آندرلاین"
+horizontal_alignment = 2
+
+[node name="ErrorLabel" type="Label" parent="Dialog/Margin/Body"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.28, 0.28, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = ""
+horizontal_alignment = 2
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="Dialog/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Dialog/Margin/Body"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="SaveButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("SB_btn_accent")
+theme_override_styles/hover = SubResource("SB_btn_accent")
+theme_override_styles/pressed = SubResource("SB_btn_accent")
+theme_override_styles/disabled = SubResource("SB_btn")
+text = "ذخیره"
+
+[node name="CancelButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
+custom_minimum_size = Vector2(150, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("SB_btn")
+theme_override_styles/hover = SubResource("SB_btn")
+theme_override_styles/pressed = SubResource("SB_btn")
+text = "انصراف"

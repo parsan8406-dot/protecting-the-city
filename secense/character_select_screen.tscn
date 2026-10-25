@@ -1,30 +1,22 @@
 [gd_scene format=3 uid="uid://bnlpx0dyhcile"]
 
-[ext_resource type="Script" uid="uid://umhowgn3h14x" path="res://scripts/character_select_screen.gd" id="1_3a6v1"]
-[ext_resource type="Texture2D" uid="uid://bp4c76qnkm6ay" path="res://assets/Rectangle (2).png" id="2_74l3e"]
-[ext_resource type="Texture2D" uid="uid://0qukk1sb1y0t" path="res://assets/menuchar.png" id="3_74l3e"]
-[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="3_bnqy1"]
-[ext_resource type="Texture2D" uid="uid://cvnmc103ux04a" path="res://assets/Path.png" id="3_l5yg1"]
-[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="6_hvwck"]
+[ext_resource type="Script" uid="uid://umhowgn3h14x" path="res://scripts/character_select_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://biu274pla2bis" path="res://assets/ChatGPT Image Aug 14, 2026, 09_50_52 PM.png" id="2_redbg"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="3_lavalight"]
+[ext_resource type="Texture2D" uid="uid://b8210jltvcc1q" path="res://assets/ChatGPT Image Aug 14, 2026, 09_51_19 PM (1).png" id="4_moltenrocks"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="5_font"]
+[ext_resource type="Texture2D" uid="uid://dlg4m2u5fcgdp" path="res://assets/sugUp_home.png" id="6_home"]
+[ext_resource type="PackedScene" path="res://secense/top_bar.tscn" id="7_topbar"]
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bnqy1"]
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_rocks"]
 light_mode = 1
 
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ywn7r"]
-light_mode = 1
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_hvwck"]
-light_mode = 1
-
-[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_5ko3l"]
-light_mode = 1
-
-[sub_resource type="Animation" id="Animation_ywn7r"]
+[sub_resource type="Animation" id="Animation_reset"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Node2D/LavaLight:position")
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -33,210 +25,350 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(-77.00001, -174.00002)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.54352754]
+}
 
-[sub_resource type="Animation" id="Animation_cf44g"]
+[sub_resource type="Animation" id="Animation_lightmove"]
 resource_name = "light_move"
 length = 7.0
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Node2D/LavaLight:position")
+tracks/0/path = NodePath("BackgroundAction/LavaLight:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 1.01, 7),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 1.02, 6.99, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [Vector2(-77.00001, -174.00002), Vector2(1000, 1000), Vector2(1000, 1000)]
+"values": [Vector2(-2976, 1447), Vector2(-2537, 3182), Vector2(-2537, 3182), Vector2(-2976, 1447)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BackgroundAction/LavaLight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.01, 1, 1.02, 7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [-0.54352754, -0.54352754, -0.54352754, -0.54352754, -0.54352754]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_6n400"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bg"]
 _data = {
-&"RESET": SubResource("Animation_ywn7r"),
-&"light_move": SubResource("Animation_cf44g")
+&"RESET": SubResource("Animation_reset"),
+&"light_move": SubResource("Animation_lightmove")
 }
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hvwck"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5ko3l"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ywn7r"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cf44g"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6n400"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qxnfv"]
-
-[node name="CharacterSelectScreen" type="Control" unique_id=186032089]
+[node name="CharacterSelectScreen" type="Control" unique_id=1073899498]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_3a6v1")
+script = ExtResource("1_script")
 
-[node name="Node2D" type="Control" parent="." unique_id=168889155]
+[node name="BackgroundAction" type="Control" parent="." unique_id=426694175]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
-[node name="RedBG" type="TextureRect" parent="Node2D" unique_id=1178484458]
+[node name="RedBG" type="TextureRect" parent="BackgroundAction" unique_id=1562858904]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_74l3e")
+mouse_filter = 2
+texture = ExtResource("2_redbg")
 expand_mode = 1
 
-[node name="LavaLight" type="PointLight2D" parent="Node2D" unique_id=1613793039]
-position = Vector2(-77.00001, -174.00002)
+[node name="LavaLight" type="TextureRect" parent="BackgroundAction" unique_id=1247407478]
+modulate = Color(1, 0.7696696, 0.73171073, 1)
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -77.00001
+offset_top = -498.0
+offset_right = -77.0
+offset_bottom = -118.72743
+grow_horizontal = 2
+grow_vertical = 2
 rotation = -0.54352754
-scale = Vector2(12.219881, 1)
-color = Color(0.71551484, 0.21765238, 0, 1)
-energy = 3.75
-texture = ExtResource("3_bnqy1")
+scale = Vector2(12.219881, 0.106689215)
+mouse_filter = 2
+texture = ExtResource("3_lavalight")
 
-[node name="ColorRect" type="ColorRect" parent="Node2D" unique_id=1419105522]
+[node name="ColorRect" type="ColorRect" parent="BackgroundAction" unique_id=940999230]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.29463828, 1.8349849e-07, 4.813075e-08, 0.5254902)
 
-[node name="MoltenRocks" type="TextureRect" parent="Node2D" unique_id=386027496]
-material = SubResource("CanvasItemMaterial_bnqy1")
+[node name="MoltenRocks" type="TextureRect" parent="BackgroundAction" unique_id=979752072]
+modulate = Color(0.24985075, 0.24985075, 0.24985075, 1)
+material = SubResource("CanvasItemMaterial_rocks")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -55.0
-offset_top = -55.0
-offset_right = 45.0
-offset_bottom = -55.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_l5yg1")
+mouse_filter = 2
+texture = ExtResource("4_moltenrocks")
 expand_mode = 1
 
-[node name="CharImage" type="TextureRect" parent="." unique_id=2062959945]
-material = SubResource("CanvasItemMaterial_ywn7r")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1218450609]
+libraries/ = SubResource("AnimationLibrary_bg")
+autoplay = &"light_move"
+
+[node name="HeaderTabs" type="Control" parent="." unique_id=1564220376]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 60.0
+offset_bottom = 108.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Tabs" type="HBoxContainer" parent="HeaderTabs" unique_id=2109000774]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CharactersButton" type="Button" parent="HeaderTabs/Tabs" unique_id=624868795]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "کاراکترها"
+
+[node name="WeaponsButton" type="Button" parent="HeaderTabs/Tabs" unique_id=1167374893]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "سلاح‌ها"
+
+[node name="CharSkinsButton" type="Button" parent="HeaderTabs/Tabs" unique_id=2034771445]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "اسکین کاراکتر"
+
+[node name="WeaponSkinsButton" type="Button" parent="HeaderTabs/Tabs" unique_id=1162583351]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "اسکین سلاح"
+
+[node name="Content" type="Control" parent="." unique_id=253001883]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 112.0
+offset_right = -16.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CardsPanel" type="Panel" parent="Content" unique_id=225635728]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.605
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardsScroll" type="ScrollContainer" parent="Content/CardsPanel" unique_id=1476987219]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = -10.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="CardsGrid" type="GridContainer" parent="Content/CardsPanel/CardsScroll" unique_id=1534617512]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 4
+
+[node name="EmptyLabel" type="Label" parent="Content/CardsPanel" unique_id=1732857743]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -148.0
-offset_top = -70.0
-offset_right = -108.0
-offset_bottom = -30.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(1.4, 1.4)
-
-[node name="CharBar2" type="TextureRect" parent="." unique_id=1477618714]
-material = SubResource("CanvasItemMaterial_hvwck")
-custom_minimum_size = Vector2(575, 400)
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -578.0
-offset_top = -296.0
-offset_right = -3.0
-offset_bottom = 104.0
-grow_horizontal = 0
-grow_vertical = 0
-texture = ExtResource("3_74l3e")
-expand_mode = 1
-
-[node name="ScrollContainer" type="ScrollContainer" parent="CharBar2" unique_id=514971954]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 20.0
+offset_left = -160.0
+offset_top = -20.0
+offset_right = 160.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.72, 0.68, 0.6, 1)
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "در حال گرفتن لیست..."
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="CharactersGrid" type="GridContainer" parent="CharBar2/ScrollContainer" unique_id=872023168]
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 4
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 4
-
-[node name="CharBar" type="TextureRect" parent="." unique_id=933926876]
-material = SubResource("CanvasItemMaterial_5ko3l")
-custom_minimum_size = Vector2(575, 400)
+[node name="Showcase" type="Panel" parent="Content" unique_id=1499228156]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
+anchors_preset = -1
+anchor_left = 0.62
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -295.0
-offset_right = 575.0
-offset_bottom = 105.0
-grow_vertical = 0
-texture = ExtResource("3_74l3e")
-expand_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CharBar" unique_id=435663521]
+[node name="NameLabel" type="Label" parent="Content/Showcase" unique_id=826969930]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 56.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.7882353, 0.23529412, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 32
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RarityChip" type="Panel" parent="Content/Showcase" unique_id=2038597597]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -62.0
+offset_top = 60.0
+offset_right = 62.0
+offset_bottom = 88.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="RarityLabel" type="Label" parent="Content/Showcase/RarityChip" unique_id=1479920358]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 22.0
-offset_bottom = 22.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 16
+text = "معمولی"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="WeaponsGrid" type="GridContainer" parent="CharBar/ScrollContainer" unique_id=1752818677]
-layout_mode = 2
-size_flags_horizontal = 6
-size_flags_vertical = 4
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
-columns = 3
+[node name="PreviewImage" type="TextureRect" parent="Content/Showcase" unique_id=1771076537]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 94.0
+offset_right = -20.0
+offset_bottom = 284.0
+grow_horizontal = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=593772412]
+[node name="StatsBox" type="VBoxContainer" parent="Content/Showcase" unique_id=1561161053]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 290.0
+offset_right = -16.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=785472993]
-libraries/ = SubResource("AnimationLibrary_6n400")
-autoplay = &"light_move"
+[node name="ActionButton" type="Button" parent="Content/Showcase" unique_id=1234357558]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -66.0
+offset_right = -24.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 26
+text = "انتخاب کن"
 
-[node name="BackButton" type="Button" parent="." unique_id=1527593084]
+[node name="TopBar" parent="." unique_id=1808685371 instance=ExtResource("7_topbar")]
+
+[node name="HomeButton" type="TextureButton" parent="." unique_id=310177515]
+custom_minimum_size = Vector2(62, 62)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -127.0
-offset_top = 50.0
-offset_right = -50.0
-offset_bottom = 100.0
+offset_left = -78.0
+offset_top = 60.0
+offset_right = -16.0
+offset_bottom = 122.0
 grow_horizontal = 0
-pivot_offset = Vector2(38, 26)
-theme_override_fonts/font = ExtResource("6_hvwck")
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = SubResource("StyleBoxEmpty_hvwck")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_5ko3l")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_ywn7r")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_cf44g")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_6n400")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_qxnfv")
-text = "بازگشت"
-
-[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
+texture_normal = ExtResource("6_home")
+ignore_texture_size = true
+stretch_mode = 5

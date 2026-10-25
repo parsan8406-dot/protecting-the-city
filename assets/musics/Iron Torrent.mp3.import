@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://caknn8vb4jxte"
+path="res://.godot/imported/Iron Torrent.mp3-926b5a1f205f7ef4918dc740f5dbd860.mp3str"
+
+[deps]
+
+source_file="res://assets/musics/Iron Torrent.mp3"
+dest_files=["res://.godot/imported/Iron Torrent.mp3-926b5a1f205f7ef4918dc740f5dbd860.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

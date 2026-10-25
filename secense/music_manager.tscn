@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://d1no57v4j7hyt"]
+
+[ext_resource type="AudioStream" uid="uid://caknn8vb4jxte" path="res://assets/musics/Iron Torrent.mp3" id="1_5boc5"]
+[ext_resource type="Script" uid="uid://04d6qev4cx5" path="res://scripts/music_manager.gd" id="2_f1d0w"]
+
+[node name="MusicManager" type="AudioStreamPlayer" unique_id=541972581]
+stream = ExtResource("1_5boc5")
+volume_db = -14.857
+bus = &"Music"
+parameters/looping = true
+script = ExtResource("2_f1d0w")

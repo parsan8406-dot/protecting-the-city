@@ -1,0 +1,178 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/chat_bubble.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Script" path="res://scripts/chat_avatar.gd" id="4_avatar"]
+[ext_resource type="Texture2D" path="res://assets/chat/icons/crown.svg" id="5_crown"]
+
+[sub_resource type="StyleBoxFlat" id="SB_bubble"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.075, 0.125, 0.2, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.16, 0.26, 0.4, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_mine"]
+content_margin_left = 14.0
+content_margin_top = 8.0
+content_margin_right = 14.0
+content_margin_bottom = 8.0
+bg_color = Color(0.06, 0.26, 0.5, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.6, 1, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 3
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_dot"]
+bg_color = Color(0.16, 0.85, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.03, 0.05, 0.09, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="ChatBubble" type="MarginContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 5
+script = ExtResource("1_script")
+style_mine = SubResource("SB_mine")
+
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="AvatarSlot" type="Control" parent="Row"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="Avatar" type="TextureRect" parent="Row/AvatarSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+script = ExtResource("4_avatar")
+
+[node name="OnlineDot" type="Panel" parent="Row/AvatarSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -13.0
+offset_top = -13.0
+offset_right = -1.0
+offset_bottom = -1.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_dot")
+
+[node name="Col" type="VBoxContainer" parent="Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="Head" type="HBoxContainer" parent="Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="Row/Col/Head"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.33, 0.7, 1, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 17
+text = "Player"
+vertical_alignment = 1
+
+[node name="Crown" type="TextureRect" parent="Row/Col/Head"]
+visible = false
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("5_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LevelLabel" type="Label" parent="Row/Col/Head"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6, 0.66, 0.74, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "Lv.1"
+vertical_alignment = 1
+
+[node name="Line" type="HBoxContainer" parent="Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Bubble" type="PanelContainer" parent="Row/Col/Line"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_bubble")
+
+[node name="Text" type="RichTextLabel" parent="Row/Col/Line/Bubble"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.93, 0.95, 0.98, 1)
+theme_override_fonts/normal_font = ExtResource("3_num")
+theme_override_font_sizes/normal_font_size = 17
+bbcode_enabled = true
+text = "..."
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+shortcut_keys_enabled = false
+
+[node name="BigEmoji" type="HBoxContainer" parent="Row/Col/Line"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TimeLabel" type="Label" parent="Row/Col/Line"]
+layout_mode = 2
+size_flags_vertical = 8
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.53, 0.58, 0.66, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 13
+text = "00:00"

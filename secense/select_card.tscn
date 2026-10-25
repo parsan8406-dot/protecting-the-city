@@ -1,0 +1,98 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/select_card.gd" id="1_card"]
+[ext_resource type="Texture2D" uid="uid://bhindjlqc42e6" path="res://assets/sugUp_rarety.png" id="2_rarity"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_font"]
+
+[node name="SelectCard" type="Control"]
+custom_minimum_size = Vector2(150, 206)
+offset_right = 150.0
+offset_bottom = 206.0
+script = ExtResource("1_card")
+
+[node name="Frame" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ItemImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 14.0
+offset_right = -12.0
+offset_bottom = -66.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RarityIcon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 1
+offset_left = 9.0
+offset_top = 9.0
+offset_right = 31.0
+offset_bottom = 31.0
+mouse_filter = 2
+texture = ExtResource("2_rarity")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = -63.0
+offset_right = -7.0
+offset_bottom = -39.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "نام آیتم"
+horizontal_alignment = 1
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="StatusChip" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = -35.0
+offset_right = -9.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="StatusLabel" type="Label" parent="StatusChip"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "انتخاب"
+horizontal_alignment = 1
+vertical_alignment = 1

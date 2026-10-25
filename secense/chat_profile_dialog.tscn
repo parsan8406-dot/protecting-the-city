@@ -1,0 +1,268 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/chat_profile_dialog.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.08, 0.075, 0.08, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.63, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="SB_dot"]
+bg_color = Color(0.16, 0.85, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.08, 0.075, 0.08, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[sub_resource type="StyleBoxFlat" id="SB_add"]
+bg_color = Color(0.6, 0.08, 0.08, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.83, 0.32, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 16.0
+content_margin_top = 9.0
+content_margin_right = 16.0
+content_margin_bottom = 9.0
+
+[sub_resource type="StyleBoxFlat" id="SB_close"]
+bg_color = Color(0.18, 0.18, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.5, 0.53, 0.7)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 16.0
+content_margin_top = 9.0
+content_margin_right = 16.0
+content_margin_bottom = 9.0
+
+[node name="ChatProfileDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.62)
+
+[node name="Card" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -120.0
+offset_right = 190.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="Col" type="VBoxContainer" parent="Card/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopRow" type="HBoxContainer" parent="Card/Margin/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="AvatarSlot" type="Control" parent="Card/Margin/Col/TopRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Avatar" type="TextureRect" parent="Card/Margin/Col/TopRow/AvatarSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="OnlineDot" type="Panel" parent="Card/Margin/Col/TopRow/AvatarSlot"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -15.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 15.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_dot")
+
+[node name="LevelLabel" type="Label" parent="Card/Margin/Col/TopRow/AvatarSlot"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_top = -24.0
+offset_right = 33.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.16, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "1"
+vertical_alignment = 2
+
+[node name="Info" type="VBoxContainer" parent="Card/Margin/Col/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="NameLabel" type="Label" parent="Card/Margin/Col/TopRow/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 25
+text = "Player"
+text_overrun_behavior = 3
+
+[node name="StatusLabel" type="Label" parent="Card/Margin/Col/TopRow/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.65, 0.65, 0.68, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "آفلاین"
+
+[node name="ClanLabel" type="Label" parent="Card/Margin/Col/TopRow/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.72, 0.72, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "شهر : بدون شهر"
+text_overrun_behavior = 3
+
+[node name="TierRow" type="HBoxContainer" parent="Card/Margin/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="TierName" type="Label" parent="Card/Margin/Col/TierRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.63, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+text = "رده :"
+
+[node name="TierValue" type="Label" parent="Card/Margin/Col/TierRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.92, 0.78, 0.36, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "—"
+
+[node name="TierBadge" type="TextureRect" parent="Card/Margin/Col/TierRow"]
+visible = false
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResultLabel" type="Label" parent="Card/Margin/Col"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.78, 0.45, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Actions" type="HBoxContainer" parent="Card/Margin/Col"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddButton" type="Button" parent="Card/Margin/Col/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.94, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_add")
+theme_override_styles/pressed = SubResource("SB_add")
+theme_override_styles/disabled = SubResource("SB_close")
+theme_override_styles/normal = SubResource("SB_add")
+text = "درخواست دوستی"
+
+[node name="CloseButton" type="Button" parent="Card/Margin/Col/Actions"]
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_close")
+theme_override_styles/pressed = SubResource("SB_close")
+theme_override_styles/normal = SubResource("SB_close")
+text = "بستن"

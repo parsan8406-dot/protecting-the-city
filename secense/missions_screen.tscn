@@ -1,0 +1,1531 @@
+[gd_scene load_steps=41 format=3]
+
+[ext_resource type="Script" path="res://scripts/missions_screen.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/bg_missions.png" id="20_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/banner_hero.png" id="21_hero"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/chest_daily.png" id="22_chestbig"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/motive_bg.png" id="23_motive"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/promo_figure.png" id="24_promo"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/season_hero.png" id="25_shero"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/season_banner_bg.png" id="26_sbg"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/season_badge.png" id="27_sbadge"]
+[ext_resource type="Texture2D" path="res://assets/ui/missions/promo_weapon.png" id="28_sweapon"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_back.png" id="4_back"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_help.svg" id="5_help"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_calendar.svg" id="6_calendar"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_gift.png" id="7_gift"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_star.svg" id="8_star"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_clock.svg" id="9_clock"]
+[ext_resource type="Texture2D" path="res://assets/icons/missions/icon_emblem.svg" id="10_emblem"]
+[ext_resource type="Texture2D" path="res://assets/ui/coin_icon.png" id="11_coin"]
+[ext_resource type="Texture2D" path="res://assets/ui/gem_icon.png" id="12_gem"]
+[ext_resource type="Texture2D" uid="uid://c20hek0tfsjg5" path="res://assets/startmenu_plus.png" id="14_plus"]
+[ext_resource type="Texture2D" uid="uid://cisbuh0p57tsw" path="res://assets/startmenu_messages.png" id="15_mail"]
+[ext_resource type="Texture2D" uid="uid://befw85nw8wrh1" path="res://assets/startmenu_friends.png" id="16_friends"]
+[ext_resource type="Texture2D" uid="uid://dbjruw4axl0vo" path="res://assets/startmenu_setting.png" id="17_settings"]
+
+[sub_resource type="AtlasTexture" id="AT_hero"]
+atlas = ExtResource("21_hero")
+region = Rect2(0, 0, 427, 368)
+
+[sub_resource type="StyleBoxFlat" id="SB_header"]
+bg_color = Color(0.027, 0.047, 0.078, 0.94)
+border_width_bottom = 1
+border_color = Color(0.09, 0.149, 0.227, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_card"]
+bg_color = Color(0.043, 0.075, 0.118, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.098, 0.153, 0.227, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_gold_btn"]
+bg_color = Color(0.91, 0.76, 0.29, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_gold_btn_hover"]
+bg_color = Color(1, 0.86, 0.4, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_gold_btn_off"]
+bg_color = Color(0.145, 0.129, 0.078, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.31, 0.267, 0.145, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_gold_card"]
+bg_color = Color(0.078, 0.063, 0.027, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.478, 0.396, 0.153, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_card_deep"]
+bg_color = Color(0.027, 0.051, 0.086, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.098, 0.153, 0.227, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_pill"]
+bg_color = Color(0.031, 0.063, 0.106, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.11, 0.176, 0.259, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="SB_chip"]
+bg_color = Color(0.031, 0.063, 0.106, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.118, 0.227, 0.361, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 9.0
+content_margin_top = 5.0
+content_margin_right = 9.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_on"]
+bg_color = Color(0.055, 0.161, 0.267, 1)
+border_width_right = 3
+border_color = Color(0.176, 0.553, 0.878, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 11.0
+content_margin_right = 12.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_on_hover"]
+bg_color = Color(0.071, 0.196, 0.318, 1)
+border_width_right = 3
+border_color = Color(0.29, 0.667, 0.949, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 11.0
+content_margin_right = 12.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_off"]
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 11.0
+content_margin_right = 12.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_off_hover"]
+bg_color = Color(1, 1, 1, 0.043)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 12.0
+content_margin_top = 11.0
+content_margin_right = 12.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
+bg_color = Color(0.075, 0.114, 0.169, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_blue"]
+bg_color = Color(0.176, 0.553, 0.878, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_bar_gold"]
+bg_color = Color(0.91, 0.76, 0.29, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_timer"]
+bg_color = Color(0.035, 0.086, 0.145, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.129, 0.271, 0.427, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="SB_badge"]
+bg_color = Color(0.898, 0.078, 0.169, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="SB_claim_off"]
+bg_color = Color(0.075, 0.106, 0.153, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 11.0
+content_margin_right = 14.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_claim_on"]
+bg_color = Color(0.91, 0.76, 0.29, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 11.0
+content_margin_right = 14.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_claim_on_hover"]
+bg_color = Color(1, 0.855, 0.42, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 14.0
+content_margin_top = 11.0
+content_margin_right = 14.0
+content_margin_bottom = 11.0
+
+[sub_resource type="StyleBoxFlat" id="SB_promo"]
+bg_color = Color(0.063, 0.098, 0.149, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.098, 0.153, 0.227, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="MissionsScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_script")
+
+[node name="BackgroundBase" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.024, 0.039, 0.063, 1)
+
+[node name="BackgroundArt" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.75)
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("20_bg")
+
+[node name="BackgroundTint" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.024, 0.039, 0.063, 0.42)
+
+[node name="MissionsHTTP" type="HTTPRequest" parent="."]
+
+[node name="MissionClaimHTTP" type="HTTPRequest" parent="."]
+
+[node name="BonusClaimHTTP" type="HTTPRequest" parent="."]
+
+[node name="SeasonHTTP" type="HTTPRequest" parent="."]
+
+[node name="SeasonClaimHTTP" type="HTTPRequest" parent="."]
+
+[node name="Header" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 54.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("SB_header")
+
+[node name="Margin" type="MarginContainer" parent="Header"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="Row" type="HBoxContainer" parent="Header/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="TextureButton" parent="Header/Margin/Row"]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("4_back")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Header/Margin/Row"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.93, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+text = "ماموریت‌ها"
+vertical_alignment = 1
+
+[node name="HelpButton" type="TextureButton" parent="Header/Margin/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+modulate = Color(0.54, 0.59, 0.67, 1)
+texture_normal = ExtResource("5_help")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Spacer" type="Control" parent="Header/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="CoinPill" type="PanelContainer" parent="Header/Margin/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_pill")
+
+[node name="Row" type="HBoxContainer" parent="Header/Margin/Row/CoinPill"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Header/Margin/Row/CoinPill/Row"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Header/Margin/Row/CoinPill/Row"]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 16
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusButton" type="TextureButton" parent="Header/Margin/Row/CoinPill/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("14_plus")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="GemPill" type="PanelContainer" parent="Header/Margin/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_pill")
+
+[node name="Row" type="HBoxContainer" parent="Header/Margin/Row/GemPill"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Header/Margin/Row/GemPill/Row"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("12_gem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Header/Margin/Row/GemPill/Row"]
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.788, 0.898, 0.973, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 16
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusButton" type="TextureButton" parent="Header/Margin/Row/GemPill/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("14_plus")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MailSlot" type="Control" parent="Header/Margin/Row"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="MailButton" type="TextureButton" parent="Header/Margin/Row/MailSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+texture_normal = ExtResource("15_mail")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Badge" type="PanelContainer" parent="Header/Margin/Row/MailSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 15.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_badge")
+
+[node name="Count" type="Label" parent="Header/Margin/Row/MailSlot/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FriendsButton" type="TextureButton" parent="Header/Margin/Row"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("16_friends")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SettingsButton" type="TextureButton" parent="Header/Margin/Row"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("17_settings")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Body" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 60.0
+offset_right = -10.0
+offset_bottom = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Sidebar" type="VBoxContainer" parent="Body"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DailySlot" type="Control" parent="Body/Sidebar"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+
+[node name="DailyButton" type="Button" parent="Body/Sidebar/DailySlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.91, 0.93, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+theme_override_constants/h_separation = 10
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_tab_on_hover")
+theme_override_styles/pressed = SubResource("SB_tab_on_hover")
+theme_override_styles/normal = SubResource("SB_tab_on")
+text = "ماموریت‌های روزانه"
+alignment = 2
+
+[node name="Icon" type="TextureRect" parent="Body/Sidebar/DailySlot"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -15.0
+offset_right = 42.0
+offset_bottom = 15.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_calendar")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Dot" type="Panel" parent="Body/Sidebar/DailySlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_top = 7.0
+offset_right = -6.0
+offset_bottom = 17.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_badge")
+
+[node name="SeasonSlot" type="Control" parent="Body/Sidebar"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+
+[node name="SeasonButton" type="Button" parent="Body/Sidebar/SeasonSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+theme_override_constants/h_separation = 10
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/hover = SubResource("SB_tab_off_hover")
+theme_override_styles/pressed = SubResource("SB_tab_off_hover")
+theme_override_styles/normal = SubResource("SB_tab_off")
+text = "پاداش‌های فصل"
+alignment = 2
+
+[node name="Icon" type="TextureRect" parent="Body/Sidebar/SeasonSlot"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -15.0
+offset_right = 42.0
+offset_bottom = 15.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_gift")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Dot" type="Panel" parent="Body/Sidebar/SeasonSlot"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_top = 7.0
+offset_right = -6.0
+offset_bottom = 17.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_badge")
+
+[node name="SidebarSpacer" type="Control" parent="Body/Sidebar"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Center" type="VBoxContainer" parent="Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="DailyPage" type="VBoxContainer" parent="Body/Center"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="BannerPanel" type="PanelContainer" parent="Body/Center/DailyPage"]
+custom_minimum_size = Vector2(0, 134)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card_deep")
+clip_children = 2
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/DailyPage/BannerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 0
+
+[node name="Row" type="HBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HeroArt" type="TextureRect" parent="Body/Center/DailyPage/BannerPanel/Margin/Row"]
+custom_minimum_size = Vector2(168, 0)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+texture = SubResource("AT_hero")
+
+[node name="Info" type="VBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="BannerTitle" type="Label" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "ماموریت‌های روزانه"
+horizontal_alignment = 2
+
+[node name="BannerSub" type="Label" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "ماموریت‌های جدید هر روز نیمه‌شب بروز می‌شوند."
+horizontal_alignment = 2
+
+[node name="TrackRow" type="HBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info"]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StarBox" type="VBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info/TrackRow"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Icon" type="TextureRect" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info/TrackRow/StarBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_filter = 2
+self_modulate = Color(0.91, 0.76, 0.29, 1)
+texture = ExtResource("8_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info/TrackRow/StarBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 15
+text = "—"
+horizontal_alignment = 1
+
+[node name="Track" type="HBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/Info/TrackRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="TimerBox" type="VBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 5
+
+[node name="Pad" type="Control" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Caption" type="Label" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "زمان باقی‌مانده"
+horizontal_alignment = 2
+
+[node name="TimerChip" type="PanelContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_timer")
+
+[node name="Row" type="HBoxContainer" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox/TimerChip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox/TimerChip/Row"]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+self_modulate = Color(0.29, 0.667, 0.949, 1)
+texture = ExtResource("9_clock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TimerLabel" type="Label" parent="Body/Center/DailyPage/BannerPanel/Margin/Row/TimerBox/TimerChip/Row"]
+custom_minimum_size = Vector2(88, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.29, 0.667, 0.949, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 18
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ListPanel" type="PanelContainer" parent="Body/Center/DailyPage"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/DailyPage/ListPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Body/Center/DailyPage/ListPanel/Margin"]
+layout_mode = 2
+
+[node name="EmptyLabel" type="Label" parent="Body/Center/DailyPage/ListPanel/Margin/Body"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "ماموریتی برای امروز نیست."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Body/Center/DailyPage/ListPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Body/Center/DailyPage/ListPanel/Margin/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SeasonPage" type="VBoxContainer" parent="Body/Center"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="BannerPanel" type="PanelContainer" parent="Body/Center/SeasonPage"]
+custom_minimum_size = Vector2(0, 132)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+clip_children = 2
+
+[node name="BannerArt" type="TextureRect" parent="Body/Center/SeasonPage/BannerPanel"]
+show_behind_parent = true
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.32)
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("26_sbg")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/BannerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Row" type="HBoxContainer" parent="Body/Center/SeasonPage/BannerPanel/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="LevelBox" type="VBoxContainer" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row"]
+custom_minimum_size = Vector2(190, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="BadgeArt" type="TextureRect" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/LevelBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture = ExtResource("27_sbadge")
+
+[node name="LevelLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/LevelBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 22
+text = "-"
+horizontal_alignment = 1
+
+[node name="Bar" type="ProgressBar" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/LevelBox"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_blue")
+value = 0.0
+show_percentage = false
+
+[node name="XpLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/LevelBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 13
+text = "-"
+horizontal_alignment = 1
+
+[node name="Info" type="VBoxContainer" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="TitleRow" type="HBoxContainer" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+theme_override_constants/separation = 8
+
+[node name="SubtitleLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info/TitleRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.76, 0.29, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 21
+text = "-"
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info/TitleRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "-"
+vertical_alignment = 1
+
+[node name="DescLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.66, 0.72, 0.8, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+theme_override_constants/line_spacing = 3
+text = "ماموریت ها را انجام دهید، امتیاز کسب کنید
+و جوایز افسانه ای بگیرید."
+horizontal_alignment = 2
+
+[node name="EndsRow" type="HBoxContainer" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info"]
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="EndsLabel" type="Label" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info/EndsRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 13
+text = "-"
+vertical_alignment = 1
+
+[node name="ClockIcon" type="TextureRect" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row/Info/EndsRow"]
+custom_minimum_size = Vector2(15, 15)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+modulate = Color(0.54, 0.59, 0.67, 1)
+texture = ExtResource("9_clock")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HeroArt" type="TextureRect" parent="Body/Center/SeasonPage/BannerPanel/Margin/Row"]
+custom_minimum_size = Vector2(228, 0)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("25_shero")
+
+[node name="LadderRow" type="HBoxContainer" parent="Body/Center/SeasonPage"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="LadderPanel" type="PanelContainer" parent="Body/Center/SeasonPage/LadderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/LadderRow/LadderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Scroll" type="ScrollContainer" parent="Body/Center/SeasonPage/LadderRow/LadderPanel/Margin"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="Ladder" type="HBoxContainer" parent="Body/Center/SeasonPage/LadderRow/LadderPanel/Margin/Scroll"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PassCards" type="VBoxContainer" parent="Body/Center/SeasonPage/LadderRow"]
+custom_minimum_size = Vector2(196, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GoldCard" type="PanelContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_gold_card")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Icon" type="TextureRect" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(0.91, 0.76, 0.29, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.91, 0.72, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+text = "بتل پس طلایی"
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.72, 0.66, 0.5, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "جوایز بیشتر، ارزش بالاتر"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PriceRow" type="HBoxContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Value" type="Label" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body/PriceRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.788, 0.898, 0.973, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 15
+text = "-"
+vertical_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body/PriceRow"]
+custom_minimum_size = Vector2(17, 17)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("12_gem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BuyButton" type="Button" parent="Body/Center/SeasonPage/LadderRow/PassCards/GoldCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.09, 0.07, 0.02, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.42, 0.32, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/disabled = SubResource("SB_gold_btn_off")
+theme_override_styles/hover = SubResource("SB_gold_btn_hover")
+theme_override_styles/pressed = SubResource("SB_gold_btn_hover")
+theme_override_styles/normal = SubResource("SB_gold_btn")
+text = "خرید"
+
+[node name="FreeCard" type="PanelContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card_deep")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Icon" type="TextureRect" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(0.54, 0.59, 0.67, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.96, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "بتل پس رایگان"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="StateLabel" type="Label" parent="Body/Center/SeasonPage/LadderRow/PassCards/FreeCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.42, 0.71, 0.44, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "فعال"
+horizontal_alignment = 1
+
+[node name="BottomRow" type="HBoxContainer" parent="Body/Center/SeasonPage"]
+custom_minimum_size = Vector2(0, 214)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ChallengesPanel" type="PanelContainer" parent="Body/Center/SeasonPage/BottomRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="VBoxContainer" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderRow" type="HBoxContainer" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+theme_override_constants/separation = 7
+
+[node name="TitleLabel" type="Label" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin/Body/HeaderRow"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "چالش های ویژه فصل"
+vertical_alignment = 1
+
+[node name="Crown" type="TextureRect" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin/Body/HeaderRow"]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+modulate = Color(0.91, 0.76, 0.29, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Scroll" type="ScrollContainer" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Body/Center/SeasonPage/BottomRow/ChallengesPanel/Margin/Body/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="PromoCard" type="PanelContainer" parent="Body/Center/SeasonPage/BottomRow"]
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_gold_card")
+clip_children = 2
+
+[node name="Art" type="TextureRect" parent="Body/Center/SeasonPage/BottomRow/PromoCard"]
+show_behind_parent = true
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.38)
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("28_sweapon")
+
+[node name="Margin" type="MarginContainer" parent="Body/Center/SeasonPage/BottomRow/PromoCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Body/Center/SeasonPage/BottomRow/PromoCard/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Body/Center/SeasonPage/BottomRow/PromoCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.91, 0.72, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "دست رویایی"
+horizontal_alignment = 2
+
+[node name="DescLabel" type="Label" parent="Body/Center/SeasonPage/BottomRow/PromoCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.78, 0.74, 0.62, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+theme_override_constants/line_spacing = 3
+text = "با خرید بتل پس طلایی، این اسکین
+افسانه ای را دریافت کنید."
+horizontal_alignment = 2
+
+[node name="Spacer" type="Control" parent="Body/Center/SeasonPage/BottomRow/PromoCard/Margin/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="DetailsButton" type="Button" parent="Body/Center/SeasonPage/BottomRow/PromoCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme_override_colors/font_color = Color(0.09, 0.07, 0.02, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/disabled = SubResource("SB_gold_btn_off")
+theme_override_styles/hover = SubResource("SB_gold_btn_hover")
+theme_override_styles/pressed = SubResource("SB_gold_btn_hover")
+theme_override_styles/normal = SubResource("SB_gold_btn")
+text = "مشاهده جزئیات"
+
+[node name="RightColumn" type="VBoxContainer" parent="Body"]
+custom_minimum_size = Vector2(248, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BonusCard" type="PanelContainer" parent="Body/RightColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card_deep")
+
+[node name="Margin" type="MarginContainer" parent="Body/RightColumn/BonusCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Body" type="VBoxContainer" parent="Body/RightColumn/BonusCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="ChestArt" type="TextureRect" parent="Body/RightColumn/BonusCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("22_chestbig")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Body/RightColumn/BonusCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "پاداش روزانه"
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="Body/RightColumn/BonusCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "با تکمیل همه‌ی ماموریت‌های روزانه، این پاداش را دریافت کنید."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Rewards" type="HBoxContainer" parent="Body/RightColumn/BonusCard/Margin/Body"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 7
+
+[node name="ClaimButton" type="Button" parent="Body/RightColumn/BonusCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+disabled = true
+focus_mode = 0
+theme_override_colors/font_color = Color(0.09, 0.078, 0.031, 1)
+theme_override_colors/font_disabled_color = Color(0.35, 0.4, 0.47, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 17
+theme_override_styles/focus = SubResource("SB_focus")
+theme_override_styles/disabled = SubResource("SB_claim_off")
+theme_override_styles/hover = SubResource("SB_claim_on_hover")
+theme_override_styles/pressed = SubResource("SB_claim_on_hover")
+theme_override_styles/normal = SubResource("SB_claim_on")
+text = "دریافت پاداش"
+
+[node name="MotiveCard" type="PanelContainer" parent="Body/RightColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_card_deep")
+clip_children = 2
+
+[node name="Art" type="TextureRect" parent="Body/RightColumn/MotiveCard"]
+show_behind_parent = true
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.42)
+expand_mode = 1
+stretch_mode = 6
+texture = ExtResource("23_motive")
+
+[node name="Margin" type="MarginContainer" parent="Body/RightColumn/MotiveCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Body" type="VBoxContainer" parent="Body/RightColumn/MotiveCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Emblem" type="TextureRect" parent="Body/RightColumn/MotiveCard/Margin/Body"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+self_modulate = Color(0.29, 0.667, 0.949, 1)
+texture = ExtResource("10_emblem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MotiveLabel" type="Label" parent="Body/RightColumn/MotiveCard/Margin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.788, 0.831, 0.882, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 15
+theme_override_constants/line_spacing = 6
+text = "هر ماموریت،
+یک قدم به سوی
+قدرت بیشتر است."
+horizontal_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -84.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 10
+
+[node name="ScoreCard" type="PanelContainer" parent="Footer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_card")
+
+[node name="Margin" type="MarginContainer" parent="Footer/ScoreCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="Row" type="HBoxContainer" parent="Footer/ScoreCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Footer/ScoreCard/Margin/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+self_modulate = Color(0.176, 0.553, 0.878, 1)
+texture = ExtResource("8_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Box" type="VBoxContainer" parent="Footer/ScoreCard/Margin/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Caption" type="Label" parent="Footer/ScoreCard/Margin/Row/Box"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+text = "امتیاز ماموریت امروز"
+horizontal_alignment = 2
+
+[node name="Bar" type="ProgressBar" parent="Footer/ScoreCard/Margin/Row/Box"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/background = SubResource("SB_bar_bg")
+theme_override_styles/fill = SubResource("SB_bar_gold")
+value = 0.0
+show_percentage = false
+
+[node name="CountLabel" type="Label" parent="Footer/ScoreCard/Margin/Row"]
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.961, 0.98, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 20
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FooterSpacer" type="Control" parent="Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.35
+mouse_filter = 2
+
+[node name="PromoStrip" type="PanelContainer" parent="Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_promo")
+clip_children = 2
+
+[node name="Row" type="HBoxContainer" parent="Footer/PromoStrip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="Accent" type="ColorRect" parent="Footer/PromoStrip/Row"]
+custom_minimum_size = Vector2(3, 0)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.91, 0.76, 0.29, 1)
+
+[node name="Art" type="TextureRect" parent="Footer/PromoStrip/Row"]
+custom_minimum_size = Vector2(146, 0)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+texture = ExtResource("24_promo")
+
+[node name="Margin" type="MarginContainer" parent="Footer/PromoStrip/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="PromoLabel" type="Label" parent="Footer/PromoStrip/Row/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 19
+text = "بازی کن، پیشرفت کن، پاداش بگیر!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Toast" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -190.0
+offset_top = -120.0
+offset_right = 190.0
+offset_bottom = -88.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.76, 0.29, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1

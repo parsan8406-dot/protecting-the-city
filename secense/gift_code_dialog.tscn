@@ -1,0 +1,165 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/gift_code_dialog.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_codefont"]
+
+[sub_resource type="StyleBoxFlat" id="SB_dialog"]
+bg_color = Color(0.07, 0.07, 0.075, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.72, 0.18, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_edit"]
+bg_color = Color(0.03, 0.03, 0.035, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.36, 0.12, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[sub_resource type="StyleBoxFlat" id="SB_btn"]
+bg_color = Color(0.2, 0.2, 0.22, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.62, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_accent"]
+bg_color = Color(0.72, 0.04, 0.07, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.72, 0.18, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="GiftCodeDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.72)
+
+[node name="Dialog" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("SB_dialog")
+
+[node name="Margin" type="MarginContainer" parent="Dialog"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="Body" type="VBoxContainer" parent="Dialog/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Dialog/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.25, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 26
+text = "اعمال کد هدیه"
+horizontal_alignment = 2
+
+[node name="HintLabel" type="Label" parent="Dialog/Margin/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.72, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "کد هدیه‌ای که از کانال‌ها یا رویدادهای بازی گرفتی رو وارد کن"
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="CodeEdit" type="LineEdit" parent="Dialog/Margin/Body"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_fonts/font = ExtResource("3_codefont")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("SB_edit")
+theme_override_styles/focus = SubResource("SB_edit")
+max_length = 32
+placeholder_text = "ABCD1234"
+alignment = 1
+caret_blink = true
+
+[node name="ErrorLabel" type="Label" parent="Dialog/Margin/Body"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.28, 0.28, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Dialog/Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="SubmitButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("SB_btn_accent")
+theme_override_styles/hover = SubResource("SB_btn_accent")
+theme_override_styles/pressed = SubResource("SB_btn_accent")
+theme_override_styles/disabled = SubResource("SB_btn")
+text = "ثبت کد"
+
+[node name="CancelButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("SB_btn")
+theme_override_styles/hover = SubResource("SB_btn")
+theme_override_styles/pressed = SubResource("SB_btn")
+text = "انصراف"

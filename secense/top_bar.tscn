@@ -1,0 +1,351 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://scripts/top_bar.gd" id="1_topbar"]
+[ext_resource type="Texture2D" path="res://assets/profiles/ChatGPT Image Sep 9, 2026, 05_25_03 PM.png" id="3_profilephoto"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="4_namefont"]
+[ext_resource type="Texture2D" uid="uid://jl2hkrd1fjh1" path="res://assets/startmenu_edit.png" id="5_editbtn"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="8_uifont"]
+[ext_resource type="Texture2D" path="res://assets/ui/coin_icon.png" id="9_coin"]
+[ext_resource type="Texture2D" uid="uid://c20hek0tfsjg5" path="res://assets/startmenu_plus.png" id="10_plusbtn"]
+[ext_resource type="Texture2D" path="res://assets/ui/gem_icon.png" id="11_gem"]
+[ext_resource type="Script" path="res://scripts/touch_slop_button.gd" id="16_slop"]
+[ext_resource type="Texture2D" uid="uid://cisbuh0p57tsw" path="res://assets/startmenu_messages.png" id="12_chaticon"]
+[ext_resource type="Texture2D" uid="uid://bpujodpf8yh7e" path="res://assets/startmenu_path65.png" id="13_badge"]
+[ext_resource type="Texture2D" uid="uid://befw85nw8wrh1" path="res://assets/startmenu_friends.png" id="14_friendsicon"]
+[ext_resource type="Texture2D" uid="uid://dbjruw4axl0vo" path="res://assets/startmenu_setting.png" id="15_settingsicon"]
+
+[sub_resource type="StyleBoxFlat" id="SB_header"]
+bg_color = Color(0.027, 0.047, 0.078, 0.94)
+border_width_bottom = 1
+border_color = Color(0.09, 0.149, 0.227, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_pill"]
+bg_color = Color(0.031, 0.063, 0.106, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.11, 0.176, 0.259, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_bg"]
+bg_color = Color(0.086, 0.125, 0.184, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_fill"]
+bg_color = Color(0.176, 0.553, 0.878, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="TopBar" type="TextureRect"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 54.0
+grow_horizontal = 2
+script = ExtResource("1_topbar")
+
+[node name="Background" type="Panel" parent="."]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_header")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 6.0
+offset_right = -12.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="Profile" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ProfileButton" type="TextureButton" parent="HBoxContainer/Profile"]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -19.0
+offset_right = 38.0
+offset_bottom = 19.0
+grow_vertical = 2
+focus_mode = 0
+texture_normal = ExtResource("3_profilephoto")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="VBoxContainer" type="HBoxContainer" parent="HBoxContainer/Profile"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 46.0
+offset_top = -19.0
+offset_right = 190.0
+offset_bottom = -1.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/Profile/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.91, 0.93, 0.96, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 15
+text = "Player1"
+vertical_alignment = 1
+
+[node name="EditButton" type="TextureButton" parent="HBoxContainer/Profile/VBoxContainer"]
+custom_minimum_size = Vector2(13, 13)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+modulate = Color(0.54, 0.59, 0.67, 1)
+texture_normal = ExtResource("5_editbtn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="LevelLabel" type="Label" parent="HBoxContainer/Profile"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 46.0
+offset_top = 1.0
+offset_right = 100.0
+offset_bottom = 18.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.3, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 14
+text = "سطح 1"
+vertical_alignment = 1
+
+[node name="LevelManager" type="Panel" parent="HBoxContainer/Profile"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 104.0
+offset_top = 6.0
+offset_right = 200.0
+offset_bottom = 13.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_xp_bg")
+
+[node name="LevelFill" type="Panel" parent="HBoxContainer/Profile/LevelManager"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 0.0
+anchor_bottom = 1.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_xp_fill")
+
+[node name="XpLabel" type="Label" parent="HBoxContainer/Profile"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 206.0
+offset_top = 0.0
+offset_right = 276.0
+offset_bottom = 18.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.42, 0.478, 0.557, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 14
+text = "1 / 100"
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Amounts" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Coins" type="PanelContainer" parent="HBoxContainer/Amounts"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_pill")
+
+[node name="Row" type="HBoxContainer" parent="HBoxContainer/Amounts/Coins"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="HBoxContainer/Amounts/Coins/Row"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinsLabel" type="Label" parent="HBoxContainer/Amounts/Coins/Row"]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.945, 0.878, 0.706, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 16
+text = "125000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusButton" type="TextureButton" parent="HBoxContainer/Amounts/Coins/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("10_plusbtn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="Gems" type="PanelContainer" parent="HBoxContainer/Amounts"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_pill")
+
+[node name="Row" type="HBoxContainer" parent="HBoxContainer/Amounts/Gems"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="HBoxContainer/Amounts/Gems/Row"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_gem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GemsLabel" type="Label" parent="HBoxContainer/Amounts/Gems/Row"]
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.788, 0.898, 0.973, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 16
+text = "1200"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlusButton" type="TextureButton" parent="HBoxContainer/Amounts/Gems/Row"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("10_plusbtn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 22
+
+[node name="MessagesButton" type="TextureButton" parent="HBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("12_chaticon")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="Badge" type="TextureRect" parent="HBoxContainer/HBoxContainer3/MessagesButton"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -15.0
+offset_top = -5.0
+offset_right = 7.0
+offset_bottom = 17.0
+grow_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("13_badge")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="HBoxContainer/HBoxContainer3/MessagesButton/Badge"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("4_namefont")
+theme_override_font_sizes/font_size = 14
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FriendsButton" type="TextureButton" parent="HBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("14_friendsicon")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")
+
+[node name="SettingsButton" type="TextureButton" parent="HBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+texture_normal = ExtResource("15_settingsicon")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("16_slop")

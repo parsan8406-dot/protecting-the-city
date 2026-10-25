@@ -1,0 +1,1 @@
+{"nodes": [{"id": "GeminiGDPlugin", "label": "Godot_Plugin_GeminiGD", "type": "component", "summary": "Repository README describing a plugin that brings Google Gemini into Godot.", "source_file": "README.md", "source_location": "README.md:1", "confidence": "EXTRACTED"}], "edges": [], "hyperedges": []}

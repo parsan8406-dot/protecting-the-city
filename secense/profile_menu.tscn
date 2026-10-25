@@ -1,0 +1,419 @@
+[gd_scene load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://scripts/profile_menu.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://secense/top_bar.tscn" id="2_topbar"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="3_font"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/tab_gun_highlight.svg" id="4_gun"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/muzzle_flash.svg" id="5_flash"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_profile.svg" id="6_icprofile"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_settings.svg" id="7_icsettings"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_friends.svg" id="8_icfriends"]
+[ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_messages.svg" id="9_icmessages"]
+[ext_resource type="Texture2D" uid="uid://dlg4m2u5fcgdp" path="res://assets/sugUp_home.png" id="11_home"]
+[ext_resource type="PackedScene" path="res://secense/profile_tab.tscn" id="12_profiletab"]
+[ext_resource type="PackedScene" path="res://secense/settings_tab.tscn" id="13_settingstab"]
+[ext_resource type="PackedScene" path="res://secense/friends_tab.tscn" id="14_friendstab"]
+[ext_resource type="PackedScene" path="res://secense/messages_tab.tscn" id="15_messagestab"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_normal"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.85)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_hover"]
+bg_color = Color(1, 1, 1, 0.06)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_pressed"]
+bg_color = Color(1, 0.9, 0.9, 0.1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.85, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tab_focus"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_page"]
+bg_color = Color(0.07, 0.07, 0.08, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.45, 0.48, 0.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.043, 0.043, 0.047, 1)
+
+[node name="ProfileMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="TopBar" parent="." instance=ExtResource("2_topbar")]
+
+[node name="Sidebar" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 28.0
+offset_top = 66.0
+offset_right = 178.0
+offset_bottom = 322.0
+
+[node name="Highlight" type="TextureRect" parent="Sidebar"]
+modulate = Color(1, 1, 1, 1)
+layout_mode = 0
+offset_left = -4.0
+offset_top = -3.0
+offset_right = 150.0
+offset_bottom = 51.0
+pivot_offset = Vector2(77, 27)
+mouse_filter = 2
+texture = ExtResource("4_gun")
+expand_mode = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Sidebar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="ProfileButton" type="Button" parent="Sidebar/Buttons"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_tab_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+
+[node name="Icon" type="TextureRect" parent="Sidebar/Buttons/ProfileButton"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -14.0
+offset_right = 40.0
+offset_bottom = 14.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_icprofile")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Sidebar/Buttons/ProfileButton"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -104.0
+offset_top = -15.0
+offset_right = -12.0
+offset_bottom = 15.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 20
+text = "پروفایل"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SettingsButton" type="Button" parent="Sidebar/Buttons"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_tab_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+
+[node name="Icon" type="TextureRect" parent="Sidebar/Buttons/SettingsButton"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -14.0
+offset_right = 40.0
+offset_bottom = 14.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("7_icsettings")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Sidebar/Buttons/SettingsButton"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -104.0
+offset_top = -15.0
+offset_right = -12.0
+offset_bottom = 15.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 20
+text = "تنظیمات"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="FriendsButton" type="Button" parent="Sidebar/Buttons"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_tab_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+
+[node name="Icon" type="TextureRect" parent="Sidebar/Buttons/FriendsButton"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -14.0
+offset_right = 40.0
+offset_bottom = 14.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_icfriends")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Sidebar/Buttons/FriendsButton"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -104.0
+offset_top = -15.0
+offset_right = -12.0
+offset_bottom = 15.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 20
+text = "دوستان"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MessagesButton" type="Button" parent="Sidebar/Buttons"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_tab_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_pressed")
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_normal")
+
+[node name="Icon" type="TextureRect" parent="Sidebar/Buttons/MessagesButton"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 12.0
+offset_top = -12.0
+offset_right = 40.0
+offset_bottom = 12.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("9_icmessages")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Sidebar/Buttons/MessagesButton"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -104.0
+offset_top = -15.0
+offset_right = -12.0
+offset_bottom = 15.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 20
+text = "پیام‌ها"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="MuzzleFlash" type="TextureRect" parent="Sidebar"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_right = 44.0
+offset_bottom = 44.0
+pivot_offset = Vector2(22, 22)
+mouse_filter = 2
+texture = ExtResource("5_flash")
+expand_mode = 1
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 200.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Pages" type="Control" parent="Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ProfilePage" type="PanelContainer" parent="Content/Pages"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_page")
+
+[node name="Placeholder" type="Label" parent="Content/Pages/ProfilePage"]
+visible = false
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.25)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 26
+text = "پروفایل"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProfileTab" parent="Content/Pages/ProfilePage" instance=ExtResource("12_profiletab")]
+layout_mode = 2
+
+[node name="SettingsPage" type="PanelContainer" parent="Content/Pages"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_page")
+
+[node name="Placeholder" type="Label" parent="Content/Pages/SettingsPage"]
+visible = false
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.25)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 26
+text = "تنظیمات"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SettingsTab" parent="Content/Pages/SettingsPage" instance=ExtResource("13_settingstab")]
+layout_mode = 2
+
+[node name="FriendsPage" type="PanelContainer" parent="Content/Pages"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_page")
+
+[node name="Placeholder" type="Label" parent="Content/Pages/FriendsPage"]
+visible = false
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.25)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 26
+text = "دوستان"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FriendsTab" parent="Content/Pages/FriendsPage" instance=ExtResource("14_friendstab")]
+layout_mode = 2
+
+[node name="MessagesPage" type="PanelContainer" parent="Content/Pages"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_page")
+
+[node name="Placeholder" type="Label" parent="Content/Pages/MessagesPage"]
+visible = false
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.25)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 26
+text = "پیام ها"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessagesTab" parent="Content/Pages/MessagesPage" instance=ExtResource("15_messagestab")]
+layout_mode = 2
+
+[node name="HomeButton" type="TextureButton" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -92.0
+offset_top = -92.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("11_home")
+ignore_texture_size = true
+stretch_mode = 5

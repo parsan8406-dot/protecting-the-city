@@ -1,0 +1,278 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/season_tier_card.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
+[ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
+
+[sub_resource type="StyleBoxFlat" id="SB_level"]
+bg_color = Color(0.055, 0.09, 0.145, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.129, 0.196, 0.286, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="SB_level_on"]
+bg_color = Color(0.157, 0.118, 0.031, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.91, 0.76, 0.29, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 6.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="SB_cell"]
+bg_color = Color(0.043, 0.075, 0.122, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.129, 0.196, 0.286, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_cell_gold"]
+bg_color = Color(0.098, 0.078, 0.031, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.639, 0.522, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 6.0
+content_margin_top = 6.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="SB_cell_ready"]
+bg_color = Color(0.063, 0.129, 0.208, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.31, 0.76, 0.97, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="SB_cell_ready_gold"]
+bg_color = Color(0.161, 0.125, 0.035, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.98, 0.83, 0.36, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="SB_lock"]
+bg_color = Color(0.02, 0.035, 0.055, 0.82)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[node name="SeasonTierCard" type="VBoxContainer"]
+custom_minimum_size = Vector2(104, 0)
+mouse_filter = 2
+offset_right = 104.0
+offset_bottom = 236.0
+theme_override_constants/separation = 6
+script = ExtResource("1_script")
+
+[node name="LevelBadge" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_level")
+
+[node name="Row" type="HBoxContainer" parent="LevelBadge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Crown" type="TextureRect" parent="LevelBadge/Row"]
+visible = false
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LevelLabel" type="Label" parent="LevelBadge/Row"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.72, 0.79, 0.87, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 15
+text = "۰"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PremiumCell" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 116)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_cell_gold")
+
+[node name="Body" type="VBoxContainer" parent="PremiumCell"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="Icon" type="TextureRect" parent="PremiumCell/Body"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="PremiumCell/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.91, 0.72, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 15
+text = "—"
+horizontal_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="PremiumCell/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.62, 0.68, 0.76, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Lock" type="PanelContainer" parent="PremiumCell"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_lock")
+
+[node name="LockIcon" type="TextureRect" parent="PremiumCell/Lock"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+modulate = Color(0.72, 0.79, 0.87, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PremiumButton" type="Button" parent="PremiumCell"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 8
+focus_mode = 0
+theme_override_colors/font_color = Color(0.09, 0.07, 0.02, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/focus = SubResource("SB_focus")
+text = "دریافت"
+
+[node name="FreeCell" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_cell")
+
+[node name="Body" type="VBoxContainer" parent="FreeCell"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="Icon" type="TextureRect" parent="FreeCell/Body"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="FreeCell/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.96, 1)
+theme_override_fonts/font = ExtResource("3_num")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="FreeCell/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.57, 0.66, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "—"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Lock" type="PanelContainer" parent="FreeCell"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SB_lock")
+
+[node name="LockIcon" type="TextureRect" parent="FreeCell/Lock"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+modulate = Color(0.72, 0.79, 0.87, 1)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FreeButton" type="Button" parent="FreeCell"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 8
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 13
+theme_override_styles/focus = SubResource("SB_focus")
+text = "دریافت"

@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://brxyuq5vjtb6b"]
+[gd_scene format=3 uid="uid://b0qmcqx8f7req"]
 
-[ext_resource type="Script" uid="uid://b2q84aj4kq10d" path="res://scripts/bullet.gd" id="1_7nfr7"]
+[ext_resource type="Script" path="res://scripts/bullet.gd" id="1_7nfr7"]
 [ext_resource type="Texture2D" uid="uid://dhv3u8vn5gajw" path="res://assets/tir.png" id="2_7y1k0"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gmwny"]

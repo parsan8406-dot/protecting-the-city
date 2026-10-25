@@ -2,3 +2,19 @@
 .godot/
 /android/
 *.translation
+# رمزهای سرور (کلید گوگل و ...) — هرگز وارد گیت نشود
+.env
+*.env
+
+/_trash_*/
+
+/_asset_backup/
+# ابزارِ جانبی، نه بخشی از بازی — نباید در گیت باشد
+/node_modules/
+# خروجی‌های اکسپورت (هر APK حدود ۱۵۰ مگابایت)
+/build/
+# باینریِ کامپایل‌شده‌ی سرور — از سورس ساخته می‌شود
+/gun_game_server/gun_game_server.exe
+/gun_game_server/game_server
+# فایل‌های موقتِ ادیتور Godot
+*.tmp

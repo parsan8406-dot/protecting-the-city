@@ -1,9 +1,21 @@
-[gd_scene format=3 uid="uid://b325qctubuq27"]
+[gd_scene load_steps=4 format=3 uid="uid://b325qctubuq27"]
 
 [ext_resource type="Texture2D" uid="uid://c3ge0587xpsrt" path="res://assets/Bomb.png" id="1_uuxgi"]
+[ext_resource type="Texture2D" uid="uid://ccxmu4eypjsa0" path="res://assets/lightall.png" id="2_light"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bombunlit"]
+light_mode = 1
 
 [node name="Bomb" type="Node2D" unique_id=1595046348]
 
+[node name="Glow" type="PointLight2D" parent="." unique_id=699654999]
+texture = ExtResource("2_light")
+scale = Vector2(0.62, 0.62)
+color = Color(1, 0.58, 0.24, 1)
+energy = 2.1
+blend_mode = 1
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=699654781]
+material = SubResource("CanvasItemMaterial_bombunlit")
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_uuxgi")
