@@ -771,7 +771,8 @@ func _fill_insights() -> void:
 ## E4 peak-end: یک لحظه‌ی خوب از همین مسابقه — حتی در باخت
 func _fill_moment() -> void:
 	var s := _stats
-	var kills := int(s.get("kills", 0))
+	# سرورِ جدید کیلِ قطعی را در match_reward می‌فرستد؛ وگرنه شمارشِ کلاینت
+	var kills := int(_reward.get("kills", s.get("kills", 0)))
 	var streak := int(s.get("best_streak", 0))
 	var deaths := int(s.get("deaths", 0))
 	var ws := int(s.get("win_streak", 0))
@@ -854,6 +855,8 @@ func _fill_rank() -> void:
 
 ## کاپِ بردِ همین حالت (از /game_modes که Global نگه داشته)؛ ۰ = نامعلوم
 func _mode_win_trophies() -> int:
+	if _reward.has("win_trophies"):
+		return int(_reward["win_trophies"])
 	var m: Dictionary = Global.selected_mode_data
 	var mode_id := str(_reward.get("mode_id", ""))
 	if m.is_empty() or (mode_id != "" and str(m.get("mode_id", "")) != mode_id):

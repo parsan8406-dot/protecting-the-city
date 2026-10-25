@@ -440,5 +440,9 @@ func ApplyMatchOutcome(ctx context.Context, username, modeID string, outcome Mat
 		"trophies":     newTrophies,
 		"level":        newLevel,
 		"level_up":     newLevel > p.Level,
+		// کیلِ خودش و کاپِ بُردِ این حالت — صفحه‌ی پایان («بهترین لحظه» و
+		// «فقط یه برد تا ارتقا») دیگر حدس نمی‌زند
+		"kills":        kills,
+		"win_trophies": mode.WinTrophies,
 	}, nil
 }

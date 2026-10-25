@@ -136,6 +136,7 @@ func luckyBoxInfo(w http.ResponseWriter) {
 			"item_id":  e.ItemID,
 			"category": e.Category,
 			"rarity":   e.Rarity,
+			"weight":   e.Weight, // شانسِ شفاف در فروشگاه از همین حساب می‌شود
 		})
 	}
 	jsonResponse(w, map[string]interface{}{

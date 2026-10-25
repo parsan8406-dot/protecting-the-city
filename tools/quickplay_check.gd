@@ -13,6 +13,32 @@ func _wait(ms: int) -> void:
 	while Time.get_ticks_msec() - t0 < ms:
 		await process_frame
 
+## نقطه‌ای در فاصله‌ی dist که خودش آزاد است و راهِ صافش تا بازیکن (با پهنای
+## بدنِ بات) به چیزی نمی‌خورد؛ اگر هیچ جهتی نبود، همان جهتِ مرکزِ زمین.
+func _clear_spot(player: Node2D, bot: Node2D, dist: float) -> Vector2:
+	var space := player.get_world_2d().direct_space_state
+	var skip := [player.get_rid(), bot.get_rid()]
+	var from := player.global_position
+	for i in 16:
+		var dir := Vector2.RIGHT.rotated(TAU * i / 16.0)
+		var spot := from + dir * dist
+		var pq := PhysicsPointQueryParameters2D.new()
+		pq.position = spot
+		pq.exclude = skip
+		if not space.intersect_point(pq, 1).is_empty():
+			continue
+		var side := dir.orthogonal() * 26.0
+		var clear := true
+		for off in [Vector2.ZERO, side, -side]:
+			var rq := PhysicsRayQueryParameters2D.create(spot + off, from + off)
+			rq.exclude = skip
+			if not space.intersect_ray(rq).is_empty():
+				clear = false
+				break
+		if clear:
+			return spot
+	return from + (Vector2(1000, 560) - from).normalized() * dist
+
 func _initialize() -> void:
 	var scene = load("res://secense/quick_play.tscn")
 	_ok("quick_play.tscn loads", scene != null)
@@ -58,13 +84,10 @@ func _initialize() -> void:
 	_ok("bot has an upright plate", bot.get_node_or_null("FoePlate") != null)
 
 	# --- از دور باید تعقیب کند تا برسد به بردِ نبرد ---
-	# به سمتِ مرکزِ زمین دورش می‌کنیم، نه کورکورانه روی محور x — وگرنه ممکن
-	# است داخلِ دیوارِ کناری بیفتد و اصلاً نتواند حرکت کند.
-	var centre := Vector2(1000, 560)
-	var away: Vector2 = (centre - player.global_position).normalized()
-	if away == Vector2.ZERO:
-		away = Vector2.RIGHT
-	bot.global_position = player.global_position + away * 700.0
+	# بات مسیریابی ندارد و مستقیم می‌دود، پس نقطه‌ای ۷۰۰ پیکسل دورتر
+	# می‌خواهیم که خطِ صافش تا بازیکن به دیوار نخورد — وگرنه پشتِ دیوار گیر
+	# می‌کند و تست به‌جای تعقیب، چیدمانِ نقشه را می‌سنجد.
+	bot.global_position = _clear_spot(player, bot, 700.0)
 	await _wait(400)
 	var d0: float = bot.global_position.distance_to(player.global_position)
 	_ok("far away the bot is chasing", bot._state == bot.State.CHASE,

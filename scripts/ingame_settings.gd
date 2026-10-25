@@ -70,18 +70,20 @@ func _build() -> void:
 	for row in [["صدای اصلی", "master"], ["صدای افکت", "sfx"], ["موزیک", "music"]]:
 		col.add_child(_slider(row[0], row[1]))
 
-	var vib := CheckBox.new()
-	vib.text = "لرزش"
-	vib.custom_minimum_size = Vector2(0, 52)
-	UIFx.bind_press_feedback(vib)   # V9
-	vib.button_pressed = LocalSettings.vibration_enabled
-	vib.add_theme_font_override("font", FONT)
-	vib.add_theme_font_size_override("font_size", 18)
-	vib.add_theme_color_override("font_color", COL_TEXT)
+	# E11: دو لرزش جدا، کنارِ هم تا پنل روی 16:9 و 4:3 بلند نشود
+	var toggles := HBoxContainer.new()
+	toggles.add_theme_constant_override("separation", 24)
+	col.add_child(toggles)
+
+	var vib := _toggle("لرزش گوشی", LocalSettings.vibration_enabled)
 	vib.toggled.connect(func(on: bool):
 		LocalSettings.vibration_enabled = on
 		LocalSettings.save_settings())
-	col.add_child(vib)
+	toggles.add_child(vib)
+
+	var shake := _toggle("لرزش صفحه", LocalSettings.screen_shake_enabled())
+	shake.toggled.connect(func(on: bool): LocalSettings.set_screen_shake(on))
+	toggles.add_child(shake)
 
 	var resume := _button("ادامه", COL_GOLD)
 	resume.pressed.connect(close)
@@ -90,6 +92,19 @@ func _build() -> void:
 	_leave_btn = _button("خروج از مسابقه", COL_DANGER)
 	_leave_btn.pressed.connect(_on_leave)
 	col.add_child(_leave_btn)
+
+
+func _toggle(text: String, on: bool) -> CheckBox:
+	var c := CheckBox.new()
+	c.text = text
+	c.custom_minimum_size = Vector2(0, 52)
+	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	UIFx.bind_press_feedback(c)   # V9
+	c.button_pressed = on
+	c.add_theme_font_override("font", FONT)
+	c.add_theme_font_size_override("font_size", 18)
+	c.add_theme_color_override("font_color", COL_TEXT)
+	return c
 
 
 func _label(text: String, size: int, colour: Color) -> Label:
