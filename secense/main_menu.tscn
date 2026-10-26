@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://ojy687jwtnbj" path="res://assets/snow_path65.png" id="4_0l1gx"]
 [ext_resource type="Texture2D" uid="uid://bgqaaqierdkdd" path="res://assets/startmenu_multiplayer.png" id="4_crvna"]
 [ext_resource type="Texture2D" uid="uid://qh1cmiobodhx" path="res://assets/startmenu_selecting.png" id="6_itgdb"]
-[ext_resource type="Texture2D" uid="uid://dutbghn2gr6e1" path="res://assets/startmenu_Start.png" id="7_2o872"]
+[ext_resource type="Texture2D" uid="uid://dutbghn2gr6e1" path="res://assets/startmenu_start.png" id="7_2o872"]
 [ext_resource type="Texture2D" uid="uid://dku3i3wiudkl1" path="res://assets/startmenu_type.png" id="8_crvna"]
 [ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="9_itgdb"]
 [ext_resource type="Texture2D" uid="uid://da4url1cne1kc" path="res://assets/startmenu_Battlepass.png" id="10_lsguj"]
