@@ -114,7 +114,7 @@ alignment = 1
 theme_override_constants/separation = 10
 
 [node name="ConfirmButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
-custom_minimum_size = Vector2(150, 42)
+custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
 disabled = true
 theme_override_fonts/font = ExtResource("2_font")
@@ -126,7 +126,7 @@ theme_override_styles/disabled = SubResource("SB_btn")
 text = "تایید"
 
 [node name="CancelButton" type="Button" parent="Dialog/Margin/Body/Buttons"]
-custom_minimum_size = Vector2(150, 42)
+custom_minimum_size = Vector2(150, 54)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16

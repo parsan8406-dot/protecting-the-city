@@ -1,8 +1,8 @@
 extends RefCounted
 ## آمارِ مسابقه‌ی جاری و رکوردهای شخصی — برای صفحه‌ی پایان (E4 peak-end).
 ##
-## سرور در match_reward فقط کاپ/سکه/تجربه می‌فرستد و کشته‌ی هر نفر را
-## نمی‌دهد، پس همین‌جا از روی سیگنال‌های Network شمرده می‌شود:
+## سرورِ جدید کیلِ قطعی را در match_reward می‌فرستد (commit آن را می‌گیرد)؛
+## مرگ و استریک را نمی‌دهد، پس همین‌جا از روی سیگنال‌های Network شمرده می‌شود:
 ##   کیل        مرگِ حریفی که کمتر از KILL_CREDIT_MS بعد از ضربه‌ی ما مُرد
 ##              (همان قاعده‌ی world.gd → _is_my_kill)
 ##   استریک     بیشترین کیلِ پشت‌سرهم بدونِ مردن
@@ -86,15 +86,22 @@ func _on_player_died(username: String) -> void:
 ## آمارِ این مسابقه را با رکوردهای قبلی مقایسه و ذخیره می‌کند.
 ## outcome: "win" | "lose" | "draw". هر مسابقه فقط یک بار ثبت می‌شود؛
 ## صدا زدنِ دوباره همان نتیجه‌ی قبلی را برمی‌گرداند.
+## server_kills: کیلِ قطعیِ سرور (match_reward → kills)؛ ‎-1 یعنی سرورِ قدیمی
+## که نمی‌فرستد — آن وقت شمارشِ همین کلاینت. رکوردِ کیل با عددِ سرور.
 ##
 ## خروجی:
 ##   kills, deaths, best_streak, tracked (آیا آمارِ این مسابقه را داریم)
 ##   win_streak       بردِ پیاپی تا همین الان (مساوی زنجیره را نمی‌شکند)
 ##   records          آرایه‌ی "kills" / "streak" / "win_streak" که رکورد شکستند
-func commit(outcome: String) -> Dictionary:
+func commit(outcome: String, server_kills: int = -1) -> Dictionary:
 	var key := match_id if match_id != "" else "local"
 	if key == _committed_id and not _last_commit.is_empty():
 		return _last_commit
+	var from_server := server_kills >= 0
+	if from_server:
+		kills = server_kills
+		# استریک نمی‌تواند از کلِ کیل بیشتر باشد (شمارشِ کلاینت گاهی جا می‌ماند)
+		best_streak = mini(best_streak, kills)
 	var cfg := ConfigFile.new()
 	cfg.load(SAVE_PATH)
 	var sec := "u_" + str(Global.my_username)
@@ -103,16 +110,17 @@ func commit(outcome: String) -> Dictionary:
 	var best_s := int(cfg.get_value(sec, "best_streak", 0))
 	var ws := int(cfg.get_value(sec, "win_streak", 0))
 	var best_ws := int(cfg.get_value(sec, "best_win_streak", 0))
+	# «tracked» یعنی مرگ و استریک را خودمان دیدیم؛ کیلِ سرور جدا معتبر است
 	var tracked := match_id != ""
+	var kills_known := tracked or from_server
 
 	var records: Array[String] = []
 	# رکورد فقط وقتی معنی دارد که قبلاً چیزی ثبت شده باشد — اولین مسابقه
 	# همیشه «رکورد» است و این دیگر تشویق نیست، شلوغی است
-	if tracked and played > 0:
-		if kills > best_k and kills >= 2:
-			records.append("kills")
-		if best_streak > best_s and best_streak >= 2:
-			records.append("streak")
+	if kills_known and played > 0 and kills > best_k and kills >= 2:
+		records.append("kills")
+	if tracked and played > 0 and best_streak > best_s and best_streak >= 2:
+		records.append("streak")
 	# بازیِ بی‌راند (تمرین/چک‌ها) زنجیره‌ی برد را دست نمی‌زند
 	if tracked:
 		match outcome:
@@ -121,9 +129,10 @@ func commit(outcome: String) -> Dictionary:
 		if outcome == "win" and ws > best_ws and ws >= 3 and played > 0:
 			records.append("win_streak")
 
-	if tracked:
+	if kills_known:
 		cfg.set_value(sec, "matches", played + 1)
 		cfg.set_value(sec, "best_kills", maxi(best_k, kills))
+	if tracked:
 		cfg.set_value(sec, "best_streak", maxi(best_s, best_streak))
 	cfg.set_value(sec, "win_streak", ws)
 	cfg.set_value(sec, "best_win_streak", maxi(best_ws, ws))
@@ -133,6 +142,6 @@ func commit(outcome: String) -> Dictionary:
 	_last_commit = {
 		"kills": kills, "deaths": deaths, "best_streak": best_streak,
 		"tracked": tracked, "win_streak": ws, "records": records,
-		"prev_best_kills": best_k,
+		"prev_best_kills": best_k, "kills_from_server": from_server,
 	}
 	return _last_commit

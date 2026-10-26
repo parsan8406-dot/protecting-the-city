@@ -18,6 +18,9 @@ class_name HudSquadHealth
 ## شیطان دقیقاً زیرِ آن می‌نشیند — پس GameHUD باید همان لحظه دوباره بچیند،
 ## وگرنه دو پنل روی هم می‌افتند یا یک شکافِ خالی بینشان می‌ماند.
 signal height_changed
+## کسی تیر خورد، افتاد یا برگشت. critical یعنی یک هم‌تیمی (یا خودم) جانش کم
+## است. GameHUD با این پنل را روشن/کم‌رنگ می‌کند.  # C1
+signal activity(critical: bool)
 
 const FONT := preload("res://fonts/Lalezar-Regular.ttf")
 
@@ -30,6 +33,9 @@ const COL_PANEL := Color(0.07, 0.05, 0.07, 0.86)
 const COL_TRACK := Color(0.16, 0.13, 0.15, 0.95)
 ## جانِ کم — نوار به این رنگ می‌رسد تا «دارد می‌افتد» از دور دیده شود
 const COL_LOW   := Color(1.0, 0.62, 0.20)
+## زیرِ این کسر، تهِ نوارِ هم‌تیمی مثلثِ «!» می‌آید — همان آستانه‌ی کارتِ
+## پروفایل؛ یعنی «درمانِ تیمی لازم است»  # V2 color + shape
+const LOW_FRAC := 0.3
 
 ## نام‌ها با فونتِ ۱۶ (روی گوشی ۱۳ ریز بود)، پس پنل و ردیف‌ها هم بزرگ‌ترند
 const PANEL_W := 420.0
@@ -51,6 +57,8 @@ const REFRESH := 0.12
 var _t := 0.0
 ## جانِ نمایشی برای هر بازیکن، تا نوار با هر تیر نپرد: نام -> کسر
 var _shown: Dictionary = {}
+## آخرین جانِ واقعیِ هر بازیکن (نام -> کسر) برای فهمیدنِ «چیزی عوض شد»
+var _last: Dictionary = {}
 
 
 func _ready() -> void:
@@ -85,17 +93,27 @@ func _process(delta: float) -> void:
 	_t = REFRESH
 
 	# جانِ نمایشی نرم به مقدارِ واقعی می‌رسد
+	var changed := false
+	var critical := false
 	for name in Network.current_players:
 		var pd = Network.current_players[name]
 		if typeof(pd) != TYPE_DICTIONARY:
 			continue
 		var target := _health_fraction(pd)
+		if absf(float(_last.get(name, target)) - target) > 0.01:
+			changed = true
+		_last[name] = target
+		if _is_ally(pd) and target > 0.0 and target < LOW_FRAC:
+			critical = true
 		var cur: float = _shown.get(name, target)
 		_shown[name] = lerpf(cur, target, clampf(REFRESH * 9.0, 0.0, 1.0))
 	# بازیکن‌هایی که رفته‌اند نباید در حافظه بمانند
 	for name in _shown.keys():
 		if not Network.current_players.has(name):
 			_shown.erase(name)
+			_last.erase(name)
+	if changed or critical:
+		activity.emit(critical)
 
 	var want := panel_h()
 	if not is_equal_approx(want, size.y):
@@ -199,6 +217,8 @@ func _draw_column(names: Array, at: Vector2, col_w: float, accent: Color) -> voi
 			draw_rect(Rect2(track.position,
 				Vector2(track.size.x * frac, track.size.y * 0.4)),
 				Color(1, 1, 1, 0.15), true)
+			if accent == COL_ALLY and frac < LOW_FRAC:
+				_warn(Vector2(track.end.x - 8.0, track.get_center().y), 13.0)
 		else:
 			# مرده: ضربدرِ کوچک به‌جای نوار — در حالتی با ریسپاون یعنی
 			# «چند ثانیه‌ی دیگر برمی‌گردد»، نه «برای همیشه رفت»
@@ -208,3 +228,17 @@ func _draw_column(names: Array, at: Vector2, col_w: float, accent: Color) -> voi
 			draw_line(c + Vector2(-r, -r), c + Vector2(r, r), dim, 2.0)
 			draw_line(c + Vector2(-r, r), c + Vector2(r, -r), dim, 2.0)
 		draw_rect(track, Color(0, 0, 0, 0.45), false, 1.0)
+
+
+## مثلثِ «!» روی تهِ نوار — همان شکلِ هشدارِ کارتِ پروفایل  # V2
+func _warn(c: Vector2, side: float) -> void:
+	var h := side * 0.9
+	var tri := PackedVector2Array([c + Vector2(0, -h * 0.55),
+		c + Vector2(side * 0.55, h * 0.45), c + Vector2(-side * 0.55, h * 0.45)])
+	draw_colored_polygon(tri, Color(0, 0, 0, 0.85))
+	var inner := PackedVector2Array()
+	for p in tri:
+		inner.append(c + (p - c) * 0.72)
+	draw_colored_polygon(inner, COL_LOW)
+	draw_line(c + Vector2(0, -h * 0.2), c + Vector2(0, h * 0.08), Color(0.3, 0.05, 0.02), 1.6)
+	draw_circle(c + Vector2(0, h * 0.24), 1.0, Color(0.3, 0.05, 0.02))

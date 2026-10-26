@@ -81,6 +81,9 @@ const COLOR_SAFE := Color(1.0, 0.8, 0.26, 1.0)
 var _rows: Array = []
 var _quality_buttons: Array[Button] = []
 var _toast_tween: Tween
+## E11 صدای نمونه بعد از رها کردن اسلایدرِ صدا — بازیکن همان لحظه بلندیِ تازه را می‌شنود
+const SAMPLE_SOUND := "res://assets/breechblock.mp3"
+var _sample: AudioStreamPlayer
 
 ## آخرین پاسخ /auth/status
 var _status: Dictionary = {}
@@ -194,6 +197,19 @@ func _on_value_committed(key: String, value: int) -> void:
 		LocalSettings.set_video(key, value)
 	else:
 		LocalSettings.set_audio(key, value)
+		_play_sample(key)
+
+## موزیک خودش در منو پخش می‌شود؛ بقیه یک صدای کوتاه روی باسِ خودشان
+func _play_sample(key: String) -> void:
+	var bus: StringName = {"sfx": &"SFX", "ambient": &"Ambient", "master": &"SFX"}.get(key, &"")
+	if bus == &"" or not ResourceLoader.exists(SAMPLE_SOUND):
+		return
+	if _sample == null:
+		_sample = AudioStreamPlayer.new()
+		_sample.stream = load(SAMPLE_SOUND)
+		add_child(_sample)
+	_sample.bus = bus if AudioServer.get_bus_index(bus) != -1 else &"Master"
+	_sample.play()
 
 ## سه دکمه‌ی کیفیت به‌جای اسلایدر — اسلایدر ۰ تا ۱۰۰ برای کیفیت معنی نداشت
 func _build_quality_choices() -> void:

@@ -87,6 +87,13 @@ void fragment() {
 const CTA_PULSE_TIME := 1.1
 var _cta_halo: Panel = null
 
+# --- E7/E16: «هدفِ بعدی» زیرِ ستونِ چپ (psych_menu_next_goal.gd) ---
+const NEXT_GOAL := preload("res://scripts/psych_menu_next_goal.gd")
+## پهنای کادر نسبت به ستونِ دکمه‌ها — کوتاه‌تر از آن، تا ثانویه دیده شود (V5)
+const NEXT_GOAL_W := 400.0
+const NEXT_GOAL_GAP := 12.0
+var _next_goal: Control = null
+
 func _ready():
 	# Back در منوی اصلی نباید یک‌باره اپ را ببندد — دو بار پشتِ هم یعنی خروج
 	get_tree().set_quit_on_go_back(false)
@@ -128,6 +135,7 @@ func _ready():
 		anim_player.play("idle")
 
 	_build_toast()
+	_build_next_goal()
 
 	# ناحیه‌ی امن: هم با تغییرِ اندازه، هم با چرخشِ ۱۸۰ درجه‌ای (که اندازه را
 	# عوض نمی‌کند و فقط ناچ را آن طرف می‌برد — SafeArea خودش چکش می‌کند)
@@ -421,6 +429,40 @@ func _apply_safe_area() -> void:
 		bottom_row.offset_bottom = -ins.w
 
 	_layout_right_column(vp, top, right, bottom_menu)
+	_layout_next_goal(column, bottom_menu, vp, left)
+
+
+func _build_next_goal() -> void:
+	# نگه‌دارنده جا را تعیین می‌کند؛ خودِ کادر هر وقت هدفی نبود پنهان می‌شود
+	_next_goal = Control.new()
+	_next_goal.name = "NextGoalSlot"
+	_next_goal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_next_goal.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	add_child(_next_goal)
+	var chip: Control = NEXT_GOAL.new()
+	chip.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_next_goal.add_child(chip)
+	# زیرِ toast، تا پیامِ «دوباره بزنید» رویش بیفتد
+	if _toast != null:
+		move_child(_next_goal, _toast.get_index())
+
+
+## درست زیرِ آخرین دکمه‌ی ستونِ چپ و بالای نوارِ پایین. اگر جا نبود (صفحه‌ی
+## خیلی کوتاه) کلاً پنهان می‌ماند، نه این‌که روی دکمه‌ها بیفتد.
+func _layout_next_goal(column: Control, bottom_menu: Control, vp: Vector2, left: float) -> void:
+	if _next_goal == null or column == null:
+		return
+	var col_bottom := column.offset_top + column.get_combined_minimum_size().y
+	var top := col_bottom + NEXT_GOAL_GAP
+	var floor_y := vp.y
+	if bottom_menu != null:
+		floor_y = bottom_menu.anchor_top * vp.y + bottom_menu.offset_top - 8.0
+	var h := 58.0
+	_next_goal.visible = floor_y - top >= h
+	_next_goal.offset_left = left
+	_next_goal.offset_right = left + minf(NEXT_GOAL_W, LEFT_COLUMN_W)
+	_next_goal.offset_top = top
+	_next_goal.offset_bottom = top + h
 
 ## ستونِ راست، از پایین به بالا: شروع و نوعِ بازی روی نوارِ پایین می‌نشینند،
 ## ماموریت‌ها زیرِ نوارِ بالا، و کادرِ بتل‌پس دقیقاً وسطِ فاصله‌ی این دو.

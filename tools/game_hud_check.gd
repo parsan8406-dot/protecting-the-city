@@ -202,7 +202,9 @@ func _offline() -> void:
 	# بات‌ها ساکت، تا فقط توانایی‌ها سنجیده شوند
 	for b in world.get_tree().get_nodes_in_group("bots"):
 		b.queue_free()
-	world._spawn_timer = 999.0
+	# موج‌ها را کارگردانِ بازیِ سریع می‌فرستد (psych_play_director.gd)؛ نگهش دار
+	if world.get("director") != null:
+		world.director.set_process(false)
 	await _wait(100)
 
 	# --- دویدن ---

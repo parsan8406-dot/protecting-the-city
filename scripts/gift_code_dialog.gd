@@ -162,7 +162,7 @@ func _on_dim_input(event: InputEvent) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		accept_event()
+		get_viewport().set_input_as_handled()
 		_on_cancel_pressed()
 
 func _notification(what: int) -> void:

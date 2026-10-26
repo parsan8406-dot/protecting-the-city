@@ -16,6 +16,8 @@ extends Control
 ##   POST /friends/respond           {username, request_id, accept}
 
 const MESSAGE_ROW_SCENE := preload("res://secense/message_row.tscn")
+const GIFT_DIALOG_SCENE := preload("res://secense/gift_dialog.tscn")
+const PsychSocialGift := preload("res://scripts/psych_social_gift.gd")
 
 const TYPE_FRIEND_REQUEST := "friend_request"
 const TYPE_GIFT := "gift"
@@ -415,6 +417,10 @@ func _apply_actions(data: Dictionary) -> void:
 			if MessageRow.reward_pending(data):
 				_primary_button.text = "دریافت جایزه"
 				_secondary_button.visible = false
+			elif _can_gift_back(data):
+				# E10 عمل متقابل: هدیه‌ی دوست را با یک لمس جبران کن
+				_primary_button.text = "هدیه‌ی متقابل"
+				_secondary_button.text = "حذف پیام"
 			else:
 				_primary_button.visible = false
 				_secondary_button.text = "حذف پیام"
@@ -454,6 +460,8 @@ func _on_primary_pressed(message_id: String) -> void:
 				{"kind": "accept", "message_id": message_id})
 		TYPE_GIFT, TYPE_REWARD:
 			if not MessageRow.reward_pending(data):
+				if _can_gift_back(data):
+					_open_gift_back(data)
 				return
 			_post("/messages/claim", {"username": Global.my_username, "message_id": message_id},
 				{"kind": "claim", "message_id": message_id, "reward": data.get("reward", {})})
@@ -535,6 +543,26 @@ func _on_action_completed(result: int, response_code: int, _headers: PackedStrin
 	if pending.get("kind", "") in ["claim", "claim_all", "accept"]:
 		Global.refresh_player_data()
 	refresh()
+
+## هدیه‌ای که از یک بازیکن (نه سیستم) آمده و جایزه‌اش گرفته شده
+func _can_gift_back(data: Dictionary) -> bool:
+	if str(data.get("type", "")) != TYPE_GIFT or MessageRow.reward_pending(data):
+		return false
+	var sender := str(data.get("sender_id", ""))
+	return not sender.is_empty() and sender != "system"
+
+## E10 همان دیالوگِ هدیه‌ی تب دوستان؛ اگر دیگر دوست نباشید سرور رد می‌کند
+func _open_gift_back(data: Dictionary) -> void:
+	var dialog := GIFT_DIALOG_SCENE.instantiate()
+	dialog.add_to_group("modal")
+	add_child(dialog)
+	var friend_name := str(data.get("sender_name", ""))
+	dialog.sent.connect(func(_id: String, _coins: int, _gems: int, _xp: int) -> void:
+		LocalSettings.vibrate(30)
+		PsychSocialGift.record_sent()
+		_show_toast("هدیه‌ات برای %s رفت — رفاقت همینه!" % friend_name))
+	dialog.failed.connect(func(reason: String) -> void: _show_toast(reason))
+	dialog.open(str(data.get("sender_id", "")), friend_name)
 
 ## صفحه‌ی جایزه (همان RewardPopup بقیه‌ی بازی) + لرزش کوتاه
 func _celebrate(reward: Dictionary, title: String) -> void:

@@ -33,6 +33,8 @@ const RANKING_SCENE := "res://secense/ranking_screen.tscn"
 ## اندازه‌ی هر صفحه‌ی لیست — باید با ClanBrowsePageSize در models.go یکی باشد
 const PAGE_SIZE := 30
 
+## E1/E9 سهم من و تازه‌واردها
+const PsychSocialCity := preload("res://scripts/psych_social_city.gd")
 const ICON_XP := preload("res://assets/icons/missions/icon_xp.png")
 const ICON_COIN := preload("res://assets/ui/coin_icon.png")
 const ICON_CROWN := preload("res://assets/icons/missions/icon_crown.svg")
@@ -226,8 +228,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_handle_back()
 
+var _back_frame := -1
+
 ## Back اندروید: اول پنجره‌ی باز، بعد برگشت از شهرِ در حال مشاهده، بعد منوی اصلی
 func _handle_back() -> void:
+	# Back اندروید ممکن است هم notification بفرستد هم ui_cancel؛ فقط یک بار
+	var frame := Engine.get_process_frames()
+	if frame == _back_frame:
+		return
+	_back_frame = frame
 	if _modal != null and is_instance_valid(_modal) and not _modal.is_closing():
 		_modal.close()
 		return
@@ -572,15 +581,29 @@ func _apply_clan(data: Dictionary, mode: Mode) -> void:
 func _apply_banner(data: Dictionary, mode: Mode) -> void:
 	if mode == Mode.MINE:
 		var role := str(data.get("my_role", "member"))
-		_banner_title.text = "شهر تو"
-		_banner_sub.text = "نقش تو در این شهر: %s" % CityUI.role_label(role)
-		# E1/E10 ارتباط: سهم خودم از امتیاز شهر (امتیاز شهر = جمع کاپ اعضا، handlers_leaderboard.go)
-		var share := _my_city_share(data)
-		if share.x > 0:
-			_banner_sub.text += "  •  سهم تو: %s کاپ (%s٪ امتیاز شهر)" % [
-				CityUI.fa_grouped(share.x), CityUI.fa(share.y)]
+		var st := PsychSocialCity.standing(data)
+		# متنِ زیرِ بنر می‌شکند تا روی گوشیِ باریک «...» نشود (سهم + جایگاه طولانی است)
+		_banner_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_banner_sub.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+		if bool(st.me_new):
+			# E1 ارتباط: عضوِ تازه خوش‌آمد می‌شنود و اولین قدمِ اجتماعی را می‌بیند
+			_banner_title.text = "به شهر خوش اومدی!"
+			_banner_sub.text = "توی چتِ شهر سلام کن — هر کاپی که می‌گیری امتیازِ شهر رو بالا می‌بره."
+		else:
+			_banner_title.text = "شهر تو"
+			_banner_sub.text = "نقش تو: %s" % CityUI.role_label(role)
+			# E1/E10 ارتباط: سهم خودم از امتیاز شهر (امتیاز شهر = جمع کاپ اعضا، handlers_leaderboard.go)
+			# E9 مقایسه در گروهِ کوچک: جایگاهم بینِ همشهری‌ها، نه بینِ همه‌ی دنیا
+			if int(st.mine) > 0:
+				_banner_sub.text += "  •  سهم تو: %s کاپ (%s٪ امتیاز شهر)  •  نفرِ %s از %s" % [
+					CityUI.fa_grouped(int(st.mine)), CityUI.fa(int(st.pct)),
+					CityUI.fa(int(st.place)), CityUI.fa(int(st.count))]
+			if int(st.new_count) > 0:
+				_banner_sub.text += "  •  %s تازه‌وارد — خوش‌آمد بگو!" % CityUI.fa(int(st.new_count))
 		_set_action("ترک شهر", "danger", true)
 		return
+	_banner_sub.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_banner_sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 	_banner_title.text = "به شهر ما بپیوندید!"
 	_banner_sub.text = "یک تیم، یک هدف؛ پیروزی در میدان نبرد."
@@ -600,25 +623,6 @@ func _apply_banner(data: Dictionary, mode: Mode) -> void:
 		_set_action("عضویت در شهر", "primary", true)
 	else:
 		_set_action("درخواست عضویت", "primary", true)
-
-## Vector2i(کاپ‌های من، درصد من از کل کاپ اعضا) — از لیست اعضای همین پاسخ
-func _my_city_share(data: Dictionary) -> Vector2i:
-	var members = data.get("members", [])
-	if not (members is Array):
-		return Vector2i.ZERO
-	var my_id := str(Global.player_id)
-	var mine := 0
-	var total := 0
-	for m in members:
-		if typeof(m) != TYPE_DICTIONARY:
-			continue
-		var cups := maxi(int((m as Dictionary).get("trophies", 0)), 0)
-		total += cups
-		if str((m as Dictionary).get("player_id", "")) == my_id:
-			mine = cups
-	if total <= 0 or mine <= 0:
-		return Vector2i.ZERO
-	return Vector2i(mine, roundi(100.0 * float(mine) / float(total)))
 
 func _set_action(text: String, kind: String, enabled: bool) -> void:
 	_action_button.text = text

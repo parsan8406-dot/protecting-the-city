@@ -39,6 +39,7 @@ const MOVE_NEEDED := 1.3
 const CARDS_FALLBACK_SEC := 7.0
 
 ## wait: tap (لمسِ هر جا) | event (خبر از صحنه) | scene (رفتن به صحنه‌ی بعد) | move (جوی‌استیک)
+##       | do (خودِ بازیکن دکمه را می‌زند و صحنه خبر می‌دهد؛ اگر نشد بعد از مدتی لمس)
 ##
 ## C7 داربست‌گذاری / C1 بار شناختی: هر قدم فقط یک چیز، جمله‌ها کوتاه.
 ## در زمین تمرین اول «راه رفتن» با انجام دادن یاد داده می‌شود (مهم‌ترین
@@ -66,12 +67,17 @@ const STEPS := [
 		"text": "اول راه رفتن: شستت رو روی جوی‌استیک بذار و یه کم این‌ور اون‌ور برو."},
 	{"scene": SCENE_GAME, "wait": "tap", "target": "profile",
 		"text": "نوارِ قرمز جونته، آبیِ زیرش تیرهات. شلیک و پر کردنِ خشاب خودکاره."},
-	{"scene": SCENE_GAME, "wait": "tap", "target": "btn_laser",
-		"text": "این دکمه‌ی بزرگ لیزره: هر کی جلوش باشه رو می‌سوزونه. بعدش باید صبر کنی پر شه."},
-	{"scene": SCENE_GAME, "wait": "tap", "target": "btn_bomb",
-		"text": "بمب: انگشتت رو روش بذار، بکش سمتِ دشمن و ول کن. فقط سه تا داری."},
-	{"scene": SCENE_GAME, "wait": "tap", "target": "btn_guard",
-		"text": "سپر: زیرِ رگبار بزنش؛ چند ثانیه تیر بهت کارگر نیست."},
+	# C7 یادگیری با انجام دادن: سه توانایی را خودِ بازیکن می‌زند (wait=do)؛
+	# اگر خبرش نرسید، بعد از DO_FALLBACK_SEC با لمس هم رد می‌شود
+	{"scene": SCENE_GAME, "wait": "do", "event": "ability_laser", "target": "btn_laser",
+		"praise": "آفرین! دیدی چه کرد؟",
+		"text": "این دکمه‌ی بزرگ لیزره: هر کی جلوش باشه رو می‌سوزونه. بزنش ببینم!"},
+	{"scene": SCENE_GAME, "wait": "do", "event": "ability_bomb", "target": "btn_bomb",
+		"praise": "ایول! پرتابِ تمیزی بود.",
+		"text": "بمب: انگشتت رو روش بذار، بکش و ول کن. امتحانش کن!"},
+	{"scene": SCENE_GAME, "wait": "do", "event": "ability_guard", "target": "btn_guard",
+		"praise": "عالی! حالا رگبار هم حریفت نیست.",
+		"text": "سپر: زیرِ رگبار بزنش؛ چند ثانیه تیر بهت کارگر نیست. بزنش!"},
 	{"scene": SCENE_GAME, "wait": "tap", "target": "btn_team_heal",
 		"text": "معجونِ سبز جونِ خودت و هم‌تیمی‌هات رو پر می‌کنه."},
 	{"scene": SCENE_GAME, "wait": "tap", "target": "round",
@@ -90,6 +96,13 @@ const STEP_JOYSTICK := 9
 ## C7 بازیکنِ برگشتی (یا کسی که بلد است) می‌تواند آموزش را رد کند — با دو لمس
 ## (C13 پیشگیری از خطا) تا اشتباهی رد نشود
 const SKIP_CONFIRM_SEC := 3.0
+## قدمِ «انجامش بده»: اگر خبرِ توانایی تا این مدت نرسید (دکمه آماده نبود، صحنه
+## خبر نداد)، لمسِ هر جا هم قدم را رد می‌کند — بازیکن هیچ‌وقت گیر نمی‌کند
+const DO_FALLBACK_SEC := 8.0
+## دکمه‌ی هدف اصلاً پیدا نشد: زودتر به لمس برگرد
+const DO_MISSING_SEC := 1.2
+## بعد از انجام دادن، کمی صبر تا بازیکن افکت را ببیند و «آفرین» را بخواند
+const DO_PRAISE_SEC := 0.9
 
 var _running := false
 var _step := -1
@@ -101,6 +114,8 @@ var _step_time := 0.0
 var _input_lock := 0.0
 var _moved := 0.0
 var _fallback_tap := false
+## قدمِ do انجام شد و منتظرِ رفتن به قدمِ بعدیم
+var _praising := false
 var _ending := false
 
 var _root: Control
@@ -207,12 +222,43 @@ func is_running() -> bool:
 
 
 ## صحنه‌ها خبر می‌دهند: character_picked، weapon_picked، category_weapon، ...
+## HUD برای توانایی‌ها ability_laser / ability_bomb / ability_guard می‌فرستد.
 func notify(event: String) -> void:
-	if not _running or not _scene_ready or _step < 0 or _ending:
+	if not _running or not _scene_ready or _step < 0 or _ending or _praising:
 		return
+	# دکمه‌ی سپر در HUD آیکنِ shield دارد؛ هر دو اسم قبول است
+	if event == "ability_shield":
+		event = "ability_guard"
 	var st: Dictionary = STEPS[_step]
-	if st.wait == "event" and st.get("event", "") == event:
+	if st.get("event", "") != event:
+		return
+	if st.wait == "event":
 		_advance()
+	elif st.wait == "do":
+		_praise_then_advance(str(st.get("praise", "")))
+
+
+## C7/E17 انجامش داد: یک «آفرین» کوتاه روی حباب، چند لحظه تماشای افکت، بعد قدمِ بعد
+func _praise_then_advance(text: String) -> void:
+	_praising = true
+	_input_lock = DO_PRAISE_SEC + 0.2
+	_spot.pass_through = false
+	LocalSettings.vibrate(25)
+	if text != "":
+		_typing = false
+		_body.text = text
+		_body.visible_characters = -1
+		_hint.text = ""
+		_name_pill.pivot_offset = _name_pill.size * 0.5
+		var tw := create_tween()
+		tw.tween_property(_name_pill, "scale", Vector2(1.18, 1.18), 0.1)
+		tw.tween_property(_name_pill, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK)
+	var step_at := _step
+	get_tree().create_timer(DO_PRAISE_SEC).timeout.connect(func() -> void:
+		_praising = false
+		# در این فاصله صحنه عوض شده یا آموزش رد شده: کاری نکن
+		if _running and not _ending and _scene_ready and _step == step_at:
+			_advance())
 
 
 ## فقط برای تست: آموزش دوباره از اول اجرا شود
@@ -370,7 +416,14 @@ func _process(delta: float) -> void:
 	if not st.is_empty():
 		_hold_joystick()
 		_spot.hole = _target_rect(st.target)
-		_spot.pass_through = st.wait == "event" or st.wait == "scene"
+		_spot.pass_through = (st.wait == "event" or st.wait == "scene" or st.wait == "do") \
+				and not _praising
+		# قدمِ do: خبر نیامد یا دکمه پیدا نشد ← لمسِ هر جا هم ادامه می‌دهد
+		if st.wait == "do" and not _fallback_tap and not _praising \
+				and (_step_time > DO_FALLBACK_SEC \
+					or (_step_time > DO_MISSING_SEC and not _spot.hole.has_area())):
+			_fallback_tap = true
+			_refresh_hint()
 		# کارت‌ها نرسیدند (سرور قطع است): بازیکن نباید پشتِ آموزش گیر کند
 		if st.target == "cards" and not _fallback_tap and _step_time > CARDS_FALLBACK_SEC \
 				and _cards_count() == 0:
@@ -469,7 +522,7 @@ func _advance() -> void:
 
 
 func _on_tap(touch_index: int = -1) -> void:
-	if not _scene_ready or _input_lock > 0.0 or _ending or _step < 0:
+	if not _scene_ready or _input_lock > 0.0 or _ending or _step < 0 or _praising:
 		return
 	# C1 انگشتی که جوی‌استیک را گرفته «لمس برای ادامه» حساب نمی‌شود — وگرنه
 	# راه رفتن وسطِ توضیح، جمله‌ها را بی‌آنکه خوانده شوند رد می‌کرد
@@ -600,7 +653,10 @@ func _refresh_hint() -> void:
 	var st: Dictionary = STEPS[_step]
 	# C9 شیب هدف: بازیکن می‌بیند چقدر مانده
 	var count := "%s/%s   " % [_fa(_step + 1), _fa(STEPS.size())]
-	if st.wait == "tap" or _fallback_tap:
+	if st.wait == "do":
+		_hint.text = count + ("بزنش، یا برای ادامه جای دیگه رو لمس کن ◂" if _fallback_tap \
+			else "خودت امتحانش کن ◂")
+	elif st.wait == "tap" or _fallback_tap:
 		_hint.text = count + "برای ادامه لمس کن ◂"
 	elif st.wait == "move":
 		_hint.text = count + "جوی‌استیک رو تکون بده ◂"

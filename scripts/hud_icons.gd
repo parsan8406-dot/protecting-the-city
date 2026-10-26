@@ -8,7 +8,7 @@ class_name HudIcons
 ## بگذاری — هیچ کدی عوض نمی‌شود.
 ##
 ## نام‌ها: laser, bomb, run, shield, heal, team_heal, settings, pause, wifi,
-## skull, people, hourglass, target, check, bullet
+## wifi_off, skull, people, hourglass, target, check, bullet
 
 const DIR := "res://assets/ui/hud/"
 
@@ -54,6 +54,7 @@ static func draw(ci: CanvasItem, name: String, rect: Rect2, col: Color = Color.W
 		"settings": _gear(ci, rect, col)
 		"pause": _pause(ci, rect, col)
 		"wifi": _wifi(ci, rect, col)
+		"wifi_off": _wifi_off(ci, rect, col)
 		"skull": _skull(ci, rect, col)
 		"people": _people(ci, rect, col)
 		"hourglass": _hourglass(ci, rect, col)
@@ -168,6 +169,14 @@ static func _wifi(ci: CanvasItem, r: Rect2, c: Color) -> void:
 	for i in 3:
 		var rad := s * (0.26 + 0.2 * float(i))
 		ci.draw_arc(base, rad, -PI * 0.78, -PI * 0.22, 16, c, s * 0.09)
+
+
+## اتصالِ بد/قطع: همان وای‌فای با خطِ مورب — رنگِ قرمز تنها نباشد  # V2 color + shape
+static func _wifi_off(ci: CanvasItem, r: Rect2, c: Color) -> void:
+	draw(ci, "wifi", r, Color(c.r, c.g, c.b, c.a * 0.55))
+	var s := minf(r.size.x, r.size.y)
+	ci.draw_line(_p(r, 0.12, 0.12), _p(r, 0.88, 0.88), Color(0, 0, 0, 0.85), s * 0.2)
+	ci.draw_line(_p(r, 0.12, 0.12), _p(r, 0.88, 0.88), c, s * 0.12)
 
 
 static func _skull(ci: CanvasItem, r: Rect2, c: Color) -> void:

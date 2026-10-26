@@ -35,6 +35,11 @@ var _trophies := 0
 var _selected := ""
 var _pending_mode := ""             # مودی که منتظر تاییدِ سرور است
 var _back_frame := -1               # جلوی دوبار اجرا شدنِ «بازگشت» در یک فریم
+## C2/C12: لمسِ کارت یعنی «همین را بازی می‌کنم» — بعد از تاییدِ سرور یک‌راست
+## به لابی برمی‌گردیم که «شروع» آن‌جا منتظر است (قبلاً باید دستی برمی‌گشت)
+var _return_after_select := false
+const RETURN_DELAY := 0.35
+const TOUCH := preload("res://scripts/psych_menu_touch.gd")
 
 
 func _ready() -> void:
@@ -116,7 +121,13 @@ func _on_back() -> void:
 
 
 func _go_back() -> void:
+	if _leaving or not is_inside_tree():
+		return
+	_leaving = true
 	get_tree().change_scene_to_file(MAIN_MENU)
+
+
+var _leaving := false
 
 
 # ============================ ناحیه‌ی امن (ناچ) ============================
@@ -239,6 +250,8 @@ func _icon_button(painter: Callable, round := false) -> Button:
 		b.add_theme_stylebox_override(state, s)
 	b.draw.connect(func() -> void: painter.call(b))
 	UIFx.bind_press_feedback(b)
+	# C3: آرت ۴۲ پیکسل است ولی ناحیه‌ی لمس ~۴۸dp
+	TOUCH.expand(b, _top_bar)
 	return b
 
 
@@ -300,8 +313,9 @@ func _info_bar() -> Control:
 	lines.add_theme_constant_override("separation", 0)
 	lines.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	lines.add_child(_label("هر مود بازی قوانین و استراتژی مخصوص به خود را دارد.", 15, COL_DIM))
-	lines.add_child(_label("مود مورد علاقه خود را انتخاب کنید و وارد میدان نبرد شوید!", 15, COL_DIM))
+	# C4/C7: دقیقاً بگو لمس چه می‌کند — بعد از انتخاب به لابی برمی‌گردی
+	lines.add_child(_label("مود را لمس کن؛ انتخاب می‌شود و به لابی برمی‌گردی.", 15, COL_DIM))
+	lines.add_child(_label("جزئیاتِ برد، باخت و شرطِ ورودِ هر مود: دکمه‌ی «؟»", 15, COL_DIM))
 	row.add_child(lines)
 
 	var spacer := Control.new()
@@ -432,7 +446,7 @@ func _open_help() -> void:
 	col.add_child(head)
 	var close := Button.new()
 	close.text = "بستن"
-	close.custom_minimum_size = Vector2(96, 44)
+	close.custom_minimum_size = Vector2(110, MenuUI.TOUCH_H)
 	close.focus_mode = Control.FOCUS_NONE
 	close.add_theme_font_override("font", FONT)
 	close.add_theme_font_size_override("font_size", 18)
@@ -608,11 +622,13 @@ func _rebuild_list(intro := false) -> void:
 		c.queue_free()
 
 	var idx := 0
+	var recommended := _recommended_id()
 	for m in _modes:
 		var mode_id := str(m.get("mode_id", ""))
 		var card := ModeCard.new()
+		card.recommended = mode_id == recommended
 		card.setup(m, _trophies, mode_id == _selected, FONT)
-		card.chosen.connect(_choose)
+		card.chosen.connect(_on_card_chosen)
 		card.blocked.connect(_on_blocked)
 		_list.add_child(card)
 		if intro:
@@ -621,7 +637,32 @@ func _rebuild_list(intro := false) -> void:
 		idx += 1
 
 
+## C2 هیک: فقط یک کارت برچسبِ «پیشنهادی» می‌گیرد. اگر سرور خودش مودی را
+## recommended بفرستد همان؛ وگرنه اولین مودِ بازشده به ترتیبِ سرور (ضربت —
+## کلاسیک و سریع‌ترین صف).
+func _recommended_id() -> String:
+	for m in _modes:
+		if bool(m.get("recommended", false)) and not bool(m.get("coming_soon", false)) \
+				and _trophies >= int(m.get("min_trophies", 0)):
+			return str(m.get("mode_id", ""))
+	return str(Global.pick_selected_mode(_modes, "", _trophies).get("mode_id", ""))
+
+
 # ============================ انتخاب ============================
+
+## لمسِ کارت: مودِ تازه را انتخاب کن و برگرد؛ مودِ فعلی را لمس کردن یعنی
+## «همین خوب است» — فوراً برگرد.
+func _on_card_chosen(mode_id: String) -> void:
+	if _pending_mode != "":
+		return
+	if mode_id == _selected:
+		_go_back()
+		return
+	_return_after_select = true
+	_choose(mode_id)
+	if _pending_mode == "":
+		_return_after_select = false
+
 
 func _choose(mode_id: String) -> void:
 	if _pending_mode != "":
@@ -656,6 +697,7 @@ func _on_select_answered(code: int, body: PackedByteArray) -> void:
 		var d = JSON.parse_string(body.get_string_from_utf8())
 		if typeof(d) == TYPE_DICTIONARY and d.has("error"):
 			msg = str(d["error"])
+		_return_after_select = false
 		_show_toast(msg)
 		return
 
@@ -667,6 +709,12 @@ func _on_select_answered(code: int, body: PackedByteArray) -> void:
 			Global.apply_selected_mode(m)
 	for card in _list.get_children():
 		card.set_active(card.mode_id == mode_id)
+	if _return_after_select:
+		_return_after_select = false
+		# فرصتِ دیدنِ تیک و درخششِ کارتِ تازه، بعد لابی
+		get_tree().create_timer(RETURN_DELAY).timeout.connect(func() -> void:
+			if is_inside_tree() and _help == null:
+				_go_back())
 
 
 # ============================================================================
@@ -697,6 +745,7 @@ class ModeCard extends Control:
 	var locked := false
 	var coming_soon := false          # هنوز ساخته نشده — قفل، با برچسبِ «به زودی...»
 	var is_active := false
+	var recommended := false          # C2: برچسبِ «پیشنهادی» — فقط یک کارت
 
 	var _font: Font = null
 	var _mode: Dictionary = {}
@@ -875,9 +924,16 @@ class ModeCard extends Control:
 		if locked and not coming_soon:
 			col.add_child(_progress_bar())
 
+		# C8/C11: «چه می‌بری» روی خودِ کارت — طلایی = پاداش (V1). جریمه‌ی باخت
+		# همچنان در راهنمای «؟» است تا کارت شلوغ نشود.
+		if not coming_soon:
+			col.add_child(_reward_line())
+
 		col.add_child(_team_frame())
 
 		_fx = _layer(_draw_front)
+		if recommended and not locked:
+			_add_recommended_badge()
 
 
 	## رنگِ کارت. مودِ قفل رنگِ خودش را نگه می‌دارد ولی کم‌جان — خاکستریِ
@@ -1009,6 +1065,38 @@ class ModeCard extends Control:
 					body.append(Vector2(x + cos(a) * 7.5, m.y + 9.0 + sin(a) * 7.0))
 				c.draw_colored_polygon(body, shade))
 		return c
+
+
+	## «برد: +۲۴ کاپ   +۱۲۰ سکه» (نقطه‌ی وسط در Lalezar شبیهِ «۰» است) — اعداد Lalezar، طلایی؛ مودِ قفل کم‌رنگ‌تر
+	func _reward_line() -> Control:
+		var cups := int(_mode.get("win_trophies", 0))
+		var coins := int(_mode.get("win_coins", 0))
+		var text := "برد: +%s کاپ   +%s سکه" % [_fa(cups), _fa(coins)]
+		var gold := Color(0.96, 0.79, 0.32)
+		var l := _label(text, 16, gold.darkened(0.35) if locked else gold)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
+		l.add_theme_constant_override("outline_size", 4)
+		return l
+
+
+	## برچسبِ طلاییِ «پیشنهادی» گوشه‌ی بالا-چپِ تصویر (گوشه‌ی راست مالِ تیکِ انتخاب است)
+	func _add_recommended_badge() -> void:
+		var chip := PanelContainer.new()
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.96, 0.79, 0.32)
+		sb.set_corner_radius_all(6)
+		sb.content_margin_left = 9.0
+		sb.content_margin_right = 9.0
+		sb.content_margin_top = 1.0
+		sb.content_margin_bottom = 2.0
+		sb.shadow_color = Color(0, 0, 0, 0.5)
+		sb.shadow_size = 4
+		chip.add_theme_stylebox_override("panel", sb)
+		chip.add_child(_label("پیشنهادی", 15, Color(0.09, 0.07, 0.04)))
+		chip.position = Vector2(8, 8)
+		add_child(chip)
 
 
 	## نوارِ «چقدر تا باز شدن» — عددِ خالی حسِ نزدیک بودن را نمی‌رساند
@@ -1151,18 +1239,17 @@ class ModeCard extends Control:
 				_src = src
 				_touch_start = event.position
 				_is_swiping = false
-				if not is_active:
-					UIFx.press_scale(self, true)
+				# V9: کارتِ فعلی هم زیرِ انگشت فرو می‌رود (قبلاً بی‌واکنش بود)
+				UIFx.press_scale(self, true)
 			elif src == _src:
 				_src = -1
-				if not is_active:
-					UIFx.press_scale(self, false)
+				UIFx.press_scale(self, false)
 				if _is_swiping:
 					return
-				# رها کردن بدونِ کشیدن = انتخاب
+				# رها کردن بدونِ کشیدن = انتخاب (کارتِ فعلی = «همین، برگرد»)
 				if locked:
 					blocked.emit(mode_id)
-				elif not is_active:
+				else:
 					UIFx.tap(self, func() -> void: chosen.emit(mode_id))
 			accept_event()
 			return
@@ -1174,8 +1261,7 @@ class ModeCard extends Control:
 			return
 		if not _is_swiping and event.position.distance_to(_touch_start) > DRAG_THRESHOLD:
 			_is_swiping = true
-			if not is_active:
-				UIFx.press_scale(self, false)
+			UIFx.press_scale(self, false)
 		if _is_swiping and _scroll != null:
 			_scroll.scroll_horizontal -= int(event.relative.x)
 		accept_event()

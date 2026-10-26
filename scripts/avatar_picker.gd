@@ -27,9 +27,17 @@ const VALID_EXTENSIONS := ["png", "jpg", "jpeg", "webp", "svg"]
 var _selected_id: String = ""
 var _cells: Dictionary = {}   # avatar_id -> TextureButton
 
+## انگشت بیش از این روی صفحه جابه‌جا شود یعنی اسکرولِ گرید، نه انتخاب
+const DRAG_SLOP := 12.0
+var _touch_start := Vector2.ZERO
+var _cell_dragged := false
+
 func _ready() -> void:
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 	_cancel_button.pressed.connect(_on_cancel_pressed)
+	# V9: فشردنِ دکمه‌ها دیده و شنیده می‌شود
+	UIFx.bind_press_feedback(_confirm_button)
+	UIFx.bind_press_feedback(_cancel_button)
 	_dim.gui_input.connect(_on_dim_input)
 	_build_grid()
 
@@ -78,6 +86,9 @@ func _build_grid() -> void:
 		button.ignore_texture_size = true
 		button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 		button.modulate = Color(0.62, 0.62, 0.64, 1.0)
+		# کشیدن روی سلول‌ها گرید را اسکرول کند (PASS) و اسکرول انتخاب حساب نشود
+		button.mouse_filter = Control.MOUSE_FILTER_PASS
+		button.gui_input.connect(_on_cell_input.bind(button))
 		button.pressed.connect(_on_cell_pressed.bind(avatar_id))
 
 		_grid.add_child(button)
@@ -121,7 +132,19 @@ static func load_avatar_texture(avatar_id: String) -> Texture2D:
 
 # ------------------------------------------------------------------ انتخاب
 
+func _on_cell_input(event: InputEvent, button: Control) -> void:
+	if event is InputEventScreenTouch and event.pressed:
+		_cell_dragged = false
+		_touch_start = button.get_global_transform_with_canvas() * event.position
+	elif event is InputEventScreenDrag and not _cell_dragged:
+		var p: Vector2 = button.get_global_transform_with_canvas() * event.position
+		if p.distance_to(_touch_start) > DRAG_SLOP:
+			_cell_dragged = true
+
 func _on_cell_pressed(avatar_id: String) -> void:
+	if _cell_dragged:
+		_cell_dragged = false
+		return
 	_select(avatar_id)
 	var button := _cells.get(avatar_id) as TextureButton
 	if button:

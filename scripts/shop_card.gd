@@ -83,15 +83,16 @@ func setup_card(data: Dictionary) -> void:
 		else:
 			final_price = original_price
 			
+	# V10: ارقامِ فارسیِ هم‌تراز با جداکننده، مثلِ بقیه‌ی فروشگاه («۲۵۰» نه «250»)
 	if final_price_label:
-		final_price_label.text = str(final_price)
+		final_price_label.text = MissionArt.fa_grouped(final_price)
 	
 	if discount_percent > 0:
 		if discount_badge: discount_badge.visible = true
 		if discount_label: 
-			discount_label.text = "%d%%-" % discount_percent
+			discount_label.text = "٪%s-" % MissionArt.fa_number(discount_percent)
 		if old_price_container: old_price_container.visible = true
-		if old_price_label: old_price_label.text = str(original_price)
+		if old_price_label: old_price_label.text = MissionArt.fa_grouped(original_price)
 	else:
 		if discount_badge: discount_badge.visible = false
 		if old_price_container: old_price_container.visible = false

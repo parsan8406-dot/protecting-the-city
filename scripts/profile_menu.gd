@@ -393,8 +393,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		_handle_back()
 
+var _back_frame := -1
+
 ## Back اندروید: اول بالاترین پنجره‌ی باز بسته می‌شود، بعد برگشت به منوی اصلی
 func _handle_back() -> void:
+	# Back اندروید ممکن است هم notification بفرستد هم ui_cancel؛ فقط یک بار
+	var frame := Engine.get_process_frames()
+	if frame == _back_frame:
+		return
+	_back_frame = frame
 	var modals := get_tree().get_nodes_in_group("modal")
 	for i in range(modals.size() - 1, -1, -1):
 		var m := modals[i] as CanvasItem

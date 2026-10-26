@@ -34,6 +34,9 @@ const SPLIT_H := 9.0
 
 ## ده بار در ثانیه بس است — هر فریم کشیدن روی گوشیِ ارزان بی‌خود است
 const REFRESH := 0.1
+## زیرِ این کسر شیطان «نزدیکِ افتادن» است: قاب می‌تپد و کنارِ نامش نوشته
+## می‌شود — آخرِ کار باید از همه جا برجسته‌تر باشد  # C9 goal-gradient
+const NEAR_FRAC := 0.25
 
 var _t := 0.0
 ## جانِ نمایشی، که نرم به مقدارِ واقعی می‌رسد. بدونِ آن نوار با هر تیر
@@ -73,8 +76,15 @@ func _process(delta: float) -> void:
 
 	_t -= delta
 	if _t <= 0.0:
-		_t = REFRESH
+		# تپشِ «نزدیکه» با ده فریم در ثانیه پله‌پله دیده می‌شد
+		_t = REFRESH * (0.5 if _near(info) else 1.0)
 		queue_redraw()
+
+
+func _near(info: Dictionary) -> bool:
+	var max_hp: float = maxf(float(info.get("max_health", 1)), 1.0)
+	var hp := float(info.get("health", 0))
+	return hp > 0.0 and hp / max_hp <= NEAR_FRAC
 
 
 func _draw() -> void:
@@ -94,10 +104,24 @@ func _draw() -> void:
 	box.set_border_width_all(2)
 	box.border_color = Color(COL_GOLD.r, COL_GOLD.g, COL_GOLD.b, 0.75)
 	draw_style_box(box, Rect2(Vector2.ZERO, size))
+	var near := _near(info)
+	if near:
+		var beat := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.009)
+		var glow := StyleBoxFlat.new()
+		glow.draw_center = false
+		glow.set_corner_radius_all(12)
+		glow.set_border_width_all(3)
+		glow.border_color = Color(COL_GOLD.r, COL_GOLD.g, COL_GOLD.b, 0.35 + 0.6 * beat)
+		draw_style_box(glow, Rect2(Vector2.ZERO, size).grow(1.0 + 2.0 * beat))
 
 	# --- سطرِ بالا: نام و عدد ---
 	var pad := 12.0
 	_text("شیطان", Vector2(pad, 21.0), 19, COL_GOLD)
+	if near:
+		# وسطِ سطر، بینِ نام و عدد — همان‌جا که چشم از نام به عدد می‌رود
+		var near_txt := "تقریباً تمومه!"
+		var nw := FONT.get_string_size(near_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
+		_text(near_txt, Vector2((w - nw) * 0.5, 21.0), 17, COL_HP_LOW)
 	var hp_text := "%s / %s" % [_fa(int(round(hp))), _fa(int(max_hp))]
 	var tw := FONT.get_string_size(hp_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 17).x
 	_text(hp_text, Vector2(w - pad - tw, 21.0), 17, COL_TEXT)

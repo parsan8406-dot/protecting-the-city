@@ -156,6 +156,7 @@ func _apply_cell(
 
 	# قفل روی خانه‌ای که هنوز باز نشده — چه به‌خاطر پله، چه به‌خاطر بتل‌پس
 	lock.visible = state == "locked" or state == "premium_locked"
+	lock.modulate = Color.WHITE
 	# قفلِ «بتل‌پس نداری» طلایی است تا از قفلِ «هنوز نرسیدی» فرق کند
 	if lock.visible:
 		var lock_icon := lock.get_child(0) as TextureRect
@@ -209,6 +210,40 @@ func _make_level_on_style() -> StyleBox:
 	flat.bg_color = Color(0.157, 0.118, 0.031, 1.0)
 	flat.border_color = COLOR_GOLD
 	return flat
+
+## E12/C9 «پله‌ی بعدی»: اولین پله‌ای که هنوز باز نشده.
+## جایزه‌اش رنگِ کامل می‌گیرد (قفل سرِ جایش می‌ماند — صادقانه، فقط دیدنی‌تر)
+## و برچسبِ «بعدی» با نبضِ آرام. شمارش یا تایمرِ فشار در کار نیست.
+var _next_pulse: Tween = null
+var _is_next := false
+
+func set_next(on: bool) -> void:
+	if not is_node_ready() or on == _is_next:
+		return
+	_is_next = on
+	if _next_pulse != null and _next_pulse.is_valid():
+		_next_pulse.kill()
+	_next_pulse = null
+	_level_badge.scale = Vector2.ONE
+	if not on:
+		_apply(_tier)
+		return
+	_level_label.text = "%s · بعدی" % MissionArt.fa_number(level)
+	_level_label.add_theme_color_override("font_color", COLOR_GOLD)
+	_level_badge.add_theme_stylebox_override("panel", _style_level_on)
+	for pair in [[_free_cell, _free_icon, _free_amount, _free_lock, COLOR_BLUE],
+			[_premium_cell, _premium_icon, _premium_amount, _premium_lock, COLOR_GOLD]]:
+		var cell: Control = pair[0]
+		if not cell.visible:
+			continue
+		(pair[1] as Control).modulate = Color.WHITE
+		(pair[2] as Label).add_theme_color_override("font_color", pair[4])
+		# قفل کم‌رنگ‌تر تا خودِ جایزه دیده شود
+		(pair[3] as Control).modulate = Color(1, 1, 1, 0.55)
+	_level_badge.pivot_offset = _level_badge.size * 0.5
+	_next_pulse = create_tween().set_loops()
+	_next_pulse.tween_property(_level_badge, "scale", Vector2(1.06, 1.06), 0.8) 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_next_pulse.tween_property(_level_badge, "scale", Vector2.ONE, 0.8) 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 ## ورود پلکانی ستون‌ها وقتی صفحه باز می‌شود
 func play_pop(delay: float) -> void:

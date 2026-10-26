@@ -121,12 +121,15 @@ func _draw() -> void:
 				if absf(off.x) > lim.x or absf(off.y) > lim.y:
 					var f := minf(lim.x / maxf(absf(off.x), 0.001), lim.y / maxf(absf(off.y), 0.001))
 					mp = half + off * f
-				draw_circle(mp, 5.0, Color(0, 0, 0, 0.6))
-				draw_circle(mp, 4.0, COL_ALLY)
+				# هم‌تیمی: دایره‌ی آبی؛ حریف: لوزیِ قرمز. رنگ تنها نیست،
+				# شکل هم فرق دارد (کوررنگی)  # V2 color + shape
+				draw_circle(mp, 5.5, Color(0, 0, 0, 0.6))
+				draw_circle(mp, 4.5, COL_ALLY)
 			elif d <= Abilities.RADAR_RANGE:
 				var fp: Vector2 = to_map.call(pos)
-				draw_circle(fp, 6.0, Color(COL_FOE.r, COL_FOE.g, COL_FOE.b, 0.3))
-				draw_circle(fp, 4.0, COL_FOE)
+				draw_circle(fp, 8.0, Color(COL_FOE.r, COL_FOE.g, COL_FOE.b, 0.25))
+				draw_colored_polygon(_diamond(fp, 7.0), Color(0, 0, 0, 0.7))
+				draw_colored_polygon(_diamond(fp, 5.5), COL_FOE)
 
 	# --- خودم: پیکان رو به جهتِ نگاه ---
 	var dir := Vector2.RIGHT.rotated(me.global_rotation - PI * 0.5)
@@ -200,3 +203,8 @@ func _dashed_circle(c: Vector2, r: float, col: Color) -> void:
 			var a0 := TAU * float(i) / float(n)
 			var a1 := TAU * float(i + 1) / float(n)
 			draw_arc(c, r, a0, a1, 4, col, 1.5, true)
+
+
+func _diamond(c: Vector2, r: float) -> PackedVector2Array:
+	return PackedVector2Array([c + Vector2(0, -r), c + Vector2(r * 0.8, 0),
+		c + Vector2(0, r), c + Vector2(-r * 0.8, 0)])

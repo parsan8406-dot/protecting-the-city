@@ -196,6 +196,12 @@ var _leaving := false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		# Back اول پنجره‌ی تأییدِ باز (بچه‌ی root) را می‌بندد، نه این‌که زیرش
+		# صحنه عوض شود و پنجره روی منوی اصلی بماند
+		for node in get_tree().get_nodes_in_group("modal"):
+			if node is MenuUI.ModalSheet:
+				(node as MenuUI.ModalSheet).dismiss()
+				return
 		_on_home_pressed()
 	elif what == NOTIFICATION_EXIT_TREE and is_inside_tree():
 		get_tree().set_quit_on_go_back(true)
@@ -1331,14 +1337,14 @@ func _refresh_upgrade_row() -> void:
 	_upgrade_level_label.text = "سطح %s / %s" % [MissionArt.fa_number(level), MissionArt.fa_number(max_level)]
 
 	if next.is_empty():
-		_upgrade_delta_label.text = "جان %s · آسیب %s" % [
+		_upgrade_delta_label.text = "جان %s  |  آسیب %s" % [
 			MissionArt.fa_number(int(current.get("health", 0))), MissionArt.fa_number(int(current.get("damage", 0)))]
 		_upgrade_button.text = "حداکثر"
 		_upgrade_button.icon = null
 		_upgrade_button.disabled = true
 		return
 
-	_upgrade_delta_label.text = "جان %s ← %s · آسیب %s ← %s" % [
+	_upgrade_delta_label.text = "جان %s ← %s  |  آسیب %s ← %s" % [
 		MissionArt.fa_number(int(current.get("health", 0))), MissionArt.fa_number(int(next.get("health", 0))),
 		MissionArt.fa_number(int(current.get("damage", 0))), MissionArt.fa_number(int(next.get("damage", 0)))]
 	_upgrade_button.icon = load("res://assets/ui/coin_icon.png")
@@ -1365,10 +1371,36 @@ func _on_upgrade_pressed() -> void:
 	tween.tween_property(_upgrade_button, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_BACK)
 	LocalSettings.vibrate(18)
 
-	if Global.coins < int(info.get("cost", 0)):
+	var cost := int(info.get("cost", 0))
+	if Global.coins < cost:
 		_show_toast("سکه کافی نیست", false)
 		return
 
+	# C13: ارتقایی که نصف یا بیشترِ سکه‌ها را می‌برد یک بار تأیید می‌خواهد —
+	# ارتقاهای کوچک همان یک لمس می‌مانند تا روالِ تکراری کند نشود
+	if cost * 2 >= Global.coins:
+		if _upgrade_confirm_open:
+			return
+		_upgrade_confirm_open = true
+		var body := "%s\nبعد از ارتقا %s سکه برایت می‌ماند." % [
+			_upgrade_delta_label.text if _upgrade_delta_label else "",
+			MissionArt.fa_grouped(Global.coins - cost)]
+		MenuUI.confirm(self, "ارتقا با %s سکه؟" % MissionArt.fa_grouped(cost), body,
+			"ارتقا — %s سکه" % MissionArt.fa_grouped(cost),
+			func(ok: bool) -> void:
+				_upgrade_confirm_open = false
+				if ok:
+					_send_upgrade(item_id))
+		return
+	_send_upgrade(item_id)
+
+
+var _upgrade_confirm_open := false
+
+
+func _send_upgrade(item_id: String) -> void:
+	if _upgrade_in_flight:
+		return
 	var payload := {"username": Global.my_username, "item_id": item_id}
 	var err := upgrade_http.request("%s/upgrade_character" % Global.SERVER_BASE,
 		Global.json_headers(), HTTPClient.METHOD_POST, JSON.stringify(payload))

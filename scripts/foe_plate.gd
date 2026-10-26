@@ -58,7 +58,8 @@ func set_weapon(tex: Texture2D) -> void:
 func set_health(current: int, maximum: int) -> void:
 	var m := maxf(float(maximum), 1.0)
 	_hp = clampf(float(current) / m, 0.0, 1.0)
-	_text = "%d" % maxi(current, 0)
+	# ارقامِ فارسی، مثلِ بقیه‌ی عددهای HUD  # V10
+	_text = MissionArt.fa_number(maxi(current, 0))
 	queue_redraw()
 
 
@@ -69,6 +70,14 @@ func _process(_delta: float) -> void:
 	# صاف و بدون چرخش، همیشه بالای سرِ حریف
 	global_position = _target.global_position + Vector2(0, OFFSET_Y)
 	global_rotation = 0.0
+	# حریفِ رو به مرگ: قابِ نوار می‌تپد — «یه تیرِ دیگه»  # C9 near-done / V1 motion
+	if _finishable():
+		queue_redraw()
+
+
+## حریفی که با یکی دو تیرِ دیگر می‌افتد (فقط حریف، نه هم‌تیمی)
+func _finishable() -> bool:
+	return not is_ally and _hp > 0.0 and _hp <= 0.25
 
 
 func _fill_color() -> Color:
@@ -113,13 +122,20 @@ func _draw() -> void:
 	# فقط قابِ نوار کافی نبود — در زمینِ تاریک و از فاصله، یک خطِ نازکِ
 	# رنگی تقریباً دیده نمی‌شود. این مثلث از دور هم می‌گوید حریف است یا
 	# هم‌تیمی، و همان رنگِ قاب را دارد پس دو تا زبانِ جدا نمی‌شود.
+	#
+	# حریف: مثلثِ قرمزِ رو به پایین؛ هم‌تیمی: دایره‌ی آبی. شکل هم فرق دارد
+	# نه فقط رنگ — کوررنگ‌ها هم دوست و دشمن را جدا ببینند  # V2 color + shape
 	var mk := 7.0
 	var my := -30.0
-	var tri := PackedVector2Array([
-		Vector2(-mk, my - mk), Vector2(mk, my - mk), Vector2(0.0, my + mk)])
-	draw_colored_polygon(tri, _edge_col)
-	draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]),
-		Color(0, 0, 0, 0.55), 1.5)
+	if is_ally:
+		draw_circle(Vector2(0.0, my), mk * 0.85 + 1.5, Color(0, 0, 0, 0.55))
+		draw_circle(Vector2(0.0, my), mk * 0.85, _edge_col)
+	else:
+		var tri := PackedVector2Array([
+			Vector2(-mk, my - mk), Vector2(mk, my - mk), Vector2(0.0, my + mk)])
+		draw_colored_polygon(tri, _edge_col)
+		draw_polyline(PackedVector2Array([tri[0], tri[1], tri[2], tri[0]]),
+			Color(0, 0, 0, 0.55), 1.5)
 	if _hp > 0.0:
 		draw_style_box(_box(_fill_color()), Rect2(x, 0.0, BAR_W * _hp, BAR_H))
 	# قابِ رنگیِ تیم آخر از همه کشیده می‌شود، وگرنه با جانِ کامل نوارِ پر
@@ -127,6 +143,10 @@ func _draw() -> void:
 	# عکسِ آزمایش دیده شد: نوار سبزِ بی‌قاب.
 	_sb_frame.border_color = _edge_col
 	draw_style_box(_sb_frame, track)
+	if _finishable():
+		var beat := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.012)
+		_sb_frame.border_color = Color(1.0, 0.86, 0.36, 0.35 + 0.55 * beat)
+		draw_style_box(_sb_frame, track.grow(2.0 + 2.0 * beat))
 
 	# عدد جان، کوچک و کنارِ نوار
 	var fs := 12

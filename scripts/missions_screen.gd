@@ -686,7 +686,64 @@ func _apply_season(data: Dictionary) -> void:
 
 	_apply_pass_cards(data)
 	_build_ladder(data.get("tiers", []))
+	_apply_next_tease(data, into, need)
 	_build_challenges(data.get("challenges", []))
+
+## E12/C9 «پاداش بعدی»: اولین پله‌ای که هنوز باز نشده، در بنر و روی خودِ
+## نردبان. فقط اطلاعاتِ واقعیِ سرور — نه شمارش معکوس و نه فشار.
+var _next_tease: HBoxContainer = null
+var _next_tease_icon: TextureRect = null
+var _next_tease_label: Label = null
+
+func _apply_next_tease(data: Dictionary, into: int, need: int) -> void:
+	var next: Dictionary = {}
+	for tier in data.get("tiers", []):
+		if typeof(tier) == TYPE_DICTIONARY and not bool(tier.get("unlocked", false)):
+			next = tier
+			break
+	for card in _ladder.get_children():
+		if card.has_method("set_next"):
+			card.set_next(not next.is_empty() and int(card.level) == int(next.get("level", 0)))
+	if _next_tease == null:
+		_build_next_tease()
+	_next_tease.visible = not next.is_empty()
+	if next.is_empty():
+		return
+	# اگر بتل‌پس طلایی دارد، جایزه‌ی طلایی همان پله را نشان بده (بزرگ‌تر است)
+	var cell: Dictionary = next.get("free", next)
+	if bool(data.get("premium", false)) and next.get("premium") is Dictionary:
+		cell = next["premium"]
+	_next_tease_icon.texture = MissionArt.reward_texture(cell)
+	var left := maxi(need - into, 0)
+	var near := PsychProgress.is_near(into, need)
+	_next_tease_label.text = "پاداش سطح %s: %s  ·  %s%s تجربه مونده" % [
+		MissionArt.fa_number(int(next.get("level", 0))), str(cell.get("title", "")),
+		"فقط " if near else "", MissionArt.fa_grouped(left)]
+	_next_tease_label.add_theme_color_override("font_color",
+		MissionArt.COLOR_GOLD if near else COLOR_TEXT)
+
+func _build_next_tease() -> void:
+	var info := get_node(_BANNER + "/Info") as VBoxContainer
+	_next_tease = HBoxContainer.new()
+	_next_tease.alignment = BoxContainer.ALIGNMENT_END
+	_next_tease.add_theme_constant_override("separation", 6)
+	_next_tease.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_next_tease_label = Label.new()
+	_next_tease_label.add_theme_font_override("font", NUM_FONT)
+	_next_tease_label.add_theme_font_size_override("font_size", 15)
+	_next_tease_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_next_tease_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_next_tease_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_next_tease_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_next_tease.add_child(_next_tease_label)
+	_next_tease_icon = TextureRect.new()
+	_next_tease_icon.custom_minimum_size = Vector2(24, 24)
+	_next_tease_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_next_tease_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_next_tease_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_next_tease_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_next_tease.add_child(_next_tease_icon)
+	info.add_child(_next_tease)
 
 ## کارت‌های «بتل پس طلایی» و «بتل پس رایگان» کنار نردبان
 func _apply_pass_cards(data: Dictionary) -> void:
@@ -748,9 +805,9 @@ func _scroll_to_first_ready(tiers: Array) -> void:
 					target_level = int(t.get("level", 0))
 					break
 
-	# هیچ جایزه‌ای آماده نیست → می‌رویم سراغ جایی که بازیکن ایستاده
+	# هیچ جایزه‌ای آماده نیست → پله‌ی بعدی (E12: جایزه‌ی بعدی در دید باشد)
 	if target_level <= 0:
-		target_level = last_unlocked
+		target_level = mini(last_unlocked + 1, tiers.size())
 	_ladder_target_level = target_level
 
 	if _season_page.visible:

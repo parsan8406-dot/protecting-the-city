@@ -123,6 +123,7 @@ var _elapsed_value: Label = null
 var _ping_dot: Control = null
 var _ping_label: Label = null
 var _tip_label: Label = null
+var _tip_icon: TextureRect = null
 var _search_text: Label = null
 var _spinner: Control = null
 var _action_button: Button = null
@@ -179,7 +180,7 @@ func _process(delta: float) -> void:
 	if _tip_cd <= 0.0:
 		_tip_cd = TIP_EVERY
 		_tip_i = (_tip_i + 1) % TIPS.size()
-		_tip_label.text = TIPS[_tip_i]
+		_show_tip()
 
 	if _state != "searching":
 		return
@@ -475,9 +476,18 @@ func _build_left_column() -> Control:
 	var tip := _panel(COL_PANEL, Color(COL_GOLD, 0.35), 14)
 	var tip_box := VBoxContainer.new()
 	tip_box.add_theme_constant_override("separation", 2)
+	# C12: سرِ نکته آیکنِ همان مکانیک (tip_*.png) — نبود، فقط متن
+	var tip_head_row := HBoxContainer.new()
+	tip_head_row.add_theme_constant_override("separation", 8)
+	tip_head_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tip_head := _label("نکته:", 17, COL_GOLD)
 	tip_head.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	tip_box.add_child(tip_head)
+	tip_head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tip_head.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	tip_head_row.add_child(tip_head)
+	_tip_icon = _tex(null, 40)
+	tip_head_row.add_child(_tip_icon)
+	tip_box.add_child(tip_head_row)
 	_tip_i = randi() % TIPS.size()
 	_tip_label = _label(TIPS[_tip_i], 15, COL_TEXT)
 	_tip_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -485,7 +495,22 @@ func _build_left_column() -> Control:
 	tip_box.add_child(_tip_label)
 	tip.add_child(tip_box)
 	col.add_child(tip)
+	_show_tip()
 	return col
+
+
+## متن و آیکنِ نکته‌ی جاری. آیکنِ رنگیِ اختصاصی همان‌طور می‌ماند؛ آیکنِ
+## تک‌رنگِ HUD (جایگزین) طلایی می‌شود تا با سرِ نکته هم‌رنگ باشد.
+func _show_tip() -> void:
+	if _tip_label == null:
+		return
+	_tip_label.text = TIPS[_tip_i]
+	if _tip_icon == null:
+		return
+	var tex := PSYCH_TIPS.icon(_tip_i)
+	_tip_icon.texture = tex
+	_tip_icon.visible = tex != null
+	_tip_icon.modulate = Color.WHITE if PSYCH_TIPS.has_art(_tip_i) else COL_GOLD
 
 
 ## یک ردیفِ آمار: عدد چپ، عنوان راست. لیبلِ عدد را برمی‌گرداند.

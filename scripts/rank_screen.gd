@@ -22,6 +22,9 @@ extends Control
 ## دیتا: GET /profile → trophies · rank · rank_tiers · season_number · season_ends_at
 
 const TIER_CHIP_SCENE := preload("res://secense/rank_tier_chip.tscn")
+const CONFETTI := preload("res://scripts/psych_results_confetti.gd")
+## آرتِ «ارتقا» کنارِ «تا ارتقا به …» (اگر نباشد همان آیکنِ صحنه)
+const UP_ART := "res://assets/ui/psych/result_level_up.png"
 const PsychProgress := preload("res://scripts/psych_results_progress.gd")
 
 const DEFAULT_TIERS := [
@@ -108,6 +111,9 @@ var _tiers: Array = DEFAULT_TIERS.duplicate(true)
 var _tier_chips: Array = []
 var _trophies := 0
 var _current_index := 0
+## کاپِ باقی‌مانده تا رنکِ بعدی و «نزدیک بودن» (برای ستونِ «بعدی»)
+var _left_to_next := 0
+var _near_next := false
 
 ## یک درخواست در راه است (جلوی درخواست دوباره را می‌گیرد)
 var _busy := false
@@ -143,6 +149,9 @@ func _ready() -> void:
 	_level_label.text = "سطح %s" % MissionArt.fa_number(int(Global.level))
 	_apply_avatar(str(Global.avatar_id))
 
+	if ResourceLoader.exists(UP_ART):
+		_up_icon.texture = load(UP_ART)
+		_up_icon.modulate = Color.WHITE
 	_build_ladder()
 	_build_rules()
 	_apply_trophies(0, "")
@@ -356,7 +365,26 @@ func _apply_profile(data: Dictionary) -> void:
 
 	var trophies := int(data.get("trophies", rank.get("points", 0)))
 	_apply_trophies(trophies, str(rank.get("tier_id", "")))
+	_check_rank_up()
 	_apply_season(data, rank)
+
+## E17 اگر از آخرین باری که این صفحه باز شد رنک بالا رفته: کنفتیِ کوتاه و
+## پیام. فقط روی همین دستگاه یادداشت می‌شود و بارِ اول چیزی نشان نمی‌دهد.
+func _check_rank_up() -> void:
+	const PATH := "user://psych_results.cfg"
+	var cfg := ConfigFile.new()
+	cfg.load(PATH)
+	var sec := "u_" + str(Global.my_username)
+	var last := int(cfg.get_value(sec, "rank_seen_index", -1))
+	if last >= 0 and _current_index > last:
+		var c := CONFETTI.new()
+		add_child(c)
+		var vp := get_viewport_rect().size
+		c.burst(Vector2(vp.x * 0.5, vp.y * 0.2), minf(vp.x * 0.6, 760.0))
+		LocalSettings.vibrate(50)
+		_show_toast("ارتقا به %s!" % str(_tiers[_current_index].get("name", "")))
+	cfg.set_value(sec, "rank_seen_index", _current_index)
+	cfg.save(PATH)
 
 ## جدول rank_tiers سرور → آرایه‌ی دیکشنری. خالی یعنی قابل استفاده نبود.
 func _parse_tiers(raw: Variant) -> Array:
@@ -403,6 +431,8 @@ func _apply_trophies(trophies: int, server_tier_id: String) -> void:
 		_progress_value.text = "%s / %s" % [MissionArt.fa_grouped(trophies), MissionArt.fa_grouped(hi)]
 		_next_label.text = "تا ارتقا به %s" % str(next.get("name", ""))
 		var left := maxi(hi - trophies, 0)
+		_left_to_next = left
+		_near_next = near
 		# C9/E5 نزدیکِ پایان: «فقط ۴۰ کاپ مونده!» به طلایی
 		_remain_label.text = ("فقط %s کاپ مونده!" if near else "%s کاپ باقی مانده") % MissionArt.fa_grouped(left)
 		if near:
@@ -473,7 +503,15 @@ func _build_ladder() -> void:
 
 func _refresh_ladder() -> void:
 	for i in _tier_chips.size():
-		_tier_chips[i].setup(_tier_view(i), i == _current_index)
+		# C9/E12: رد شده / فعلی / بعدی («فقط X کاپ») / قفل (تیزر)
+		var state := "passed"
+		if i == _current_index:
+			state = "current"
+		elif i == _current_index + 1:
+			state = "next"
+		elif i > _current_index + 1:
+			state = "locked"
+		_tier_chips[i].setup(_tier_view(i), i == _current_index, state, _left_to_next, _near_next)
 	for i in _tier_chips.size():
 		_tier_chips[i].play_pop(0.04 * float(i))
 

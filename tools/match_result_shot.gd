@@ -10,12 +10,19 @@ extends Node
 ##   final  حالتِ پایانی
 ##
 ##   godot --path . res://tools/match_result_shot.tscn --resolution 1280x720 --fixed-fps 60 -- --outcome=win --out=C:/tmp/res
+##
+## اختیاری: --kills=N (کیلِ سرور در match_reward؛ ‎-1 = سرورِ قدیمی)،
+## --tracked (آمارِ کلاینت فعال — برای زنجیره‌ی برد/رکورد)، --goal=ready
+## (کارتِ هدف با «جایزه‌ی آماده»). outcome: win | lose | lose0 | draw
 
 var _out := ""
 var _outcome := "win"
 var _frames := 0
 var _screen: MatchResultScreen = null
 var _movers: Array[Node2D] = []
+var _kills := 7
+var _tracked := false
+var _goal := ""
 
 const SHOTS := {6: "start", 30: "slide", 50: "landed", 110: "cards", 240: "final"}
 
@@ -26,6 +33,12 @@ func _ready() -> void:
 			_out = a.substr(6)
 		elif a.begins_with("--outcome="):
 			_outcome = a.substr(10)
+		elif a.begins_with("--kills="):
+			_kills = a.substr(8).to_int()
+		elif a == "--tracked":
+			_tracked = true
+		elif a.begins_with("--goal="):
+			_goal = a.substr(7)
 	_build_board()
 
 
@@ -56,20 +69,37 @@ func _process(_delta: float) -> void:
 
 	if _frames == 3:
 		Global.my_team = "0"
+		var st = Network.get("psych_match_stats")
+		if _tracked and st != null:
+			st.match_id = "shot_%d" % Time.get_ticks_usec()
+			st.reset()
+			st.active = true
 		_screen = MatchResultScreen.new()
 		match _outcome:
-			"lose": _screen.outcome = MatchResultScreen.Outcome.LOSE
+			"lose", "lose0": _screen.outcome = MatchResultScreen.Outcome.LOSE
 			"draw": _screen.outcome = MatchResultScreen.Outcome.DRAW
 			_: _screen.outcome = MatchResultScreen.Outcome.WIN
 		add_child(_screen)
 	elif _frames == 20:
 		# سرورِ واقعی پاداش را کمی بعد از match_over می‌فرستد
+		var r := {}
 		if _outcome == "lose":
-			_screen.set_reward({"won": false, "trophy_delta": -21, "coin_delta": 0,
-				"xp_delta": 0, "trophies": 2822, "level": 12, "level_up": false})
+			r = {"won": false, "trophy_delta": -21, "coin_delta": 60,
+				"xp_delta": 40, "trophies": 2822, "level": 12, "level_up": false}
+		elif _outcome == "lose0":
+			r = {"won": false, "trophy_delta": 0, "coin_delta": 60,
+				"xp_delta": 40, "trophies": 40, "level": 2, "level_up": false}
 		else:
-			_screen.set_reward({"won": true, "trophy_delta": 25, "coin_delta": 4800,
-				"xp_delta": 2500, "trophies": 2868, "level": 13, "level_up": true})
+			r = {"won": true, "trophy_delta": 25, "coin_delta": 4800,
+				"xp_delta": 2500, "trophies": 2868, "level": 13, "level_up": true}
+		if _kills >= 0:
+			r["kills"] = _kills
+			r["win_trophies"] = 25
+		_screen.set_reward(r)
+	elif _frames == 200 and _goal == "ready":
+		_screen.set("_goal_missions", [{"done": true, "claimed": false, "target": 1, "progress": 1}])
+		_screen.set("_goal_challenges", [])
+		_screen.call("_fill_goal")
 
 	if SHOTS.has(_frames):
 		var wl = _screen.get("_wing_l")
@@ -79,6 +109,13 @@ func _process(_delta: float) -> void:
 			wl.rotation_degrees, wr.rotation_degrees, slider.position.y])
 		_save(SHOTS[_frames])
 	if _frames == 240:
+		for chip in ["_chip_moment", "_chip_rank", "_chip_goal"]:
+			var d: Dictionary = _screen.get(chip)
+			var icon: TextureRect = d["icon"]
+			var tex_path: String = icon.texture.resource_path if icon.texture != null else "-"
+			print("RESULT %s visible=%s icon=%s rect=%s title=%s value=%s" % [chip,
+				(d["panel"] as Control).visible, tex_path.get_file(), icon.get_global_rect(),
+				(d["title"] as Label).text, (d["value"] as Label).text])
 		var btn: Button = _screen.get("_button")
 		print("RESULT button disabled=%s back_ready=%s" % [btn.disabled, _screen.get("_ready_for_back")])
 		print("RESULT OK")

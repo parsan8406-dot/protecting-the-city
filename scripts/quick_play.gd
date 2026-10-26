@@ -14,11 +14,21 @@ const BOT_SCRIPT := preload("res://scripts/bot.gd")
 ## E8: کیل‌های تمرین هم در آمارِ شخصیِ اسلحه/کاراکتر ثبت می‌شوند
 const PSYCH_LOADOUT := preload("res://scripts/psych_menu_loadout_stats.gd")
 const PACING := [[20.0, 2], [15.0, 3], [11.0, 4]]
+## C6/C5/E2 موج‌ها، سختیِ نامرئی و صندوقِ تدارکات (psych_play_director.gd)
+const DIRECTOR := preload("res://scripts/psych_play_director.gd")
+## C5 مسیریابیِ بات‌ها دورِ دیوارها
+const NAV := preload("res://scripts/psych_play_nav.gd")
+## رگبارِ صندوق: چند ثانیه و چه ضریبی روی فاصله‌ی شلیک
+const RAPID_TIME := 8.0
+const RAPID_MUL := 0.65
 ## حریف‌ها این‌قدر از بازیکن دور متولد می‌شوند که ناگهانی روی سرش نیفتند
 const MIN_SPAWN_DIST := 420.0
 
 var _bots: Array[Node2D] = []
-var _spawn_timer := 3.0
+var director: Node = null
+var _nav = null
+var _rapid_left := 0.0
+var _rapid_base := 0.0
 var _kills := 0
 var _menu: CanvasLayer = null
 var _alive_time := 0.0
@@ -33,6 +43,11 @@ func _ready() -> void:
 	# می‌کند و از روی همین پرچم Global.offline_mode را تثبیت می‌کند.
 	is_offline_scene = true
 	Global.offline_mode = true
+	# کارگردان از همین لحظه می‌شمارد تا اولین حریف همان ۳ ثانیه‌ی قبلی برسد
+	director = DIRECTOR.new()
+	director.name = "PlayDirector"
+	director.world = self
+	add_child(director)
 	await super._ready()
 	# آنلاین، سرور جانِ واقعی و تواناییِ کاراکتر را می‌فرستد و کلاینت با آن
 	# هماهنگ می‌شود. آفلاین کسی نمی‌فرستد، پس بازیکن روی مقدارِ پیش‌فرضِ
@@ -55,7 +70,8 @@ func _ready() -> void:
 
 
 func _on_tutorial_finished() -> void:
-	_spawn_timer = 2.0
+	if director != null:
+		director.restart_intro(2.0)
 	_alive_time = 0.0
 
 
@@ -91,6 +107,7 @@ func _stats() -> Dictionary:
 	var names := ["آسان", "متوسط", "سخت"]
 	return {
 		"سطح": names[clampi(Global.quick_play_difficulty, 0, 2)],
+		"موج": maxi(director.wave, 1) if director != null else 1,
 		"کشته": _kills,
 		"خسارت": _damage_dealt,
 		"دوام": "%d:%02d" % [secs / 60, secs % 60],
@@ -129,10 +146,12 @@ func _process(delta: float) -> void:
 	super._process(delta)
 	if not $Player.is_dead:
 		_alive_time += delta
-	_spawn_timer -= delta
-	if _spawn_timer <= 0.0:
-		_spawn_timer = _pacing()[0]
-		_spawn_bot()
+	# رگبارِ صندوق تمام شد: ریتمِ شلیک به حالتِ خودش برمی‌گردد
+	if _rapid_left > 0.0:
+		_rapid_left -= delta
+		if _rapid_left <= 0.0:
+			$Player.fire_cooldown = _rapid_base
+			CombatFX.float_text($Player.global_position, "پایانِ رگبار", Color(0.78, 0.76, 0.72), 0.9)
 	# _bots دیگر هر فریم فیلتر نمی‌شود (یک آرایه‌ی تازه در هر فریم)؛ بات
 	# خودش موقعِ بیرون رفتن از درخت از فهرست پاک می‌شود (_forget_bot)
 	_hud_refresh -= delta
@@ -150,8 +169,11 @@ func _refresh_round_hud() -> void:
 	for b in _bots:
 		if is_instance_valid(b) and not b.is_dead:
 			foes += 1
-	hud.round_hud.set_local(0 if $Player.is_dead else 1, foes, _alive_time,
-		"کشته: %s" % MissionArt.fa_number(_kills))
+	# C8 هدفِ همین دست: موجِ فعلی کنارِ شمارِ کشته
+	var label := "کشته: %s" % MissionArt.fa_number(_kills)
+	if director != null and director.wave > 0:
+		label += "  •  موج %s" % MissionArt.fa_number(director.wave)
+	hud.round_hud.set_local(0 if $Player.is_dead else 1, foes, _alive_time, label)
 
 
 ## مینی‌مپ: بات‌ها حریف‌اند (همان قانونِ رادار رویشان اعمال می‌شود)
@@ -168,24 +190,42 @@ func _pacing() -> Array:
 	return PACING[clampi(Global.quick_play_difficulty, 0, PACING.size() - 1)]
 
 
-## یک حریفِ تازه با کاراکترِ پیش‌فرض
-func _spawn_bot() -> void:
-	if _bots.size() >= _pacing()[1] or $Player.is_dead:
-		return
+## یک حریفِ تازه با کاراکترِ پیش‌فرض. kind تیپِ بات است (E15) و elite یعنی
+## «فرمانده»ی آخرِ موج. کارگردان صدایش می‌زند؛ خروجی null یعنی جا نبود.
+func _spawn_bot(kind := "soldier", elite := false) -> Node2D:
+	var cap_now: int = director.cap() if director != null else int(_pacing()[1])
+	if _bots.size() >= cap_now or $Player.is_dead:
+		return null
 	# تا سارا حرف می‌زند، زمینِ تمرین خالی می‌ماند
 	if Tutorial.is_running():
-		return
+		return null
 	var bot: Node2D = BOT_SCENE.instantiate()
 	bot.set_script(BOT_SCRIPT)
 	bot.apply_difficulty(Global.quick_play_difficulty)
+	bot.apply_personality(kind, elite)
 	bot.global_position = _pick_spawn()
 	add_child(bot)
 	bot.target = $Player
-	bot.setup_appearance(Global.DEFAULT_CHARACTER, "ak47")
+	# V6 تیپ از روی اسلحه‌ی دستش (و آیکنِ پلاک) پیداست
+	bot.setup_appearance(Global.DEFAULT_CHARACTER, bot.weapon_for_personality())
 	bot.died.connect(_on_bot_died)
 	bot.hurt.connect(func(amount: int): _damage_dealt += amount)
 	bot.tree_exiting.connect(_forget_bot.bind(bot))
 	_bots.append(bot)
+	if director != null:
+		bot.set_assist(director.assist)
+	return bot
+
+
+## C5 گریدِ مسیریابی — یک بار و اولین باری که باتی لازمش داشت
+func bot_nav():
+	if _nav == null:
+		var arena: Node = get_node_or_null("Arena")
+		if arena == null or arena.wall_rects().is_empty():
+			return null
+		_nav = NAV.new()
+		_nav.build(arena.wall_rects(), arena.world_size)
+	return _nav
 
 
 ## بات از درخت بیرون رفت (مرد و آزاد شد، یا کلِ صحنه عوض شد)
@@ -193,25 +233,78 @@ func _forget_bot(bot: Node2D) -> void:
 	_bots.erase(bot)
 
 
-## نقطه‌ی تولد: از نقاطِ شروعِ همان نقشه‌ی سرور، دورترین‌شان از بازیکن
+## نقطه‌ی تولد: از نقاطِ شروعِ همان نقشه‌ی سرور، یکی از سه‌تای دورتر از
+## بازیکن که باتِ دیگری رویش نایستاده باشد. قبلاً همیشه «دورترین» بود و در
+## موج‌ها چند بات روی هم متولد می‌شدند و از یک جهت می‌آمدند.
 func _pick_spawn() -> Vector2:
 	var arena: Node = get_node_or_null("Arena")
 	var best: Vector2 = $Player.global_position + Vector2(MIN_SPAWN_DIST, 0)
-	if arena != null and "spawn_points" in arena and not arena.spawn_points.is_empty():
-		var far := -1.0
-		for p in arena.spawn_points:
-			var d: float = $Player.global_position.distance_to(p)
-			if d > far:
-				far = d
-				best = p
-	return best
+	if arena == null or not ("spawn_points" in arena) or arena.spawn_points.is_empty():
+		return best
+	var pts: Array = arena.spawn_points.duplicate()
+	var me: Vector2 = $Player.global_position
+	pts.sort_custom(func(a, b): return me.distance_to(a) > me.distance_to(b))
+	best = pts[0]
+	var options: Array = []
+	for p in pts.slice(0, 3):
+		if me.distance_to(p) < MIN_SPAWN_DIST:
+			continue
+		var taken := false
+		for b in _bots:
+			if is_instance_valid(b) and not b.is_dead and b.global_position.distance_to(p) < 90.0:
+				taken = true
+				break
+		if not taken:
+			options.append(p)
+	return options.pick_random() if not options.is_empty() else best
 
 
-func _on_bot_died(_bot) -> void:
+func _on_bot_died(bot) -> void:
+	# بمبِ یک بات که باتِ دیگری را کشت کیلِ بازیکن نیست
+	if is_instance_valid(bot) and not bool(bot.get("killed_by_player")):
+		_refresh_round_hud()
+		return
 	_kills += 1
 	PSYCH_LOADOUT.record_kills(1)
+	if director != null:
+		director.note_kill()
 	_refresh_round_hud()
 	CombatFX.shake(4.0)
+
+
+## E2 جایزه‌ی صندوقِ تدارکات را اعمال می‌کند؛ متنِ کوتاهش برای اعلان
+func _grant_supply(kind: String) -> String:
+	var p = $Player
+	if p.is_dead:
+		return ""
+	match kind:
+		"rapid":
+			if _rapid_left <= 0.0:
+				_rapid_base = p.fire_cooldown
+				p.fire_cooldown = _rapid_base * RAPID_MUL
+			_rapid_left = RAPID_TIME
+			CombatFX.float_text(p.global_position, "رگبار!", Color(0.98, 0.8, 0.3), 1.2)
+			return "رگبار %s ثانیه" % MissionArt.fa_number(int(RAPID_TIME))
+		"bomb":
+			if bombs_left < Abilities.BOMB_STOCK:
+				_set_bombs_left(bombs_left + 1)
+				return "+۱ بمب"
+			return _grant_supply("patch")
+		"sprint":
+			play_ability_fx(str(Global.my_username), "sprint", 6.0)
+			return "دویدنِ سریع"
+		_:
+			var gained: int = mini(35, max_health - p.health)
+			if gained > 0:
+				p.health += gained
+				update_player_health_ui(p.health, max_health)
+				_spawn_heal_effect(p.global_position)
+				CombatFX.damage_number(p.global_position, gained, true)
+			if "max_ammo" in p:
+				p.current_ammo = p.max_ammo
+				p._reload_left = 0.0
+				p._sync_ammo_hud()
+			return "درمان و خشابِ پر"
 
 
 ## بمبِ خودِ بازیکن. آنلاین `Network.send_bomb_request` می‌رفت و سرور بمب را
@@ -292,12 +385,14 @@ func spawn_local_bomb(from: Vector2, to: Vector2, radius: float, dmg: int, throw
 
 	if not $Player.is_dead and $Player.global_position.distance_to(to) <= radius:
 		_damage_local_player(dmg)
+	# بمبِ بات‌ها کیلِ بازیکن نیست (نه طلایی، نه اعلانِ کیل)
+	var by_player: bool = thrower == $Player
 	for b in _bots:
 		if is_instance_valid(b) and not b.is_dead and b.global_position.distance_to(to) <= radius:
 			# بمبِ خودی هم به خودش می‌زند — همان قاعده‌ی سرور
 			if b == thrower and b.global_position.distance_to(to) > radius * 0.5:
 				continue
-			b.take_damage(dmg)
+			b.take_damage(dmg, by_player)
 
 
 ## دکمه‌ی درمان. آنلاین این فقط یک درخواست به سرور می‌فرستد و سرور درمان
@@ -336,6 +431,8 @@ func _damage_local_player(amount: int) -> void:
 	if _now() < _guard_until:
 		return
 	var new_health: int = maxi($Player.health - amount, 0)
+	if director != null:
+		director.note_player_hurt($Player.health - new_health)
 	CombatFX.hit_burst($Player.global_position, Vector2(0, -1))
 	CombatFX.damage_number($Player.global_position, amount)
 	CombatFX.shake(6.0)
@@ -348,7 +445,15 @@ func _damage_local_player(amount: int) -> void:
 func _on_local_death() -> void:
 	if $Player.has_method("die"):
 		$Player.die()
+	if _rapid_left > 0.0:
+		_rapid_left = 0.0
+		$Player.fire_cooldown = _rapid_base
 	# صفحه‌ی پایان با همان آمار — بدون دکمه‌ی «ادامه»
+	# E4 رکورد/بهترین لحظه، E5 نزدیک‌برد، C10 یک نکته‌ی کاربردی
+	var run: Dictionary = director.finish_run(_kills) if director != null else {}
+	if feel != null and feel.has_method("death_tip"):
+		run["tip"] = feel.death_tip()
+		run["best_multi"] = feel.best_multi()
 	if _menu != null:
-		_menu.open_game_over(_stats())
+		_menu.open_game_over(_stats(), run)
 

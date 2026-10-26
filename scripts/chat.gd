@@ -495,6 +495,25 @@ func _build_conversation_list() -> void:
 		_conv_list.add_child(row)
 	_fade_in_children(_conv_list)
 
+## C12 سرور با همین GET /chat/history اتاق را «خوانده» ثبت کرده؛ نشانِ قرمزِ
+## کارت/ردیف و عددِ منوی اصلی همین حالا صفر شوند، نه با رفرشِ بعدیِ overview
+func _clear_open_room_badge() -> void:
+	var channel := str(_open_room.get("channel", ""))
+	if channel == CHANNEL_PRIVATE:
+		var entry := _find_private(str(_open_room.get("peer_id", "")))
+		var n := int(entry.get("unread", 0))
+		if n <= 0:
+			return
+		entry["unread"] = 0
+		_overview["private_unread"] = maxi(int(_overview.get("private_unread", 0)) - n, 0)
+		Global.set_chat_unread(int(_overview["private_unread"]))
+	else:
+		var card = _overview.get(channel, {})
+		if not (card is Dictionary) or int((card as Dictionary).get("unread", 0)) <= 0:
+			return
+		(card as Dictionary)["unread"] = 0
+	_update_cards()
+
 ## از گفتگوی خصوصی به لیست دوستان برمی‌گردد
 func _close_private_room() -> void:
 	if _channel != CHANNEL_PRIVATE or _open_room.is_empty():
@@ -652,6 +671,7 @@ func _on_history_received(result: int, response_code: int, _headers: PackedStrin
 	if data.has("peer") and data["peer"] is Dictionary:
 		_open_room.merge(data["peer"] as Dictionary, true)
 	_apply_header()
+	_clear_open_room_badge()
 
 	var incoming = data.get("messages", [])
 	if not (incoming is Array):

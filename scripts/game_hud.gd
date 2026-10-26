@@ -17,6 +17,9 @@ class_name GameHUD
 signal ability_pressed(kind: String)
 signal menu_pressed
 
+## پلاکِ بالای سرِ بازیکن (self_plate.gd) با این گروه HUD را پیدا می‌کند
+const GROUP := "game_hud"
+
 const DESIGN_H := 720.0
 const EDGE := 16.0
 
@@ -26,6 +29,10 @@ const POTION_D := 78.0
 const MENU_D := 62.0
 const ARC_R := 142.0
 const MINIMAP := 196.0
+## جانِ نفرات و نوارِ شیطان فقط وقتی کنارِ هم می‌نشینند که دست‌کم این‌قدر
+## بزرگ بمانند (وگرنه نوشته‌ها ریز می‌شوند و زیرِ هم بهتر است)
+const SIDE_BY_SIDE_MIN_K := 0.85
+const SIDE_GAP := 10.0
 
 const COL_GOLD := Color(0.96, 0.78, 0.3)
 const COL_TEXT := Color(0.95, 0.94, 0.9)
@@ -74,6 +81,7 @@ var _pulse_alpha := 0.0
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_to_group(GROUP)
 
 	# اولین بچه، تا همه‌ی دکمه‌ها و پنل‌ها رویش کشیده شوند
 	_build_vignette()
@@ -185,6 +193,13 @@ func _build_focus() -> void:
 			# هدفی که نزدیکِ تمام شدن است کم‌رنگ‌تر از بقیه نمی‌شود  # C9
 			focus.set_idle_alpha(objectives, 0.75 if near else 0.5)
 			focus.wake(objectives))
+	# حالتِ شیطان دو پنلِ دیگر هم دارد (جانِ نفرات + نوارِ شیطان). نوارِ
+	# شیطان هدفِ راند است و همیشه روشن می‌ماند؛ جانِ نفرات فقط وقتی کسی تیر
+	# خورد یا افتاد روشن می‌شود، تا وسطِ درگیری بیشتر از ۴ گروه پررنگ نباشد.  # C1
+	if squad_health != null and squad_health.has_signal("activity"):
+		focus.track(squad_health, 0.6, 3.0)
+		squad_health.activity.connect(func(critical: bool):
+			focus.wake(squad_health, critical))
 
 
 func _build_buttons() -> void:
@@ -206,8 +221,17 @@ func _add_button(kind: String, icon: String, d: float, accent: Color, hero := fa
 	var b := HudAbilityButton.new().setup(icon, d, accent, hero)
 	b.name = kind.capitalize().replace(" ", "") + "Button"
 	b.activated.connect(func(): ability_pressed.emit(kind))
+	b.used.connect(_on_ability_used.bind(kind))
 	_root.add_child(b)
 	_buttons[kind] = b
+
+
+## توانایی واقعاً اجرا شد (نه فقط لمس): آموزش قدمِ «لیزر/بمب/سپر» را با
+## انجامِ واقعی تمام می‌کند، نه با لمسِ هر جای صفحه.  # C7 learn by doing
+func _on_ability_used(kind: String) -> void:
+	var tut := get_node_or_null("/root/Tutorial")
+	if tut != null and tut.has_method("notify"):
+		tut.notify("ability_" + kind)
 
 
 # ============================ API ============================
@@ -234,6 +258,17 @@ func set_demon_visible(on: bool) -> void:
 		demon_pointer.visible = on
 	if on:
 		_layout()
+
+
+## پایین‌ترین لبه‌ی پنل‌های وسطِ بالا (قابِ تایمر و، در حالتِ شیطان، جانِ
+## نفرات و نوارِ شیطان) به مختصاتِ canvas. پلاکِ بالای سرِ بازیکن اگر به
+## این برسد زیرِ پا می‌رود تا زیرِ HUD گم نشود.  # V3 / C1
+func top_center_bottom() -> float:
+	var y := 0.0
+	for c: Control in [round_hud._panel if round_hud != null else null, squad_health, demon_bar]:
+		if c != null and c.is_visible_in_tree():
+			y = maxf(y, (c.get_global_transform_with_canvas() * Vector2(0.0, c.size.y)).y)
+	return y
 
 
 ## دکمه‌های گیم‌پلی (موقعِ تماشا بعد از مرگ پنهان می‌شوند)
@@ -286,13 +321,28 @@ func _layout() -> void:
 	var lane_l: float = left + maxf(CombatHUD.panel_w() * pk, objectives_w) + 12.0
 	var lane_r: float = W - right - MINIMAP - 12.0
 	var room_w: float = maxf(lane_r - lane_l, 0.0)
-	if squad_health != null and squad_health.visible:
+	var squad_on := squad_health != null and squad_health.visible
+	var demon_on := demon_bar != null and demon_bar.visible
+	# گوشیِ دراز (۱۹.۵:۹ به بالا): دو پنل کنارِ هم، نه زیرِ هم. زیرِ هم تا
+	# ۴۴٪ِ ارتفاعِ صفحه پایین می‌آمدند — درست بالای سرِ کاراکتر، جایی که
+	# باید زمینِ بازی دیده شود.  # C1 / V4 (وسطِ صفحه مالِ بازی است)
+	var pair_w: float = HudSquadHealth.PANEL_W + HudDemonBar.BAR_W
+	if squad_on and demon_on and room_w >= pair_w * SIDE_BY_SIDE_MIN_K + SIDE_GAP:
+		var k: float = clampf((room_w - SIDE_GAP) / pair_w, SIDE_BY_SIDE_MIN_K, 1.0)
+		var gx: float = _lane_x(pair_w * k + SIDE_GAP, lane_l, lane_r, W)
+		squad_health.scale = Vector2(k, k)
+		squad_health.position = Vector2(gx, stack_y)
+		demon_bar.scale = Vector2(k, k)
+		demon_bar.position = Vector2(gx + HudSquadHealth.PANEL_W * k + SIDE_GAP, stack_y)
+		squad_on = false
+		demon_on = false
+	if squad_on:
 		var sk: float = clampf(room_w / HudSquadHealth.PANEL_W, 0.62, 1.0)
 		squad_health.scale = Vector2(sk, sk)
 		squad_health.position = Vector2(
 			_lane_x(HudSquadHealth.PANEL_W * sk, lane_l, lane_r, W), stack_y)
 		stack_y += squad_health.panel_h() * sk + 5.0
-	if demon_bar != null and demon_bar.visible:
+	if demon_on:
 		var dk: float = clampf(room_w / HudDemonBar.BAR_W, 0.62, 1.0)
 		demon_bar.scale = Vector2(dk, dk)
 		demon_bar.position = Vector2(
@@ -463,9 +513,11 @@ func _show_ping(ms: int) -> void:
 			col = Color(0.98, 0.8, 0.3)
 		_ping_label.text = "%dms" % ms
 	_ping_label.add_theme_color_override("font_color", col)
-	_ping_icon.set_tint(col)
 	# پینگِ خوب کم‌رنگ است؛ بد شدنش روشن و بحرانی  # C1
 	var grade := 2 if (ms < 0 or ms >= 160) else (1 if ms >= 80 else 0)
+	# بد/قطع فقط قرمز نیست، شکلش هم عوض می‌شود (خطِ مورب)  # V2 color + shape
+	_ping_icon.icon_name = "wifi_off" if grade == 2 else "wifi"
+	_ping_icon.set_tint(col)
 	if focus != null and grade != _ping_grade:
 		_ping_grade = grade
 		focus.wake(_ping_box, grade == 2)

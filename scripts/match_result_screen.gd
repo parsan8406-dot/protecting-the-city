@@ -762,7 +762,8 @@ func _fill_insights() -> void:
 		match outcome:
 			Outcome.WIN: key = "win"
 			Outcome.LOSE: key = "lose"
-		_stats = stats_node.commit(key)
+		# کیلِ قطعیِ سرور (سرورهای قدیمی نمی‌فرستند → ‎-1 = شمارشِ کلاینت)
+		_stats = stats_node.commit(key, int(_reward.get("kills", -1)))
 	_fill_moment()
 	_fill_rank()
 	_request_goals()
@@ -773,6 +774,7 @@ func _fill_moment() -> void:
 	var s := _stats
 	# سرورِ جدید کیلِ قطعی را در match_reward می‌فرستد؛ وگرنه شمارشِ کلاینت
 	var kills := int(_reward.get("kills", s.get("kills", 0)))
+	# «بدونِ مرگ» فقط وقتی که مرگ‌ها را واقعاً شمرده‌ایم (کیلِ سرور تنها کافی نیست)
 	var streak := int(s.get("best_streak", 0))
 	var deaths := int(s.get("deaths", 0))
 	var ws := int(s.get("win_streak", 0))
@@ -791,7 +793,7 @@ func _fill_moment() -> void:
 	elif streak >= 2:
 		_show_chip(_chip_moment, _psych_tex("streak_double", CUP_ICON), "بهترین لحظه‌ی تو",
 			"%s کیل پشت‌سرهم" % _fa(streak), false)
-	elif kills > 0 and deaths == 0:
+	elif kills > 0 and deaths == 0 and tracked:
 		_show_chip(_chip_moment, _psych_tex("streak_mvp", CUP_ICON), "بهترین لحظه‌ی تو",
 			"%s کیل بدونِ حتی یک مرگ" % _fa(kills), true)
 	elif kills > 0:
@@ -806,7 +808,7 @@ func _fill_moment() -> void:
 		if xp_tex == null:
 			xp_tex = MissionArt.texture_for("xp")
 		_show_chip(_chip_moment, xp_tex, "یک قدم جلوتر",
-			"%s تجربه گرفتی" % _group(int(_reward.get("xp_delta", 0))), false)
+			"%s تجربه گرفتی" % MissionArt.fa_grouped(int(_reward.get("xp_delta", 0))), false)
 
 
 ## E5/E6/C9: رنک و فاصله تا بعدی — همیشه با جمله‌ی مثبت
@@ -826,6 +828,7 @@ func _fill_rank() -> void:
 		r_to = PsychProgress.visual_ratio(after - int(ta["min"]), span)
 		r_from = PsychProgress.visual_ratio(before - int(ta["min"]), span) if tb["index"] == ta["index"] else 0.0
 
+	var shield := _psych_tex("result_rank_shield")
 	if int(ta["index"]) > int(tb["index"]):
 		# E17 ارتقا: کنفتیِ کوتاه + لرزش
 		_show_chip(_chip_rank, badge, "ارتقای رنک!", "به %s رسیدی" % str(ta["name"]), true, 0.0, 1.0)
@@ -838,8 +841,8 @@ func _fill_rank() -> void:
 	var left := int(ta["next_min"]) - after
 	var win_t := _mode_win_trophies()
 	var next_name := str(ta["next_name"])
-	if outcome == Outcome.DRAW:
-		var shield := _psych_tex("result_rank_shield")
+	if outcome == Outcome.DRAW or (outcome == Outcome.LOSE and delta == 0):
+		# E6 سپر: باخت/مساوی‌ای که کاپ کم نکرد، به‌عنوانِ «محافظت شد»
 		_show_chip(_chip_rank, shield if shield != null else badge, "کاپت کم نشد", "%s کاپ تا %s" % [_fa(left), next_name], false, r_from, r_to)
 	elif win_t > 0 and left <= win_t:
 		# E6 قابِ مثبت: «یه برد تا ارتقا» به‌جای «کاپ از دست دادی»
@@ -1077,12 +1080,35 @@ func _card_icon(item: Dictionary) -> Control:
 			return _icon_rect(_tex(CUP_ICON), ICON)
 		"coin":
 			return _icon_rect(_tex(COIN_ICON), ICON * 0.9)
+		"level":
+			# E17 آرتِ «سطح جدید» با شماره‌ی سطح؛ بدونِ آرت همان شش‌ضلعی
+			var lv_tex := _psych_tex("result_level_up")
+			if lv_tex != null:
+				return _level_icon(lv_tex, int(item["level"]))
+			return _hex_badge(str(item["level"]), Color(1.0, 0.9, 0.5), Color(0.82, 0.5, 0.08),
+				Color(1.0, 0.95, 0.7), Color(0.26, 0.14, 0.02, 0.95))
 		"xp":
 			return _hex_badge("EXP", Color(0.62, 0.50, 1.0), Color(0.14, 0.36, 0.98),
 				Color(0.78, 0.92, 1.0), Color(0.07, 0.06, 0.24, 0.95))
 		_:
 			return _hex_badge(str(item["level"]), Color(1.0, 0.9, 0.5), Color(0.82, 0.5, 0.08),
 				Color(1.0, 0.95, 0.7), Color(0.26, 0.14, 0.02, 0.95))
+
+
+func _level_icon(tex: Texture2D, lv: int) -> Control:
+	var c := Control.new()
+	c.size = Vector2(ICON, ICON)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var art := _icon_rect(tex, ICON)
+	art.position = Vector2.ZERO
+	c.add_child(art)
+	var num := _num_label(str(lv), 30, Color.WHITE)
+	num.add_theme_constant_override("outline_size", 8)
+	num.add_theme_color_override("font_outline_color", Color(0.26, 0.12, 0.02, 0.95))
+	num.size = Vector2(ICON * 0.5, 36)
+	num.position = Vector2(ICON * 0.55, ICON - 38)
+	c.add_child(num)
+	return c
 
 
 func _hex_badge(text: String, top: Color, bottom: Color, edge: Color, inner: Color) -> Control:
@@ -1453,7 +1479,11 @@ func _animate_trophies() -> void:
 	else:
 		_before_label.text = "—"
 		_after_label.text = "—"
-	if lost > 0:
+	var win_t := _mode_win_trophies()
+	if lost > 0 and win_t >= lost:
+		# E6 قابِ مثبت: زیان قابلِ جبران است، نه پایانِ راه
+		_pill_label.text = "%s کاپ کم شد — یه برد جبرانش می‌کنه" % _fa(lost)
+	elif lost > 0:
 		_pill_label.text = "کاپ شما %d واحد کاهش یافت" % lost
 	else:
 		_pill_label.text = "کاپ شما تغییری نکرد"

@@ -12,6 +12,9 @@ class_name HudAbilityButton
 ## کوتاه و برق می‌دهد تا کاربر بفهمد ثبت شد.
 
 signal activated
+## توانایی واقعاً اجرا شد (run با تأییدِ سرور یا قانونِ بازیِ سریع) — نه فقط لمس.
+## GameHUD با این به آموزش خبر می‌دهد.  # C7
+signal used
 
 const FONT := preload("res://fonts/Lalezar-Regular.ttf")
 
@@ -45,6 +48,8 @@ var _last_fire := 0
 
 ## لرزشِ کوتاهِ «دوباره آماده شد» (میلی‌ثانیه)؛ از تنظیماتِ لرزش پیروی می‌کند
 const READY_VIBRATE_MS := 10
+## «هنوز آماده نیست»: کمی محکم‌تر از «آماده شد»، تا دو معنی قاطی نشوند  # E11
+const DENY_VIBRATE_MS := 15
 
 
 func setup(p_icon: String, diameter: float, p_accent: Color = COL_GOLD, p_hero := false) -> HudAbilityButton:
@@ -83,6 +88,8 @@ func run(active: float, cooldown: float) -> void:
 	_lock_total = maxf(_lock_left, 0.001)
 	set_process(true)
 	queue_redraw()
+	if _active_left > 0.0 or _lock_left > 0.0:
+		used.emit()
 
 
 ## قفلِ فعلی را همین حالا برمی‌دارد (مثلاً بعد از ریسپاون)
@@ -99,6 +106,9 @@ func set_badge(n: int) -> void:
 
 ## لرزشِ کوتاه وقتی دکمه هنوز آماده نیست یا کاری نمی‌کند
 func deny() -> void:
+	# یک لمسِ ریزِ «نه» کنارِ لرزشِ دکمه، تا بدونِ نگاه هم حس شود  # E11
+	if _deny <= 0.0 and is_visible_in_tree():
+		LocalSettings.vibrate(DENY_VIBRATE_MS)
 	_deny = 1.0
 	set_process(true)
 

@@ -8,13 +8,14 @@ extends CityTapRow
 ##
 ## دیتا: یک آیتم members از GET /clan
 ##   {player_id, username, role, avatar_id, level, is_online, trophies,
-##    tier_id, tier_name, is_me, is_friend, friend_request_sent}
+##    tier_id, tier_name, is_me, is_friend, friend_request_sent, joined_at}
 
 ## نسبت عرض ستون‌ها — سرستون city.gd هم از همین استفاده می‌کند
 const COLUMN_RATIOS := [2.6, 0.9, 1.0, 1.0, 1.0]
 const COLUMN_TITLES := ["نام بازیکن", "سطح", "کاپ", "نقش", "وضعیت"]
 
 const ICON_CUP := preload("res://assets/icons/missions/icon_cup.png")
+const PsychSocialCity := preload("res://scripts/psych_social_city.gd")
 
 var player_id := ""
 var role := "member"
@@ -91,7 +92,11 @@ func setup(data: Dictionary) -> void:
 	var sub := CityUI.role_label(role)
 	if is_me:
 		sub += " (تو)"
-	names.add_child(CityUI.label(sub, 12, CityUI.MUTED))
+	# E1 ارتباط: تازه‌واردها دیده شوند تا بقیه خوش‌آمد بگویند (طلایی = ارزش)
+	var fresh := PsychSocialCity.is_new_member(data)
+	if fresh:
+		sub += "  •  تازه‌وارد"
+	names.add_child(CityUI.label(sub, 12, CityUI.GOLD if fresh else CityUI.MUTED))
 
 	# --- سطح ---
 	var level_col := _column(row, 1)

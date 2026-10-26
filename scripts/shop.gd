@@ -140,6 +140,9 @@ var _pending_buy_item: Dictionary = {}
 # --- C13 پیشگیری از خطا: تأییدِ خرج کردنِ قلب (ارزِ ویژه) ---
 ## خریدِ قلبی از این مبلغ به بالا یک پنجره‌ی تأیید دارد؛ بسته‌های کوچکِ سکه نه
 const GEM_CONFIRM_MIN := 50
+## C13: کارت‌های ویترین با یک لمس روی نوارِ قیمت خرید می‌زنند؛ خریدِ سکه‌ایِ
+## از این مبلغ به بالا (کاراکتر/اسلحه، معمولاً چند هزار) هم یک بار تأیید می‌خواهد
+const COIN_CONFIRM_MIN := 1000
 ## یک پنجره‌ی تأیید در هر لحظه — لمسِ دوباره پنجره‌ی دوم باز نمی‌کند
 var _confirm_open := false
 
@@ -631,7 +634,9 @@ func instantiate_weapon_card() -> Control:
 
 func _lock_card_size(card: Control, size: Vector2) -> void:
 	card.custom_minimum_size = size
-	card.size = size
+	# کارتِ اسلحه anchorهای نابرابر دارد و ستِ size رویش فقط هشدار می‌داد
+	if is_equal_approx(card.anchor_left, card.anchor_right) and is_equal_approx(card.anchor_top, card.anchor_bottom):
+		card.size = size
 	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
@@ -1160,7 +1165,8 @@ func _odds_line(odds: Dictionary) -> String:
 		if odds.has(r):
 			parts.append("%s ٪%s" % [LUCKY_RARITY_NAMES.get(r, r),
 				MissionArt.fa_number(int(round(float(odds[r]["p"]) * 100.0)))])
-	return " · ".join(parts)
+	# جداکننده «|» نه «·» — نقطه‌ی وسط در Lalezar شبیهِ «۰» است و ٪۴۰ · ٪۶۰ گیج می‌کرد
+	return "  |  ".join(parts)
 
 
 func _lucky_odds_body(odds: Dictionary) -> String:
@@ -2052,15 +2058,18 @@ func _on_card_buy_requested(item_data: Dictionary) -> void:
 
 	# C13: خرج کردنِ قلب (ارزِ ویژه) قبلش یک بار تأیید می‌خواهد؛ قیمت، مانده‌ی
 	# بعد از خرید و دکمه‌ی انصرافِ هم‌اندازه — بدونِ فشار و بدونِ دکمه‌ی پنهان
-	if cost_type == "gems" and price >= GEM_CONFIRM_MIN:
+	var gem_buy := cost_type == "gems"
+	if (gem_buy and price >= GEM_CONFIRM_MIN) or (not gem_buy and price >= COIN_CONFIRM_MIN):
 		if _confirm_open:
 			return
 		_confirm_open = true
 		var item_name := str(item_data.get("name", "")).strip_edges()
-		var body := "«%s» را با %s قلب می‌خری؟\nبعد از خرید %s قلب برایت می‌ماند." % [
+		var unit := "قلب" if gem_buy else "سکه"
+		var left := (Global.gems if gem_buy else Global.coins) - price
+		var body := "«%s» را با %s %s می‌خری؟\nبعد از خرید %s %s برایت می‌ماند." % [
 			item_name if item_name != "" else "این آیتم",
-			MissionArt.fa_grouped(price), MissionArt.fa_grouped(Global.gems - price)]
-		MenuUI.confirm(self, "تأییدِ خرید", body, "خرید با %s قلب" % MissionArt.fa_grouped(price),
+			MissionArt.fa_grouped(price), unit, MissionArt.fa_grouped(left), unit]
+		MenuUI.confirm(self, "تأییدِ خرید", body, "خرید با %s %s" % [MissionArt.fa_grouped(price), unit],
 			func(ok: bool) -> void:
 				_confirm_open = false
 				if ok:

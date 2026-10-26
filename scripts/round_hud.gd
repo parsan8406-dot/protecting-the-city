@@ -56,6 +56,7 @@ var _shown_count_up := false
 var _pulse_tw: Tween = null
 ## اولین شمارش پالس نمی‌خورد (فقط تغییرِ واقعی)
 var _counts_shown := false
+var _subtitle_shown := false
 
 ## فاصله‌ی ناچ/لبه‌ی بالا — GameHUD ست می‌کند
 var top_inset := 12.0:
@@ -274,9 +275,6 @@ func _refresh_counts() -> void:
 		compact = true          # آسیب چهار پنج رقمی است و در قاب جا نمی‌شود
 	elif by_kills:
 		source = Network.round_info.get("score", {})
-	if _mode_label != null:
-		_mode_label.text = "امتیاز" if by_demon else ("کشته" if by_kills else "زنده")
-
 	var mine := Global.my_team
 	var ally := 0
 	var foe := 0
@@ -308,6 +306,42 @@ func _refresh_counts() -> void:
 	var fs := 19 if compact else 24
 	_ally_label.add_theme_font_size_override("font_size", fs)
 	_foe_label.add_theme_font_size_override("font_size", fs)
+	_refresh_subtitle(by_demon, by_kills, ally, foe, mine != "")
+
+
+## زیرنویسِ تایمر: اول می‌گوید عددها چه هستند («زنده»/«کشته»/«امتیاز»)، و
+## وقتی چیزی برای گفتن هست، فاصله تا هدف را — مثبت و هدف‌دار، نه شرم‌آور.  # C9 / E5 / E6
+##   حذفی   یک حریف مانده      «آخرین حریف!»
+##   انتقام جلوییم / مساوی / عقب «+۲ جلو» / «مساوی» / «۱ تا مساوی»
+func _refresh_subtitle(by_demon: bool, by_kills: bool, ally: int, foe: int, teams: bool) -> void:
+	if _mode_label == null:
+		return
+	var txt := "امتیاز" if by_demon else ("کشته" if by_kills else "زنده")
+	var col := COL_TEXT
+	if teams and by_kills and not by_demon and ally + foe > 0:
+		var diff := ally - foe
+		if diff > 0:
+			txt = "+%s جلو" % _fa(diff)
+			col = COL_GOLD
+		elif diff == 0:
+			txt = "مساوی"
+		else:
+			txt = "%s تا مساوی" % _fa(-diff)
+	elif teams and not by_kills and not by_demon and foe == 1 and ally > 0:
+		txt = "آخرین حریف!"
+		col = COL_GOLD
+	_set_subtitle(txt, col)
+
+
+func _set_subtitle(txt: String, col: Color) -> void:
+	if _mode_label.text == txt:
+		return
+	_mode_label.text = txt
+	_mode_label.add_theme_color_override("font_color", col)
+	# اولین نوشتن پالس نمی‌خورد، فقط تغییرِ واقعی  # V10
+	if _subtitle_shown:
+		_pop(_mode_label)
+	_subtitle_shown = true
 
 
 ## بازیِ سریعِ آفلاین سروری ندارد که round_state بفرستد؛ صحنه خودش عددها را
@@ -318,8 +352,19 @@ func set_local(ally_alive: int, foe_alive: int, seconds: float, subtitle: String
 	_count_up = true
 	_running = true
 	_seconds_left = seconds
-	_ally_label.text = _fa(ally_alive)
-	_foe_label.text = _fa(foe_alive)
+	# بازیِ سریع هم مثلِ آنلاین: هر تغییرِ عدد یک پالس  # V10
+	var ally_txt := _fa(ally_alive)
+	var foe_txt := _fa(foe_alive)
+	if _counts_shown:
+		if _ally_label.text != ally_txt:
+			_pop(_ally_label)
+		if _foe_label.text != foe_txt:
+			_pop(_foe_label)
+		if _mode_label.text != subtitle:
+			_pop(_mode_label)
+	_counts_shown = true
+	_ally_label.text = ally_txt
+	_foe_label.text = foe_txt
 	_mode_label.text = subtitle
 	_refresh_timer()
 

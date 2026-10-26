@@ -10,6 +10,11 @@ extends TextureRect
 const SHOP_SCENE_PATH := "res://secense/shop.tscn"
 const SHOP_TAB_CURRENCY := 3  # ترتیب تب‌ها توی shop.gd: 0=ویژه، 1=کاراکتر، 2=سلاح، 3=سکه/جم
 const PROFILE_MENU_SCENE_PATH := "res://secense/profile_menu.tscn"
+const TOUCH := preload("res://scripts/psych_menu_touch.gd")
+
+## آخرین عددهای نشان‌داده‌شده — برای پالسِ «عوض شد» (V10)
+var _shown_coins := -1
+var _shown_gems := -1
 
 @onready var name_text: Label = $HBoxContainer/Profile/VBoxContainer/NameLabel
 @onready var level_text: Label = $HBoxContainer/Profile/LevelLabel
@@ -58,6 +63,11 @@ func _ready() -> void:
 	_wire_profile_menu_button(friends_button, "friends")
 	_wire_profile_menu_button(messages_button, "messages")
 
+	# C3 فیتس: پلاس‌ها ۲۲ و آیکن‌ها ۳۴ پیکسل‌اند — ناحیه‌ی لمس حداقل ~۴۸dp
+	for b in [coins_plus_button, gems_plus_button, profile_button, edit_button,
+			messages_button, friends_button, settings_button]:
+		TOUCH.expand(b, self)
+
 ## هر آیکون تاپ‌بار رو به یک تب از منوی کاربر وصل می‌کنه:
 ## اول انیمیشن فشردن پخش میشه، بعد صحنه عوض میشه.
 func _wire_profile_menu_button(button: TextureButton, tab_id: String) -> void:
@@ -88,6 +98,13 @@ func _on_player_data_updated() -> void:
 		coins_text.text = MissionArt.fa_grouped(Global.coins)
 	if gems_text:
 		gems_text.text = MissionArt.fa_grouped(Global.gems)
+	# V10: عددِ تازه یک پالسِ کوچک می‌زند تا تغییر (جایزه/خرید) دیده شود
+	if _shown_coins >= 0 and Global.coins != _shown_coins:
+		_pulse(coins_text, Global.coins > _shown_coins)
+	if _shown_gems >= 0 and Global.gems != _shown_gems:
+		_pulse(gems_text, Global.gems > _shown_gems)
+	_shown_coins = Global.coins
+	_shown_gems = Global.gems
 
 	_apply_xp_bar()
 	_apply_avatar(str(Global.avatar_id))
@@ -161,3 +178,16 @@ func _on_currency_plus_pressed() -> void:
 	if current_scene and current_scene.scene_file_path == SHOP_SCENE_PATH:
 		return
 	get_tree().change_scene_to_file(SHOP_SCENE_PATH)
+
+
+## V10: پالسِ کوتاهِ عدد — افزایش طلایی، کاهش بی‌رنگ (فقط بزرگ و برگشت)
+func _pulse(label: Label, gained: bool) -> void:
+	if label == null or not label.is_visible_in_tree():
+		return
+	label.pivot_offset = label.size * 0.5
+	var tw := label.create_tween().set_parallel(true)
+	tw.tween_property(label, "scale", Vector2(1.22, 1.22), 0.09) 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if gained:
+		tw.tween_property(label, "modulate", Color(1.25, 1.1, 0.6), 0.09)
+	tw.chain().tween_property(label, "scale", Vector2.ONE, 0.26) 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(label, "modulate", Color.WHITE, 0.3)

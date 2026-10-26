@@ -83,12 +83,22 @@ const LABELS := {
 	"cup": "کاپ فصل",
 }
 
+## E14 «تأییدِ مهارت، نه مزد»: جمله‌ی کوتاهِ زیرِ عنوان برای جایزه‌هایی که
+## با بازی به دست آمده‌اند. خرید/کد هدیه/تبلیغ جمله ندارند (مهارتی در کار نبود).
+const NOTES := {
+	"ماموریت انجام شد": "هدف رو زدی — این جایزه‌ی بازیِ خودته",
+	"صندوق باز شد": "نتیجه‌ی تلاشِ امروزت",
+	"پاداش فصل": "هر پله یعنی یک قدم قوی‌تر شدی",
+	"چالش فصل تمام شد": "چالشِ سخت رو از پا درآوردی!",
+}
+
 ## صفحه‌ای که الان باز است و صفِ بعدی‌ها
 static var _active: RewardPopup = null
 static var _queue: Array = []
 
 var _items: Array = []
 var _title := ""
+var _note := ""
 var _header: Texture2D = null
 
 var _root: Control
@@ -104,8 +114,9 @@ var _closing := false
 # ------------------------------------------------------------------ API عمومی
 
 ## نمایش یک دسته جایزه. اگر نمایش دیگری باز است، در صف می‌ماند.
+## note: جمله‌ی زیرِ عنوان («» = از روی NOTES برای همان عنوان، اگر باشد)
 static func show_rewards(
-	items: Array, title: String = "جوایز شما", header: Texture2D = null
+	items: Array, title: String = "جوایز شما", header: Texture2D = null, note: String = ""
 ) -> void:
 	var clean: Array = []
 	for item in items:
@@ -115,7 +126,7 @@ static func show_rewards(
 		return
 
 	if _active != null and is_instance_valid(_active):
-		_queue.append([clean, title, header])
+		_queue.append([clean, title, header, note])
 		return
 
 	var tree := Engine.get_main_loop() as SceneTree
@@ -124,6 +135,7 @@ static func show_rewards(
 	var popup := RewardPopup.new()
 	popup._items = clean
 	popup._title = title
+	popup._note = note if not note.is_empty() else str(NOTES.get(title, ""))
 	popup._header = header
 	_active = popup
 	# زیر ریشه نه زیر صحنه‌ی فعلی — اگر خرید باعث عوض شدن صحنه شود،
@@ -258,6 +270,18 @@ func _build_title() -> Control:
 	row.add_child(label)
 
 	row.add_child(_ornament_line(false))
+
+	if not _note.is_empty():
+		var note := Label.new()
+		note.text = _note
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		note.add_theme_font_override("font", FONT_UI)
+		note.add_theme_font_size_override("font_size", 17)
+		note.add_theme_color_override("font_color", COLOR_TEXT)
+		note.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		note.add_theme_constant_override("shadow_offset_y", 2)
+		note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(note)
 	return box
 
 ## خط تزئینی: از شفاف به طلایی، با یک لوزی کوچک سمت عنوان
@@ -452,6 +476,17 @@ func _animate_card(card: Control, delay: float) -> void:
 				amount_label.text = "+" + MissionArt.fa_grouped(int(round(v))),
 			0.0, float(amount), T_COUNT) \
 			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		# V10 پایانِ شمارش: پرشِ کوچک و برقِ طلایی روی عدد
+		t_count.tween_callback(func() -> void:
+			if not is_instance_valid(amount_label):
+				return
+			amount_label.pivot_offset = amount_label.size * 0.5
+			var p := amount_label.create_tween()
+			p.tween_property(amount_label, "scale", Vector2(1.22, 1.22), 0.08)
+			p.parallel().tween_property(amount_label, "modulate", Color(1.4, 1.2, 0.6), 0.08)
+			p.tween_property(amount_label, "scale", Vector2.ONE, 0.25) \
+				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			p.parallel().tween_property(amount_label, "modulate", Color.WHITE, 0.3))
 
 	# آیکن بعد از نشستن آرام نفس می‌کشد
 	var icon := card.get_meta("icon") as Control
@@ -519,4 +554,4 @@ func _close() -> void:
 	# نوبت دسته‌ی بعدی در صف
 	if not _queue.is_empty():
 		var next: Array = _queue.pop_front()
-		RewardPopup.show_rewards(next[0], next[1], next[2])
+		RewardPopup.show_rewards(next[0], next[1], next[2], str(next[3]) if next.size() > 3 else "")

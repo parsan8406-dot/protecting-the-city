@@ -17,8 +17,10 @@ class_name HudDemonPointer
 
 const FONT := preload("res://fonts/Lalezar-Regular.ttf")
 
-const COL_HOT  := Color(1.0, 0.86, 0.55)
-const COL_MAIN := Color(0.95, 0.16, 0.20)
+## همان رنگ‌های نشانِ شیطان روی مینی‌مپ (hud_minimap.gd): یک چیز، یک رنگ —
+## و جدا از قرمزِ حریف‌های معمولی  # V1 / V3 similarity
+const COL_HOT  := Color(1.0, 0.72, 0.32)
+const COL_MAIN := Color(0.86, 0.18, 0.62)
 const COL_EDGE := Color(0.20, 0.03, 0.05, 0.92)
 const COL_TEXT := Color(0.98, 0.90, 0.72)
 

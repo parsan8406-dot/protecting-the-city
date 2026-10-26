@@ -26,6 +26,9 @@ var _original_name: String = ""
 func _ready() -> void:
 	_save_button.pressed.connect(_on_save_pressed)
 	_cancel_button.pressed.connect(_on_cancel_pressed)
+	# V9: فشردنِ دکمه‌ها دیده و شنیده می‌شود
+	UIFx.bind_press_feedback(_save_button)
+	UIFx.bind_press_feedback(_cancel_button)
 	_name_edit.text_submitted.connect(_on_text_submitted)
 	_name_edit.text_changed.connect(_on_text_changed)
 	_dim.gui_input.connect(_on_dim_input)

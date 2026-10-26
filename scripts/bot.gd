@@ -10,6 +10,11 @@ extends CharacterBody2D
 ##   DODGE  → تیر که خورد، چند لحظه عمود بر خطِ دشمن جاخالی می‌دهد
 ##   FLEE   → جان کم است: عقب می‌کشد
 ##   HEAL   → جای امن ایستاده و خودش را درمان می‌کند
+##
+## E15 شخصیت: هر بات یکی از چهار تیپ است (سرباز، یورشی، تک‌تیرانداز، دورزن)
+## که با اسلحه‌ی دستش (و آیکنِ پلاک) هم دیده می‌شود (V6). C5 مسیریابی: اگر
+## هدف را نبیند یا گیر کند، دورِ دیوار راه پیدا می‌کند (psych_play_nav.gd).
+## C5 کمکِ نامرئی: صحنه با set_assist دقت و ریتمِ شلیک را کمی جابه‌جا می‌کند.
 
 signal died(bot)
 ## چقدر خسارت خورد — صحنه از این برای آمارِ بازیکن استفاده می‌کند
@@ -65,6 +70,43 @@ var _think_cd := 0.0
 var _plate: Node2D = null
 var _weapon_id := ""
 var _flash_tw: Tween = null
+
+## E15 تیپِ این بات و اینکه «فرمانده»ی آخرِ موج است یا نه
+var personality := "soldier"
+var elite := false
+## آیا آخرین ضربه کارِ بازیکن بود؟ (بمبِ یک بات ممکن است باتِ دیگری را بکشد)
+var killed_by_player := true
+var _strafe_weight := 0.9
+var _base_miss := 0.18
+var _base_cd := 0.85
+var _assist := 0.0
+
+# --- مسیریابی (C5) ---
+var _los := true
+var _path := PackedVector2Array()
+var _path_i := 0
+var _path_goal := Vector2.INF
+var _repath_cd := 0.0
+var _nav_force := 0.0
+var _stuck_t := 0.5
+var _stuck_from := Vector2.INF
+
+## تیپ‌ها — ضریب‌ها روی عددهای سطح (DIFFICULTY) می‌نشینند
+const PERSONAS := {
+	"soldier": {"name": "ربات تمرینی", "weapon": "ak47"},
+	# نزدیک می‌شود و تند ولی کم‌زور می‌زند؛ بمب ندارد
+	"rusher": {"name": "ربات یورشی", "weapon": "mp5", "speed": 1.15, "hp": 0.85,
+		"damage": 0.8, "cd": 0.75, "miss_add": 0.04, "keep": 85.0, "range": 0.85,
+		"heal_below": 0.2, "no_bomb": true},
+	# فاصله می‌گیرد، کند ولی دقیق و پرزور؛ زود عقب می‌کشد
+	"marksman": {"name": "ربات تک‌تیرانداز", "weapon": "m24sws", "speed": 0.9, "hp": 0.9,
+		"damage": 1.5, "cd": 1.45, "miss_mul": 0.55, "keep": 150.0, "heal_below": 0.5},
+	# از پهلو می‌آید و دورت می‌چرخد؛ بمب بیشتر
+	"flanker": {"name": "ربات دورزن", "weapon": "hk416", "speed": 1.1, "hp": 0.95,
+		"strafe": 1.0, "bomb": 0.75},
+}
+## خسارتِ هر تیرِ بات هرگز به تیرِ خودِ بازیکن (۲۵) نمی‌رسد
+const MAX_BOT_DAMAGE := 24
 
 @onready var sprite: Node2D = $Sprite2D
 @onready var weapon_sprite: Node2D = $gun
@@ -137,8 +179,58 @@ func apply_difficulty(level: int) -> void:
 	heal_amount = int(d["heal_amount"])
 	# اولین بمب هم به‌اندازه‌ی سطح دیرتر می‌آید
 	_bomb_cd = bomb_cooldown * 0.5
+	_base_miss = miss_chance
+	_base_cd = fire_cooldown
 	if _plate != null:
 		_plate.set_health(health, max_health)
+
+
+## E15 تیپ و «فرمانده» بودن. بعد از apply_difficulty و قبل از add_child.
+func apply_personality(kind: String, is_elite := false) -> void:
+	if not PERSONAS.has(kind):
+		kind = "soldier"
+	personality = kind
+	elite = is_elite
+	var p: Dictionary = PERSONAS[kind]
+	move_speed *= float(p.get("speed", 1.0))
+	max_health = int(round(max_health * float(p.get("hp", 1.0)) * (1.7 if elite else 1.0)))
+	health = max_health
+	damage = mini(int(round(damage * float(p.get("damage", 1.0)) * (1.1 if elite else 1.0))), MAX_BOT_DAMAGE)
+	fire_cooldown *= float(p.get("cd", 1.0))
+	miss_chance = clampf(miss_chance * float(p.get("miss_mul", 1.0)) + float(p.get("miss_add", 0.0)), 0.03, 0.6)
+	keep_distance = float(p.get("keep", keep_distance))
+	fire_range *= float(p.get("range", 1.0))
+	heal_below = float(p.get("heal_below", heal_below))
+	_strafe_weight = float(p.get("strafe", 0.9))
+	bomb_cooldown *= float(p.get("bomb", 1.0))
+	if bool(p.get("no_bomb", false)):
+		bomb_cooldown = 9999.0
+	_bomb_cd = minf(bomb_cooldown * 0.5, 9999.0)
+	_base_miss = miss_chance
+	_base_cd = fire_cooldown
+	if elite:
+		scale *= 1.12
+	if _plate != null:
+		_plate.set_health(health, max_health)
+
+
+## نامی که اعلان‌ها و کارتِ «چه کسی زدت» نشان می‌دهند
+func display_name() -> String:
+	var n := str(PERSONAS.get(personality, PERSONAS["soldier"])["name"])
+	return ("فرمانده‌ی " + n) if elite else n
+
+
+func weapon_for_personality() -> String:
+	return str(PERSONAS.get(personality, PERSONAS["soldier"])["weapon"])
+
+
+## C5 کمکِ نامرئی: a بینِ -۱ (تیزتر) و ۱ (نرم‌تر). فقط دقت و ریتمِ شلیک —
+## خسارت و جان دست نمی‌خورد، و تیرِ خطا هم واقعاً خطا دیده می‌شود.
+func set_assist(a: float) -> void:
+	_assist = clampf(a, -1.0, 1.0)
+	var miss_shift := 0.14 * _assist if _assist > 0.0 else 0.07 * _assist
+	miss_chance = clampf(_base_miss + miss_shift, 0.03, 0.6)
+	fire_cooldown = _base_cd * (1.0 + (0.22 if _assist > 0.0 else 0.1) * _assist)
 
 
 func setup_appearance(character_id: String, weapon_id: String) -> void:
@@ -151,22 +243,26 @@ func setup_appearance(character_id: String, weapon_id: String) -> void:
 
 
 ## بازیکن به بات شلیک کرده. player.gd در حالت آفلاین این را صدا می‌زند.
-func take_damage(amount: int) -> void:
+## by_player=false یعنی بمبِ یک باتِ دیگر — نه طلایی، نه تیکِ «زدی»، نه کیلِ تو.
+func take_damage(amount: int, by_player := true) -> void:
 	if is_dead:
 		return
 	var real: int = mini(amount, health)   # خسارتِ اضافه‌ی ضربه‌ی آخر حساب نشود
 	health -= real
-	hurt.emit(real)
+	if by_player:
+		hurt.emit(real)
 	if _plate != null:
 		_plate.set_health(health, max_health)
 	CombatFX.hit_burst(global_position, Vector2(0, -1))
 	# V1 خسارتِ خودت طلایی است؛ E11 تیکِ برخورد + چشمکِ سفید
-	CombatFX.damage_number(global_position, amount, false, CombatFX.DMG_MINE)
+	CombatFX.damage_number(global_position, amount, false,
+		CombatFX.DMG_MINE if by_player else CombatFX.DMG_OTHER)
 	_flash()
 	if CombatFX.feel != null:
-		CombatFX.feel.on_enemy_hit(true)
+		CombatFX.feel.on_enemy_hit(by_player)
 
 	if health <= 0:
+		killed_by_player = by_player
 		_die()
 		return
 	# تیر خورد → جاخالی. همین باعث می‌شود بات مثل تخته‌ی هدف نایستد.
@@ -182,9 +278,11 @@ func _die() -> void:
 	if _plate != null:
 		_plate.queue_free()
 	died.emit(self)
-	# آفلاین تنها کسی که بات را می‌زند خودِ بازیکن است
 	if CombatFX.feel != null:
-		CombatFX.feel.on_local_kill("", global_position, false)
+		if killed_by_player:
+			CombatFX.feel.on_local_kill("", global_position, false)
+		else:
+			CombatFX.feel.note_death()
 	CombatFX.death(self, true, 0.5)
 
 
@@ -219,12 +317,16 @@ func _physics_process(delta: float) -> void:
 	var to_target: Vector2 = target.global_position - global_position
 	var dist := to_target.length()
 
+	_nav_force = maxf(_nav_force - delta, 0.0)
+	_repath_cd -= delta
 	if _think_cd <= 0.0:
 		_think_cd = 0.2
+		_los = _has_line_of_sight()
 		_decide(dist)
 
 	velocity = _move_for_state(to_target, dist, delta) * move_speed
 	move_and_slide()
+	_check_stuck(delta)
 
 	# رو به هدف می‌چرخد، ولی نه آنی — مثل خودِ بازیکن با نرخِ محدود
 	var want_rot := to_target.angle() + deg_to_rad(90)
@@ -256,13 +358,15 @@ func _decide(dist: float) -> void:
 			_state = State.FLEE
 		return
 
-	if dist > fire_range:
+	# پشتِ دیوار «نبرد» معنی ندارد: باید راهی پیدا کند که هدف را ببیند
+	if dist > fire_range or not _los:
 		_state = State.CHASE
 	else:
 		_state = State.FIGHT
 		if _strafe_time <= 0.0:
 			# جهتِ کنارکشی هر چند وقت عوض می‌شود تا قابل پیش‌بینی نباشد
-			_strafe_time = randf_range(0.7, 1.6)
+			# (دورزن زودتر عوض می‌کند)
+			_strafe_time = randf_range(0.5, 1.1) if personality == "flanker" else randf_range(0.7, 1.6)
 			_strafe_dir = -_strafe_dir
 
 
@@ -277,6 +381,9 @@ func _move_for_state(to_target: Vector2, dist: float, delta: float) -> Vector2:
 			return dir.orthogonal() * _dodge_dir
 
 		State.FLEE:
+			# گیر کرده (پشتش دیوار است): به‌جای فشار دادنِ دیوار، کنار می‌کشد
+			if _nav_force > 0.0:
+				return (dir.orthogonal() * _strafe_dir - dir * 0.3).normalized()
 			return -dir
 
 		State.HEAL:
@@ -291,10 +398,61 @@ func _move_for_state(to_target: Vector2, dist: float, delta: float) -> Vector2:
 				radial = -1.0
 			elif dist > keep_distance + 25.0:
 				radial = 1.0
-			return (dir * radial + dir.orthogonal() * _strafe_dir * 0.9).normalized()
+			return (dir * radial + dir.orthogonal() * _strafe_dir * _strafe_weight).normalized()
 
 		_:
-			return dir
+			var goal := target.global_position
+			# E15 دورزن از پهلو می‌آید، نه از روبه‌رو
+			if personality == "flanker" and dist > 220.0:
+				goal += dir.orthogonal() * _strafe_dir * 170.0
+			return _steer_to(goal, dir, personality == "flanker" and dist > 220.0)
+
+
+## C5 راه رفتن به سمتِ goal: اگر خطِ دید باز است و گیر نکرده مستقیم، وگرنه
+## روی مسیرِ گرید (دورِ دیوارها). مسیر حداکثر هر ۰٫۶ ثانیه دوباره حساب می‌شود.
+func _steer_to(goal: Vector2, direct: Vector2, force_nav := false) -> Vector2:
+	if _los and _nav_force <= 0.0 and not force_nav:
+		_path = PackedVector2Array()
+		return direct
+	var nav = _nav()
+	if nav == null:
+		return (goal - global_position).normalized()
+	# مسیرِ کهنه: هدف جابه‌جا شده، یا خودِ بات از مسیر دور افتاده (هل خورده)
+	var off_path := not _path.is_empty() and _path_i < _path.size() \
+		and global_position.distance_to(_path[_path_i]) > 110.0
+	if _path.is_empty() or _repath_cd <= 0.0 or off_path or _path_goal.distance_to(goal) > 80.0:
+		_path = nav.path(global_position, goal)
+		_path_i = 0
+		_path_goal = goal
+		_repath_cd = 0.6
+	while _path_i < _path.size() and global_position.distance_to(_path[_path_i]) < 18.0:
+		_path_i += 1
+	if _path_i >= _path.size():
+		var to_goal := goal - global_position
+		return to_goal.normalized() if to_goal.length() > 8.0 else Vector2.ZERO
+	return (_path[_path_i] - global_position).normalized()
+
+
+func _nav():
+	var arena := get_parent()
+	if arena != null and arena.has_method("bot_nav"):
+		return arena.bot_nav()
+	return null
+
+
+## هر نیم‌ثانیه: اگر می‌خواست راه برود و تقریباً جابه‌جا نشده، گیر کرده —
+## چند لحظه مسیریابی اجباری و جهتِ کنارکشیِ برعکس.
+func _check_stuck(delta: float) -> void:
+	_stuck_t -= delta
+	if _stuck_t > 0.0:
+		return
+	_stuck_t = 0.5
+	var wants_move := _state == State.CHASE or _state == State.FLEE or _state == State.FIGHT
+	if wants_move and _stuck_from.is_finite() and global_position.distance_to(_stuck_from) < 10.0:
+		_nav_force = 1.5
+		_repath_cd = 0.0
+		_strafe_dir = -_strafe_dir
+	_stuck_from = global_position
 
 
 func _try_shoot(dist: float, want_rot: float) -> void:
@@ -320,7 +478,7 @@ func _try_shoot(dist: float, want_rot: float) -> void:
 	if not missed and target.has_method("take_damage"):
 		# C10/V4: منبعِ ضربه برای کمانِ جهت و کارتِ «چه کسی زدت»
 		if CombatFX.feel != null:
-			CombatFX.feel.note_attack(DISPLAY_NAME, global_position, _weapon_id, "gun")
+			CombatFX.feel.note_attack(display_name(), global_position, _weapon_id, "gun")
 		target.take_damage(damage)
 
 
@@ -341,7 +499,7 @@ func _try_bomb(dist: float) -> void:
 	var arena := get_parent()
 	if arena != null and arena.has_method("spawn_local_bomb"):
 		if CombatFX.feel != null:
-			CombatFX.feel.note_attack(DISPLAY_NAME, target.global_position + lead, "", "bomb")
+			CombatFX.feel.note_attack(display_name(), target.global_position + lead, "", "bomb")
 		arena.spawn_local_bomb(global_position, target.global_position + lead,
 			bomb_radius, bomb_damage, self)
 

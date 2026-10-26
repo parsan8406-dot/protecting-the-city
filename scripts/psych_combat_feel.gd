@@ -13,6 +13,8 @@ extends CanvasLayer
 ##     و شمارشِ برگشت در حالت‌های ریسپاون‌دار (C10/E13)
 ##   - «برگشتی! محافظ داری» بعد از تولد (E13)
 ##   - ۳۰ و ۱۰ ثانیه‌ی آخرِ راند + تیک‌تاکِ ۵ ثانیه‌ی آخر (C6)
+##   - اعلان‌های بازیِ سریع: موج، پاک شدنِ موج، فرمانده، صندوقِ تدارکات
+##     (announce — psych_play_director.gd) (C6/E2)
 ##
 ## سرور در پیامِ die قاتل را نمی‌فرستد؛ پس منبعِ هر ضربه از روی آخرین شلیک‌ها،
 ## بمب‌ها، لیزرها و نفرینِ شیطان که همین کلاینت دیده حدس زده می‌شود (_attribute).
@@ -71,6 +73,12 @@ const CALLOUTS := {
 	"respawn": {"text": "برگشتی!", "icon": "", "prio": 1},
 	"final30": {"text": "۳۰ ثانیه‌ی آخر!", "icon": "", "prio": 1, "red": true},
 	"final10": {"text": "۱۰ ثانیه!", "icon": "", "prio": 1, "red": true},
+	# بازیِ سریع (psych_play_director.gd) — عنوانِ موج‌ها از بیرون می‌آید
+	"wave": {"text": "موج", "icon": "", "prio": 3},
+	"wave_clear": {"text": "موج پاک شد!", "icon": "streak_mvp", "prio": 3},
+	"elite": {"text": "فرمانده آمد!", "icon": "", "prio": 3, "red": true},
+	"supply_drop": {"text": "صندوقِ تدارکات!", "icon": "chest_closed", "prio": 2},
+	"supply": {"text": "صندوقِ تدارکات!", "icon": "chest_closed", "prio": 3},
 }
 
 ## صحنه‌ی زمین (world.gd) — بازیکن، حریف‌ها و آیکنِ آیتم از آن خوانده می‌شود
@@ -119,6 +127,8 @@ var _multi := 0
 var _last_kill_ms := -100000
 var _first_seen := false
 var _last_killer := ""
+## E4 بهترین لحظه‌ی همین دست (بزرگ‌ترین مولتی‌کیل)
+var _best_multi := 0
 
 # --- منبعِ ضربه ---
 var _shots := {}               # نام -> {pos, dir, ms}
@@ -327,7 +337,8 @@ func _build_audio() -> void:
 	_heart.stream = SFX.get_stream("heart")
 	add_child(_heart)
 	# همه‌ی صداها همین حالا ساخته شوند، نه وسطِ اولین درگیری
-	for n in ["hit", "kill", "multi2", "multi3", "multi4", "hurt", "tick", "respawn", "death"]:
+	for n in ["hit", "kill", "multi2", "multi3", "multi4", "hurt", "tick", "respawn", "death",
+			"wave", "clear", "supply"]:
 		SFX.get_stream(n)
 
 
@@ -384,6 +395,7 @@ func on_local_kill(victim: String, pos: Vector2, coins_ok: bool = true) -> void:
 	_last_kill_ms = now
 	_kills_life += 1
 	_match_kills += 1
+	_best_multi = maxi(_best_multi, _multi)
 
 	var tags: Array = []
 	if not _first_seen:
@@ -427,6 +439,37 @@ func on_local_kill(victim: String, pos: Vector2, coins_ok: bool = true) -> void:
 ## کسی (هر کسی، غیر از خودت) مرد — فقط برای «اولین حذف»
 func note_death() -> void:
 	_first_seen = true
+
+
+## اعلانِ آزاد (بازیِ سریع: موج، فرمانده، صندوق). title خالی یعنی متنِ پیش‌فرضِ همان برچسب.
+func announce(tag: String, title: String = "", sub: String = "") -> void:
+	if not CALLOUTS.has(tag):
+		return
+	var item := {"tag": tag, "prio": int(CALLOUTS[tag]["prio"]), "sub": sub, "title": title}
+	if _co_left <= 0.0 or item["prio"] >= _co_prio:
+		_show_callout(item)
+	else:
+		_co_queue.append(item)
+		if _co_queue.size() > 2:
+			_co_queue.pop_front()
+
+
+## پخشِ یکی از صداهای ساخته‌شده از بیرون (کارگردانِ بازیِ سریع)
+func play_sfx(name: String) -> void:
+	_play(name)
+
+
+## C10 نکته‌ی صفحه‌ی پایانِ بازیِ سریع: [متن، آیکنِ آرت، جایگزینِ HUD]
+func death_tip() -> Array:
+	var src := {}
+	if not _last_attack.is_empty() and Time.get_ticks_msec() - int(_last_attack.get("ms", 0)) < 4000:
+		src = _last_attack
+	return _pick_tip(src)
+
+
+## E4 بزرگ‌ترین مولتی‌کیلِ این دست (۰ یعنی هیچ کیلی)
+func best_multi() -> int:
+	return _best_multi
 
 
 ## بات‌های بازیِ سریع منبعِ ضربه‌شان را خودشان می‌گویند (kind: gun / bomb)
@@ -694,7 +737,7 @@ func _callout_for(tags: Array, sub: String = "") -> void:
 func _show_callout(item: Dictionary) -> void:
 	var def: Dictionary = CALLOUTS[item["tag"]]
 	var red := bool(def.get("red", false))
-	_co_title.text = str(def["text"])
+	_co_title.text = str(item.get("title", "")) if str(item.get("title", "")) != "" else str(def["text"])
 	_co_title.add_theme_color_override("font_color", COL_RED if red else COL_GOLD)
 	_co_sub.text = str(item["sub"])
 	_co_sub.visible = _co_sub.text != ""
@@ -861,11 +904,19 @@ func _pick_tip(src: Dictionary) -> Array:
 	var me := _me()
 	if me != null and "_reload_left" in me and (float(me._reload_left) > 0.0 or int(me.current_ammo) <= 0):
 		return ["خشابت وسطِ درگیری خالی شد؛ قبل از جنگ جعبه‌ی فشنگ بردار", "tip_reload", "icon_bullet"]
+	# بازیِ سریع: نکته‌ی مخصوصِ تیپِ قاتل (E15/C10)
+	var who := str(src.get("name", ""))
+	if who.find("تک‌تیرانداز") >= 0:
+		return ["تک‌تیرانداز کند شلیک می‌کند؛ بینِ دو تیرش نزدیک شو", "tip_cover", "icon_run"]
+	if who.find("یورشی") >= 0:
+		return ["یورشی کم‌جان است؛ عقب‌عقب برو و بزنش", "tip_cover", "icon_run"]
 	var many := 0
 	for u in _recent_attackers:
 		if now - int(_recent_attackers[u]) < 4000:
 			many += 1
 	if many >= 2:
+		if Global.offline_mode:
+			return ["عقب بکش تا حریف‌ها یکی‌یکی به تو برسند", "tip_cover", "icon_shield"]
 		return ["تنها جلوی چند نفر نرو؛ کنارِ هم‌تیمی‌ها بجنگ", "social_squad", "icon_people"]
 	if _low_since_ms > 0 and now - _low_since_ms > 1500 and _heal_was_ready():
 		return ["جانت کم بود و درمان آماده — زودتر بزنش", "", "icon_heal"]

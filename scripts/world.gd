@@ -584,7 +584,8 @@ func update_player_health_ui(current_health: int, max_hp: int):
 	# حسِ تیر خوردن (لرزش، حاشیه، کمانِ جهت) همین‌جا داده می‌شود. آنلاین همین
 	# کار در _on_health_updated انجام می‌شود (تا با همگام‌سازیِ update_players
 	# دوبار حساب نشود).
-	if Global.offline_mode and _ui_hp > current_health and current_health > 0			 and not $Player.is_dead:
+	if Global.offline_mode and _ui_hp > current_health and current_health > 0 \
+			and not $Player.is_dead:
 		_feel_local_damage()
 		if feel != null:
 			feel.on_local_damaged(_ui_hp - current_health, max_hp)
@@ -1054,7 +1055,8 @@ func _on_health_updated(username: String, new_health: int):
 				CombatFX.hit_burst(p.global_position, Vector2(0, -1))
 				# V1: خسارتِ خودت طلایی، بقیه خنثی، آسیبِ هم‌تیمی قرمز (خطر)
 				var ally: bool = "is_ally" in p and p.is_ally
-				var mine: bool = not ally and feel != null					 and feel.credit_mine(username, p.global_position, 600)
+				var mine: bool = not ally and feel != null \
+						and feel.credit_mine(username, p.global_position, 600)
 				var kind: int = CombatFX.DMG_TAKEN if ally else (CombatFX.DMG_MINE if mine else CombatFX.DMG_OTHER)
 				CombatFX.damage_number(p.global_position, prev - new_health, false, kind)
 				if not ally:

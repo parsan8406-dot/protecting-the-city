@@ -5,9 +5,13 @@ extends RefCounted
 ## GET /profile?player_id=... — فقط بخش عمومی پروفایل: رنک، آمار، دستاورد،
 ## آخرین سلاح، شهر و وضعیت آنلاین.
 ##
-## استفاده: PlayerCardDialog.open(self, player_id, on_message_callable)
+## استفاده: PlayerCardDialog.open(self, player_id, on_message_callable, on_gift_callable)
 
-static func open(host: Node, player_id: String, on_message: Callable = Callable()) -> void:
+const PsychSocialMastery := preload("res://scripts/psych_social_mastery.gd")
+const PsychSocialGift := preload("res://scripts/psych_social_gift.gd")
+
+static func open(host: Node, player_id: String, on_message: Callable = Callable(),
+		on_gift: Callable = Callable()) -> void:
 	var sheet := MenuUI.ModalSheet.new()
 	host.get_tree().root.add_child(sheet)
 	var col := sheet.build("پروفایل بازیکن", 640.0)
@@ -32,13 +36,14 @@ static func open(host: Node, player_id: String, on_message: Callable = Callable(
 			loading.text = MenuUI.server_error(raw, code if result == HTTPRequest.RESULT_SUCCESS else 0, "پروفایل پیدا نشد")
 			return
 		loading.queue_free()
-		_fill(body, MenuUI.parse_json(raw), sheet, on_message))
+		_fill(body, MenuUI.parse_json(raw), sheet, on_message, on_gift))
 	var url := "%s/profile?player_id=%s" % [Global.SERVER_BASE, player_id.uri_encode()]
 	if http.request(url, Global.auth_headers()) != OK:
 		loading.text = "اتصال به سرور برقرار نشد"
 	sheet.open()
 
-static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalSheet, on_message: Callable) -> void:
+static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalSheet, on_message: Callable,
+		on_gift: Callable = Callable()) -> void:
 	# --- سربرگ: آواتار، اسم، سطح، وضعیت ---
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 14)
@@ -95,6 +100,15 @@ static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalShee
 	for cell in cells:
 		grid.add_child(_stat_cell(cell[0], cell[1], cell[2]))
 
+	# E8 مالکیت / E1 شایستگی: یک خطِ «مهارت» به‌جای عددِ خام — سلاحِ امضا،
+	# رکوردِ اخیر و بهترین رنکی که تا حالا گرفته
+	var mastery := _mastery_text(data)
+	if not mastery.is_empty():
+		var ml := MenuUI.label(mastery, 16, MenuUI.GOLD)
+		ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		ml.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		body.add_child(ml)
+
 	# --- آخرین سلاح و شهر ---
 	var foot := HBoxContainer.new()
 	foot.add_theme_constant_override("separation", 12)
@@ -113,12 +127,51 @@ static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalShee
 	foot_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	foot.add_child(foot_label)
 
+	# دکمه‌ها کنارِ هم: «پیام» تنها دکمه‌ی طلایی (V5)، «هدیه» کنارش (E10)
+	var actions := HBoxContainer.new()
+	actions.add_theme_constant_override("separation", 14)
+	if on_gift.is_valid():
+		var gift := MenuUI.button(PsychSocialGift.button_text(), "dark")
+		gift.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var gift_icon := PsychSocialGift.load_icon()
+		if gift_icon != null:
+			gift.icon = gift_icon
+			gift.expand_icon = true
+			gift.add_theme_constant_override("icon_max_width", 30)
+		if PsychSocialGift.seconds_until_next() <= 0:
+			gift.add_theme_color_override("font_color", MenuUI.GOLD)
+		gift.pressed.connect(func() -> void:
+			sheet.close()
+			on_gift.call())
+		actions.add_child(gift)
 	if on_message.is_valid():
 		var msg := MenuUI.button("پیام دادن", "gold")
+		msg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		msg.pressed.connect(func() -> void:
 			sheet.close()
 			on_message.call())
-		body.add_child(msg)
+		actions.add_child(msg)
+	if actions.get_child_count() > 0:
+		body.add_child(actions)
+	else:
+		actions.free()
+
+
+## «سلاحِ امضا: AK-47 (۲۴ کیل در ۶ مسابقه‌ی اخیر)  •  ۳ برد پشت‌سرهم  •  بهترین رنک: طلا»
+static func _mastery_text(data: Dictionary) -> String:
+	var recent = data.get("recent_matches", [])
+	var m := PsychSocialMastery.from_recent(recent if recent is Array else [])
+	var parts: Array[String] = []
+	if not str(m.fav_weapon).is_empty() and int(m.fav_matches) >= 2:
+		parts.append("سلاحِ امضا: %s (%s کیل در %s مسابقه‌ی اخیر)" % [MenuUI.weapon_name(str(m.fav_weapon)),
+			MenuUI.fa(int(m.fav_kills)), MenuUI.fa(int(m.fav_matches))])
+	var line := PsychSocialMastery.mastery_line(m)
+	if not line.is_empty():
+		parts.append(line)
+	var best := str(data.get("best_tier_name", ""))
+	if not best.is_empty():
+		parts.append("بهترین رنک: %s" % best)
+	return "  •  ".join(parts)
 
 static func _stat_cell(title: String, value: String, metric: String) -> Control:
 	var panel := PanelContainer.new()

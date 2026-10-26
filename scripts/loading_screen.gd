@@ -494,7 +494,8 @@ func _build_tip_row() -> Control:
 	_tip_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6))
 	_tip_label.add_theme_constant_override("shadow_offset_y", 1)
 	_tip_row.add_child(_tip_label)
-	_tip_icon = MenuUI.icon(null, 40.0, MenuUI.GOLD)
+	# آیکن‌های رنگیِ tip_* در ۴۰ پیکسل ریز و گنگ بودند
+	_tip_icon = MenuUI.icon(null, 50.0, MenuUI.GOLD)
 	_tip_row.add_child(_tip_icon)
 	return _tip_row
 

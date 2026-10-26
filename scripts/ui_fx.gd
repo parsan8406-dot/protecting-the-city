@@ -27,6 +27,8 @@ const RING_SPREAD := 16.0
 const RING_TIME := 0.42
 ## اکشن بعدی (مثلاً تعویض صحنه) کِی اجرا بشه — بعد از فرو رفتن و وسط برگشت
 const PRESS_CALLBACK_DELAY := 0.15
+## V9 + E11: تیکِ صوتیِ لمس، کنارِ انیمیشن (باس SFX، با تنظیمات بی‌صدا می‌شود)
+const UI_SFX := preload("res://scripts/psych_menu_ui_sfx.gd")
 
 ## انیمیشن لمس اصلی. اگه on_finished داده بشه، بعد از حرکت صدا زده میشه
 ## (مثلاً برای عوض کردن صحنه، تا بازیکن انیمیشن رو ببینه).
@@ -56,6 +58,7 @@ static func press(control: Control, on_finished: Callable = Callable()) -> void:
 
 	control.set_meta("_press_tweens", [scale_tween, glow_tween])
 	_spawn_ring(control)
+	UI_SFX.tap(control)
 
 	if on_finished.is_valid():
 		var delay_tween := control.create_tween()
@@ -156,6 +159,7 @@ static func tap(control: Control, on_finished: Callable = Callable()) -> void:
 		return
 
 	control.pivot_offset = control.size * 0.5
+	UI_SFX.tap(control)
 
 	# فرو رفتن کوتاه، بعد برگشت با اورشوت ملایم — یه بار می‌پره بیرون و می‌شینه
 	var scale_tween := control.create_tween()
@@ -194,6 +198,7 @@ static func bind_press_feedback(button: BaseButton) -> void:
 		return
 	button.button_down.connect(func() -> void: press_scale(button, true))
 	button.button_up.connect(func() -> void: press_scale(button, false))
+	button.pressed.connect(func() -> void: UI_SFX.tap(button))
 
 ## جمع/باز شدن دکمه زیر انگشت
 static func press_scale(control: Control, down: bool) -> void:

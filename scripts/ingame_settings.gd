@@ -78,7 +78,10 @@ func _build() -> void:
 	var vib := _toggle("لرزش گوشی", LocalSettings.vibration_enabled)
 	vib.toggled.connect(func(on: bool):
 		LocalSettings.vibration_enabled = on
-		LocalSettings.save_settings())
+		LocalSettings.save_settings()
+		# روشن کردنش همان لحظه حس شود  # E11
+		if on:
+			LocalSettings.vibrate(40))
 	toggles.add_child(vib)
 
 	var shake := _toggle("لرزش صفحه", LocalSettings.screen_shake_enabled())
@@ -88,6 +91,12 @@ func _build() -> void:
 	var resume := _button("ادامه", COL_GOLD)
 	resume.pressed.connect(close)
 	col.add_child(resume)
+
+	# فاصله‌ی بیشتر بینِ «ادامه» و «خروج» تا شستِ عجول اشتباهی نزند  # C13
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 8)
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(gap)
 
 	_leave_btn = _button("خروج از مسابقه", COL_DANGER)
 	_leave_btn.pressed.connect(_on_leave)

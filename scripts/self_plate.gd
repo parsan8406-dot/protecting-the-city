@@ -11,7 +11,14 @@ const FONT := preload("res://fonts/Lalezar-Regular.ttf")
 const BAR_W := 76.0
 const HP_H := 8.0
 const AMMO_H := 4.0
-const OFFSET_Y := -96.0
+## با زومِ ۲ی دوربین، ۹۶ پلاک را تا زیرِ قابِ تایمر بالا می‌برد و با HUDِ
+## بالای صفحه یکی دیده می‌شد؛ نزدیکِ سر بماند تا «مالِ کاراکتر» خوانده شود  # V3 proximity
+const OFFSET_Y := -76.0
+## وقتی بالای سر زیرِ پنل‌های وسطِ بالای HUD می‌افتد (حالتِ شیطان روی
+## صفحه‌ی ۱۶:۹ و ۴:۳)، پلاک زیرِ پا می‌نشیند
+const BELOW_Y := 66.0
+## بالای پلاک (واحدِ محلی) — برای فهمیدنِ برخورد با HUD
+const PLATE_TOP := -20.0
 
 const COL_TRACK := Color(0.06, 0.055, 0.07, 0.92)
 const COL_HP    := Color(0.35, 0.86, 0.42)
@@ -28,6 +35,9 @@ var _hp_text := ""
 var _ammo := 0
 var _ammo_max := 0
 var _level := 1
+var _below := false
+var _hud: Node = null
+var _hud_t := 0.0
 
 
 func setup(target: Node2D) -> void:
@@ -62,8 +72,27 @@ func _process(_delta: float) -> void:
 		queue_free()
 		return
 	visible = _target.visible and _target.modulate.a > 0.05
-	global_position = _target.global_position + Vector2(0, OFFSET_Y)
+	global_position = _target.global_position + Vector2(0, BELOW_Y if _below else OFFSET_Y)
 	global_rotation = 0.0
+	_avoid_hud(_delta)
+
+
+## زیرِ HUDِ وسطِ بالا گم نشود: اگر جای بالای سر به پنل‌ها می‌خورد، زیرِ پا
+## برو؛ با کمی فاصله‌ی برگشت (hysteresis) تا لب‌به‌لب چشمک نزند.  # V3 / C1
+func _avoid_hud(delta: float) -> void:
+	_hud_t -= delta
+	if _hud_t <= 0.0:
+		_hud_t = 1.0
+		if _hud == null or not is_instance_valid(_hud):
+			_hud = get_tree().get_first_node_in_group("game_hud")
+	if _hud == null or not _hud.has_method("top_center_bottom"):
+		return
+	var band: float = _hud.top_center_bottom()
+	# تبدیلِ دوربین، بدونِ چرخشِ خودِ بازیکن
+	var top_above: float = (get_canvas_transform() \
+		* (_target.global_position + Vector2(0.0, OFFSET_Y + PLATE_TOP))).y
+	var margin := 24.0 if _below else 4.0
+	_below = top_above < band + margin
 
 
 ## دو StyleBoxِ ثابت (گوشه‌ی ۴ و ۳)؛ هر _draw فقط رنگشان را عوض می‌کند،
@@ -94,10 +123,13 @@ func _draw() -> void:
 
 	# جان
 	draw_style_box(_box(COL_TRACK, 4), Rect2(x - 1, -1, BAR_W + 2, HP_H + AMMO_H + 5))
-	var hp_col := COL_HP if _hp > 0.55 else (COL_MID if _hp > 0.25 else COL_LOW)
+	# «بحرانی» همان آستانه‌ی کارتِ پروفایل و لبه‌ی قرمز است، تا سه نشانه
+	# با هم روشن شوند و یک معنی بدهند  # V1 one feature, one meaning
+	var low := _hp < CombatHUD.LOW_HP
+	var hp_col := COL_HP if _hp > 0.55 else (COL_LOW if low else COL_MID)
 	if _hp > 0.0:
 		draw_style_box(_box(hp_col, 3), Rect2(x, 0, BAR_W * _hp, HP_H))
-	if _hp > 0.0 and _hp <= 0.25:
+	if _hp > 0.0 and low:
 		# جانِ بحرانی فقط با رنگ گفته نشود: مثلثِ «!» کنارِ نوار  # V2 color + shape
 		var t := Vector2(x + BAR_W + 9.0, (HP_H + AMMO_H) * 0.5 + 1.0)
 		var tri := PackedVector2Array([t + Vector2(0, -8), t + Vector2(7, 5), t + Vector2(-7, 5)])

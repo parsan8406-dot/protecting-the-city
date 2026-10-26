@@ -6,6 +6,11 @@ extends CanvasLayer
 ##
 ## کل درخت روی PROCESS_MODE_ALWAYS است تا وقتی get_tree().paused روشن شد
 ## خودِ منو زنده بماند — وگرنه دکمه‌هایش هم یخ می‌زدند.
+##
+## صفحه‌ی پایان (E4 اوج-پایان): حتی در باخت یک نقطه‌ی مثبت برجسته می‌شود —
+## رکوردِ جدید یا بهترین لحظه‌ی همین دست — و اگر نزدیکِ رکورد بودی (E5)
+## گفته می‌شود؛ یک نکته‌ی کاربردی از روی همین مرگ (C10)؛ و «شروع دوباره»
+## تنها دکمه‌ی اصلیِ طلایی و درشت است (V5، E13 شروعِ مجددِ سریع).
 
 signal resume_pressed
 signal restart_pressed
@@ -20,6 +25,10 @@ const COL_GOLD   := Color(0.96, 0.79, 0.32)
 const COL_TEXT   := Color(0.96, 0.94, 0.90)
 const COL_DIM    := Color(0.62, 0.60, 0.64)
 const COL_DANGER := Color(0.86, 0.20, 0.22)
+const TEXT_FONT_PATH := "res://fonts/SJADIDBD.TTF"
+const PSYCH_ICON := "res://assets/ui/psych/%s.png"
+const HUD_ICON := "res://assets/ui/hud/%s.png"
+const MULTI_NAMES := {2: "دوتایی", 3: "سه‌تایی"}
 
 var _panel: PanelContainer = null
 var _title: Label = null
@@ -27,7 +36,11 @@ var _stats_box: VBoxContainer = null
 var _buttons_box: VBoxContainer = null
 var _settings_box: VBoxContainer = null
 var _resume_btn: Button = null
+var _restart_btn: Button = null
 var _is_game_over := false
+## E4/E5/C10 بخشِ مخصوصِ صفحه‌ی پایان
+var _run_box: VBoxContainer = null
+var _text_font: Font = null
 
 
 func _ready() -> void:
@@ -72,6 +85,13 @@ func _build() -> void:
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_title)
 
+	if ResourceLoader.exists(TEXT_FONT_PATH):
+		_text_font = load(TEXT_FONT_PATH)
+	_run_box = VBoxContainer.new()
+	_run_box.add_theme_constant_override("separation", 6)
+	_run_box.hide()
+	col.add_child(_run_box)
+
 	_stats_box = VBoxContainer.new()
 	_stats_box.add_theme_constant_override("separation", 5)
 	col.add_child(_stats_box)
@@ -93,6 +113,7 @@ func _build() -> void:
 	var restart := _make_button("شروع دوباره", COL_GOLD)
 	restart.pressed.connect(func(): restart_pressed.emit())
 	_buttons_box.add_child(restart)
+	_restart_btn = restart
 
 	var settings := _make_button("تنظیمات", COL_DIM)
 	settings.pressed.connect(_toggle_settings)
@@ -132,7 +153,28 @@ func _make_button(text: String, colour: Color) -> Button:
 	sp.bg_color = colour
 	sp.set_corner_radius_all(11)
 	b.add_theme_stylebox_override("pressed", sp)
+	# V9 حالتِ فشرده‌ی واضح: کوچک شدنِ کوتاه زیرِ انگشت
+	UIFx.bind_press_feedback(b)
 	return b
+
+
+## V5 تنها دکمه‌ی اصلی: طلاییِ پُر، متنِ تیره و درشت‌تر. on=false برمی‌گرداند.
+func _set_primary(b: Button, on: bool) -> void:
+	if b == null:
+		return
+	b.custom_minimum_size = Vector2(0, 58 if on else 46)
+	b.add_theme_font_size_override("font_size", 24 if on else 20)
+	var dark := Color(0.08, 0.06, 0.04)
+	b.add_theme_color_override("font_color", dark if on else COL_GOLD)
+	b.add_theme_color_override("font_hover_color", dark if on else COL_GOLD)
+	b.add_theme_color_override("font_focus_color", dark if on else COL_GOLD)
+	for state in ["normal", "hover", "focus"]:
+		var s := StyleBoxFlat.new()
+		s.bg_color = COL_GOLD if on else Color(0.12, 0.115, 0.13)
+		s.set_corner_radius_all(11)
+		s.set_border_width_all(2)
+		s.border_color = COL_GOLD
+		b.add_theme_stylebox_override(state, s)
 
 
 ## چند تنظیمِ پرکاربرد، همان‌جا بدون خروج از بازی. مقدارها مستقیم در
@@ -187,16 +229,90 @@ func open_paused(stats: Dictionary) -> void:
 	_title.text = "توقف"
 	_title.add_theme_color_override("font_color", COL_GOLD)
 	_resume_btn.show()
+	_set_primary(_restart_btn, false)
+	_run_box.hide()
 	_show(stats)
 
 
-## باز کردن به‌عنوان «باختی» — ادامه‌ای در کار نیست
-func open_game_over(stats: Dictionary) -> void:
+## باز کردن به‌عنوان «باختی» — ادامه‌ای در کار نیست.
+## run از psych_play_director.finish_run (+ tip و best_multi از حسِ نبرد).
+func open_game_over(stats: Dictionary, run: Dictionary = {}) -> void:
 	_is_game_over = true
 	_title.text = "از بین رفتی!"
 	_title.add_theme_color_override("font_color", COL_DANGER)
 	_resume_btn.hide()
+	_set_primary(_restart_btn, true)
+	_fill_run(run)
 	_show(stats)
+
+
+## E4 نقطه‌ی مثبت + E5 نزدیک‌برد + C10 نکته
+func _fill_run(run: Dictionary) -> void:
+	for c in _run_box.get_children():
+		c.queue_free()
+	_run_box.visible = not run.is_empty()
+	if run.is_empty():
+		return
+	var highlight := ""
+	var icon := ""
+	if bool(run.get("new_record", false)):
+		highlight = "رکوردِ جدید! موج %s • %s کیل" % [_fa(int(run.get("wave", 1))), _fa(int(run.get("kills", 0)))]
+		icon = "result_new_record"
+	elif str(run.get("near", "")) != "":
+		highlight = str(run["near"])
+	elif int(run.get("best_multi", 0)) >= 2:
+		var m := int(run["best_multi"])
+		highlight = "بهترین لحظه‌ات: %s!" % str(MULTI_NAMES.get(m, "بی‌مهار"))
+		icon = "streak_double" if m == 2 else ("streak_triple" if m == 3 else "streak_rampage")
+	elif int(run.get("kills", 0)) > 0:
+		highlight = "تا موجِ %s رسیدی" % _fa(int(run.get("wave", 1)))
+	if highlight != "":
+		_run_box.add_child(_row(highlight, icon, "", COL_GOLD, 21, 46.0))
+	var tip = run.get("tip", [])
+	if tip is Array and tip.size() >= 3 and str(tip[0]) != "":
+		_run_box.add_child(_row(str(tip[0]), str(tip[1]), str(tip[2]), COL_TEXT, 16, 34.0))
+	var line := ColorRect.new()
+	line.color = Color(COL_EDGE, 0.35)
+	line.custom_minimum_size = Vector2(0, 2)
+	_run_box.add_child(line)
+
+
+## یک ردیفِ راست‌چین: متن و آیکن (آرتِ روانشناسی، وگرنه آیکنِ HUD، وگرنه هیچ)
+func _row(text: String, psych_icon: String, hud_icon: String, colour: Color, size: int, icon_px: float) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	var l := Label.new()
+	l.text = text
+	if _text_font != null:
+		l.add_theme_font_override("font", _text_font)
+	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_color_override("font_color", colour)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	l.custom_minimum_size = Vector2(260, 0)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(l)
+	var tex: Texture2D = null
+	if psych_icon != "" and ResourceLoader.exists(PSYCH_ICON % psych_icon):
+		tex = load(PSYCH_ICON % psych_icon)
+	elif hud_icon != "" and ResourceLoader.exists(HUD_ICON % hud_icon):
+		tex = load(HUD_ICON % hud_icon)
+	if tex != null:
+		var t := TextureRect.new()
+		t.texture = tex
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		t.custom_minimum_size = Vector2(icon_px, icon_px)
+		row.add_child(t)
+	return row
+
+
+static func _fa(n: int) -> String:
+	var digits := "۰۱۲۳۴۵۶۷۸۹"
+	var out := ""
+	for ch in str(n):
+		out += digits[int(ch)] if ch >= "0" and ch <= "9" else ch
+	return out
 
 
 func _show(stats: Dictionary) -> void:

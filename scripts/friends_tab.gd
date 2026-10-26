@@ -360,7 +360,13 @@ func _on_profile_pressed() -> void:
 	if _selected_id.is_empty():
 		return
 	var peer := _selected_id
-	PlayerCardDialog.open(self, peer, func() -> void: _open_chat(peer))
+	# E10 هدیه از خودِ کارت هم در دسترس است (همان دیالوگِ هدیه‌ی تب)
+	PlayerCardDialog.open(self, peer, func() -> void: _open_chat(peer),
+		func() -> void:
+			if _find_friend(peer).is_empty():
+				return
+			_selected_id = peer
+			_on_gift_pressed())
 
 func _on_gift_pressed() -> void:
 	UIFx.press(_gift_button)
@@ -406,6 +412,10 @@ func _apply_social_art() -> void:
 		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_empty_box.add_child(art)
 		_empty_box.move_child(art, 0)
+		# C1 یک تصویر کافی است: آیکنِ خاکستریِ قدیمیِ حالتِ خالی جایش را می‌دهد
+		var old_icon := _empty_box.get_node_or_null("EmptyIcon") as CanvasItem
+		if old_icon != null:
+			old_icon.visible = false
 
 ## حذف دوست با پنجره‌ی تأیید (قبلاً «دوباره بزن» بود و هیچ‌وقت ریست نمی‌شد)
 func _on_remove_pressed() -> void:
