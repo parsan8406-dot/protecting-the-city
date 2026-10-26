@@ -55,14 +55,15 @@ type PendingMatch struct {
 //
 //	۰ تا HumanSearchFor ثانیه: فقط آدم‌هایی که کاپشان حداکثر TrophyWindow
 //	                            بالاتر یا پایین‌تر است.
-//	تا BackfillAfter ثانیه:     همان جستجو ادامه دارد (آدمِ هم‌سطحی که همین
-//	                            حالا برسد هنوز به بات ترجیح دارد) ولی کلاینت
-//	                            به بازیکن می‌گوید بات‌ها در راه‌اند.
+//	از HumanSearchFor به بعد:   بازه برای کسی که این‌قدر منتظر مانده باز
+//	                            می‌شود و هر آدمی که در صفِ همین حالت است
+//	                            کنارش می‌نشیند — آدمِ واقعی از بات بهتر است.
 //	از BackfillAfter به بعد:    صندلی‌های خالی با نزدیک‌ترین بات‌ها از نظرِ
 //	                            کاپ پر می‌شوند (mm_backfill.go).
 //
-// آدمِ بیرون از بازه هیچ‌وقت حریف نمی‌شود — حتی بعد از ۱۵ ثانیه. بازیکنِ
-// ۳۰۰۰ کاپی که با ۳۰۰ کاپی بیفتد بازیِ یک‌طرفه‌ای است که هیچ‌کدام نمی‌خواهند.
+// قبلاً بازه هیچ‌وقت باز نمی‌شد: دو بازیکنِ دور از هم یکدیگر را در لیستِ
+// صفحه‌ی جستجو می‌دیدند ولی سرِ ۲۰ ثانیه هر کدام جدا با بات می‌افتاد. تیم‌بندیِ
+// ماری (formMatchLocked) اختلافِ کاپ را بینِ دو تیم پخش می‌کند.
 const (
 	TrophyWindow   = 200
 	HumanSearchFor = 15 * time.Second
@@ -155,12 +156,14 @@ func withinWindow(a, b int) bool {
 	return d <= TrophyWindow
 }
 
-// peersOfLocked همه‌ی کسانی در صف که با anchor هم‌سطح‌اند، نزدیک‌ترین کاپ
-// اول (و در کاپِ برابر، کسی که زودتر آمده). خودِ anchor در خروجی نیست.
+// peersOfLocked همه‌ی کسانی در صف که می‌توانند هم‌بازیِ anchor شوند، نزدیک‌ترین
+// کاپ اول (و در کاپِ برابر، کسی که زودتر آمده). خودِ anchor در خروجی نیست.
+// تا HumanSearchFor فقط هم‌سطح‌ها؛ بعد از آن هر آدمی در صف.
 func peersOfLocked(q []*QueuedPlayer, anchor *QueuedPlayer) []*QueuedPlayer {
+	wide := time.Since(anchor.joinedAt) >= HumanSearchFor
 	var out []*QueuedPlayer
 	for _, p := range q {
-		if p != anchor && withinWindow(p.Trophies, anchor.Trophies) {
+		if p != anchor && (wide || withinWindow(p.Trophies, anchor.Trophies)) {
 			out = append(out, p)
 		}
 	}
@@ -390,12 +393,16 @@ func matchmakingStatusHandler(w http.ResponseWriter, r *http.Request) {
 		resp["mode_id"] = match.ModeID
 	} else if inQueue {
 		mmMu.Lock()
+		// فقط خودت و کسانی که واقعاً می‌توانند هم‌بازی‌ات شوند. قبلاً کلِ صفِ
+		// حالت فرستاده می‌شد و بازیکن آدمی را «پیدا شده» می‌دید که بعد با
+		// او نمی‌افتاد.
 		roster := []QueuedPlayer{}
 		var waited time.Duration
-		for _, p := range mmQueues[myMode] {
-			roster = append(roster, *p)
-			if p.Username == username {
-				waited = time.Since(p.joinedAt)
+		if me := queuedLocked(myMode, username); me != nil {
+			waited = time.Since(me.joinedAt)
+			roster = append(roster, *me)
+			for _, p := range peersOfLocked(mmQueues[myMode], me) {
+				roster = append(roster, *p)
 			}
 		}
 		mmMu.Unlock()

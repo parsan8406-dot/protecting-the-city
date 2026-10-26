@@ -1185,12 +1185,21 @@ func _on_status(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		if need > 0 and need != _slots.size():
 			_need = need
 			_rebuild_slots(need)
-		_apply_roster(d.get("players", []))
-		# سرور ۱۵ ثانیه فقط دنبالِ هم‌سطح (±۲۰۰ کاپ) می‌گردد و سرِ ۲۰ ثانیه بات
-		# می‌آورد؛ بازیکن باید بداند چرا هنوز منتظر است
+		var roster: Array = d.get("players", [])
+		_apply_roster(roster)
+		# سرور ۱۵ ثانیه فقط دنبالِ هم‌سطح (±۲۰۰ کاپ) می‌گردد، بعد هر آدمِ صف را
+		# کنارت می‌نشاند و سرِ ۲۰ ثانیه صندلی‌های خالی را با بات پر می‌کند.
+		# لیست فقط کسانی است که واقعاً با تو می‌افتند (سرورِ جدید)، پس اگر
+		# آدمی پیدا شده نباید بگوییم «هم‌سطحی پیدا نشد».
+		var others := maxi(roster.size() - 1, 0)
+		var left := maxi(int(d.get("bots_at", 20)) - int(d.get("waited", 0)), 0)
 		if str(d.get("phase", "human")) == "bots":
-			var left := maxi(int(d.get("bots_at", 20)) - int(d.get("waited", 0)), 0)
-			_center_sub.text = "هم‌سطحی پیدا نشد — تکمیلِ تیم تا %d ثانیه‌ی دیگر" % left
+			if others > 0:
+				_center_sub.text = "%d بازیکن پیدا شد — بقیه‌ی تیم تا %d ثانیه‌ی دیگر" % [others, left]
+			else:
+				_center_sub.text = "هم‌سطحی پیدا نشد — تکمیلِ تیم تا %d ثانیه‌ی دیگر" % left
+		elif others > 0:
+			_center_sub.text = "%d بازیکن پیدا شد — در انتظارِ بقیه" % others
 		else:
 			_center_sub.text = "بازیکن‌های هم‌سطحِ تو پیدا می‌شوند"
 	else:

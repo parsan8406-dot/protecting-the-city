@@ -20,7 +20,9 @@ func enqueue(mode string, trophies ...int) []*QueuedPlayer {
 	mmMu.Lock()
 	defer mmMu.Unlock()
 	var out []*QueuedPlayer
-	base := time.Now().Add(-time.Minute)
+	// همه تازه‌وارد (کمتر از HumanSearchFor) تا بازه‌ی هم‌سطح بسته بماند؛
+	// تست‌های بازه‌ی بازشده خودشان joinedAt را عقب می‌برند
+	base := time.Now().Add(-5 * time.Second)
 	for i, tr := range trophies {
 		rankID, rankName := rankFromTrophies(tr)
 		p := &QueuedPlayer{
@@ -185,5 +187,40 @@ func TestBotsNearestTrophiesFirst(t *testing.T) {
 		if b.Trophies == 1000 || b.Trophies < 950 {
 			t.Fatalf("busy/under-minimum bot %d was picked", b.Trophies)
 		}
+	}
+}
+
+// بعد از HumanSearchFor بازه باز می‌شود: آدمِ دور از بات بهتر است
+func TestWindowOpensAfterHumanSearch(t *testing.T) {
+	resetQueues(t)
+	ps := enqueue("revenge", 3000, 300)
+	if formNow("revenge", 1) != nil {
+		t.Fatal("fresh 3000 vs 300 must still wait for a closer opponent")
+	}
+	mmMu.Lock()
+	ps[0].joinedAt = time.Now().Add(-HumanSearchFor - time.Second)
+	mmMu.Unlock()
+	m := formNow("revenge", 1)
+	if m == nil {
+		t.Fatal("after HumanSearchFor the two waiting humans should be matched together")
+	}
+	if got := trophiesOf(m); !got[3000] || !got[300] {
+		t.Fatalf("expected 3000+300, got %v", got)
+	}
+}
+
+// حتی با بازه‌ی باز، نزدیک‌ترین آدم‌ها اول انتخاب می‌شوند
+func TestOpenWindowStillPrefersClosest(t *testing.T) {
+	resetQueues(t)
+	ps := enqueue("revenge", 1000, 2500, 1400)
+	mmMu.Lock()
+	ps[0].joinedAt = time.Now().Add(-HumanSearchFor - time.Second)
+	mmMu.Unlock()
+	m := formNow("revenge", 1)
+	if m == nil {
+		t.Fatal("expected a match")
+	}
+	if got := trophiesOf(m); !got[1000] || !got[1400] {
+		t.Fatalf("expected 1000+1400 (closest), got %v", got)
 	}
 }
