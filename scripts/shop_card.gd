@@ -87,16 +87,12 @@ func setup_card(data: Dictionary) -> void:
 	apply_border_shader_effect(base_color)
 	var pips := get_node_or_null("RarityPips") as Control
 	if pips == null:
-		pips = Rarity.pips(rarity, 8.0)
+		pips = Rarity.pips(rarity, 11.0)
 		pips.name = "RarityPips"
 		add_child(pips)
-	pips.set("tier", Rarity.TIER[rarity])
-	pips.set("tint", base_color)
-	pips.visible = Rarity.TIER[rarity] > 0
-	pips.custom_minimum_size.x = maxf(1.0, Rarity.TIER[rarity]) * 10.0
+	Rarity.set_pips(pips, rarity)
 	pips.size = pips.custom_minimum_size
-	pips.position = Vector2(5, 24)
-	pips.queue_redraw()
+	pips.position = Vector2(5, 26)
 	if name_label:
 		name_label.add_theme_font_size_override("font_size", 15)
 		# نام روی عکسِ شلوغ هم خوانا بماند

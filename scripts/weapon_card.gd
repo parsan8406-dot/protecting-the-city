@@ -40,6 +40,7 @@ var _touch_start_pos: Vector2 = Vector2.ZERO
 var _is_swiping: bool = false
 var _parent_scroll: ScrollContainer = null
 const DRAG_THRESHOLD: float = 10.0
+const NAME_FONT_SIZE := 17
 
 
 func _ready() -> void:
@@ -58,7 +59,8 @@ func _ready() -> void:
 	# ۲. فعال‌سازی دریافت ورودی لمس و اجازه عبور ورودی به نود والد
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_configure_child_mouse_filters()
-	
+	_build_header()
+
 	# C13: نوارِ قیمت فقط برچسب است؛ لمسِ کارت انتخاب می‌کند و خرید از پنلِ کنار
 	# است — وگرنه کشیدنِ انگشت روی لیست از روی دکمه خرید می‌زد و اسکرول گیر می‌کرد
 	if buy_button:
@@ -91,6 +93,8 @@ func setup_card(data: Dictionary) -> void:
 
 	# ۱. نام سلاح
 	if name_label:
+		name_label.clip_text = true
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		name_label.text = str(data.get("name", "نامشخص"))
 
 	# ۲. قیمت
@@ -100,9 +104,7 @@ func setup_card(data: Dictionary) -> void:
 	if price_node:
 		price_node.text = MissionArt.fa_grouped(price)
 		price_node.add_theme_font_override("font", MenuUI.FONT_NUM)
-	if name_label:
-		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_label.clip_text = true
+	_fit_name.call_deferred()
 
 	# ۳. تنظیم نوع ارز (سکه / الماس)
 	var currency: String = str(data.get("currency", data.get("cost_type", "coins"))).to_lower().strip_edges()
@@ -118,6 +120,49 @@ func setup_card(data: Dictionary) -> void:
 
 	# ۵. اعمال استایل نایابی (Rarity)
 	_apply_rarity_style(Rarity.of(data))
+
+
+## سرتیترِ کارت یک ردیف است: [آیکنِ رده][نگین‌ها] ... [اسم]؛ اسم فقط جای باقی‌مانده
+## را می‌گیرد و هیچ‌وقت روی نگین‌ها نمی‌افتد
+func _build_header() -> void:
+	if name_label == null or rarity_icon == null or has_node("Header"):
+		return
+	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header.z_index = 1
+	header.add_theme_constant_override("separation", 4)
+	header.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	header.offset_left = 6.0
+	header.offset_right = -6.0
+	header.offset_top = 5.0
+	header.offset_bottom = 33.0
+	add_child(header)
+	rarity_icon.reparent(header, false)
+	rarity_icon.custom_minimum_size = Vector2(23, 23)
+	rarity_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	name_label.reparent(header, false)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.custom_minimum_size = Vector2.ZERO
+	name_label.clip_text = true
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	header.resized.connect(func() -> void: _fit_name.call_deferred())
+
+
+## اسمِ بلند اول تا ۱۲ کوچک می‌شود، بعد «…» می‌خورد
+func _fit_name() -> void:
+	if name_label == null or not is_instance_valid(name_label):
+		return
+	var room := name_label.size.x
+	if room <= 1.0:
+		return
+	var font := name_label.get_theme_font("font")
+	var fs := NAME_FONT_SIZE
+	while fs > 12 and font.get_string_size(name_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room:
+		fs -= 1
+	name_label.add_theme_font_size_override("font_size", fs)
 
 
 func _get_amount_label() -> Label:
@@ -162,17 +207,13 @@ func _apply_rarity_style(rarity: String) -> void:
 	if rarity_icon:
 		rarity_icon.modulate = _border_color
 		if _pips == null:
-			_pips = Rarity.pips(rarity, 8.0)
-			_pips.z_index = 1
-			add_child(_pips)
-		var tier: int = Rarity.TIER[Rarity.key(rarity)]
-		_pips.set("tier", tier)
-		_pips.set("tint", _border_color)
-		_pips.visible = tier > 0
-		_pips.custom_minimum_size.x = maxf(1.0, tier) * 10.0
-		_pips.size = _pips.custom_minimum_size
-		_pips.position = rarity_icon.position + Vector2(rarity_icon.size.x + 3.0, 4.0)
-		_pips.queue_redraw()
+			_pips = Rarity.pips(rarity, 11.0)
+			_pips.name = "RarityPips"
+			var header := rarity_icon.get_parent()
+			header.add_child(_pips)
+			header.move_child(_pips, rarity_icon.get_index() + 1)
+		Rarity.set_pips(_pips, rarity)
+		_fit_name.call_deferred()
 	if bg_texture:
 		bg_texture.texture = Rarity.gradient(rarity)
 

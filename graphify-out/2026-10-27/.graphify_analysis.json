@@ -797,37 +797,6 @@
       "tools_rig_patch_scenes_vec2"
     ],
     "15": [
-      "android_content_serviceconnection",
-      "android_os_handler",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin_bazaarbillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin_myketbillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_signalinfo",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_getpluginsignals",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storebillingplugin",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_java_override",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_java_signalinfo",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_emit",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_getpluginname",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_getpluginsignals",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_initialize",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_preloadrewarded",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_prepare",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_rewardedadsplugin",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_setuserid",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_show",
-      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_showrewarded",
-      "com_adivery_sdk_adiverylistener",
-      "org_godotengine_godot_godot",
-      "org_godotengine_godot_plugin_godotplugin",
-      "org_godotengine_godot_plugin_signalinfo",
-      "org_godotengine_godot_plugin_usedbygodot"
-    ],
-    "16": [
       "gun_game_server_bot_sense_test",
       "gun_game_server_bot_sense_test_go_hub",
       "gun_game_server_bot_sense_test_go_player",
@@ -855,6 +824,34 @@
       "gun_game_server_botai_test_testbotnavigateswallstoreachtheplayer",
       "gun_game_server_botai_test_testbotrespawnssomewherevalid",
       "gun_game_server_botai_test_testbotsleavewhennohumansremain"
+    ],
+    "16": [
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_intent",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_bindaction",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_broadcastminversioncode",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_broadcastusesping",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_consume",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_failconnection",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_getpurchasesviabroadcast",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlebuyintentbundle",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlepurchaseresult",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlestorebroadcast",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_isready",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_packagename",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_purchase",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_querypurchases",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_responsecode",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_sendstorebroadcast",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startbroadcastconnection",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startconnection",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startconnectiononmain",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startserviceconnection",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storepackage",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storereceiverclass",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storeversioncode",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_succeedconnection",
+      "serviceconnection"
     ],
     "17": [
       "gun_game_server_game_modes",
@@ -912,31 +909,6 @@
       "matchoutcome"
     ],
     "19": [
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_intent",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_override",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_bindaction",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_broadcastminversioncode",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_broadcastusesping",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_consume",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_dropconnection",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_failconnection",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_getpurchasesviabroadcast",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_isready",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onmaindestroy",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_packagename",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_purchase",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_sendstorebroadcast",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startbroadcastconnection",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startconnection",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startconnectiononmain",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_startserviceconnection",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storepackage",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storereceiverclass",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storeversioncode",
-      "serviceconnection"
-    ],
-    "20": [
       "gun_game_server_awaystate",
       "gun_game_server_hub_begingrace",
       "gun_game_server_hub_canresume",
@@ -961,7 +933,7 @@
       "gun_game_server_reconnect_go_gun_game_server_hub",
       "gun_game_server_reconnect_inmatchmaking"
     ],
-    "21": [
+    "20": [
       "tools_rig_build_rig",
       "tools_rig_build_rig_arm_weights",
       "tools_rig_build_rig_body_alpha",
@@ -985,6 +957,30 @@
       "tools_rig_build_rig_to_pl",
       "tools_rig_build_rig_triangulate",
       "tools_rig_build_rig_union_mask"
+    ],
+    "21": [
+      "android_content_serviceconnection",
+      "android_os_handler",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin_bazaarbillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin_myketbillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_storebillingplugin",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_emit",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_initialize",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_preloadrewarded",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_prepare",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_rewardedadsplugin",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_setuserid",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_show",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_showrewarded",
+      "com_adivery_sdk_adiverylistener",
+      "org_godotengine_godot_godot",
+      "org_godotengine_godot_plugin_godotplugin",
+      "org_godotengine_godot_plugin_usedbygodot"
     ],
     "22": [
       "go_type_context_context",
@@ -1194,6 +1190,27 @@
       "gun_game_server_friendly_fire_test_testplayersinanothermatchareunreachable"
     ],
     "31": [
+      "android_app_activity",
+      "android_content_broadcastreceiver",
+      "android_content_context",
+      "android_content_intent",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_billingbroadcastreceiver",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_billingbroadcastreceiver_onreceive",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_java_override",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_deliver",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_onactivityresult",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_oncreate",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_ondestroy",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_onsaveinstancestate",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_java_intent",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_java_override",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onproxyresult",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onstorebroadcast"
+    ],
+    "32": [
       "go_type_go_mongodb_org_mongo_driver_bson_m",
       "gun_game_server_admin_content_fanoutmessage",
       "gun_game_server_admin_live",
@@ -1214,7 +1231,7 @@
       "gun_game_server_hubsnapshot",
       "t"
     ],
-    "32": [
+    "33": [
       "gun_game_server_citypointsrow",
       "gun_game_server_handlers_cups_buildseasoncupsresponse",
       "gun_game_server_handlers_leaderboard",
@@ -1235,7 +1252,7 @@
       "gun_game_server_season_cups_currentseasoncups",
       "gun_game_server_seasonrewardtier"
     ],
-    "33": [
+    "34": [
       "gun_game_server_weekly_rewards",
       "gun_game_server_weekly_rewards_createweeklyrun",
       "gun_game_server_weekly_rewards_payweeklyrun",
@@ -1256,7 +1273,7 @@
       "gun_game_server_weeklyrewardrun",
       "gun_game_server_weeklyrewardwinner"
     ],
-    "34": [
+    "35": [
       "gun_game_server_chatmessagemodel",
       "gun_game_server_handlers_chat",
       "gun_game_server_handlers_chat_allowchatsend",
@@ -1276,7 +1293,7 @@
       "gun_game_server_handlers_chat_resolvechatroom",
       "gun_game_server_handlers_chat_sanitizechattext"
     ],
-    "35": [
+    "36": [
       "gun_game_server_reconnect_test",
       "gun_game_server_reconnect_test_arenaplayer",
       "gun_game_server_reconnect_test_connectfake",
@@ -1296,7 +1313,7 @@
       "gun_game_server_reconnect_test_testshortdisconnectkeepsmatchmakingqueue",
       "gun_game_server_reconnect_test_typesof"
     ],
-    "36": [
+    "37": [
       "gun_game_server_arena_buildclearance",
       "gun_game_server_arena_cellfree",
       "gun_game_server_arena_findpath",
@@ -1314,25 +1331,6 @@
       "gun_game_server_pfqueue_pop",
       "gun_game_server_pfqueue_push",
       "gun_game_server_pfqueue_swap"
-    ],
-    "37": [
-      "gun_game_server_dailymissiondoc",
-      "gun_game_server_missions_builddailybonusview",
-      "gun_game_server_missions_loadorcreatedailymissions",
-      "gun_game_server_missions_missionseed",
-      "gun_game_server_missions_pickdailymissions",
-      "gun_game_server_missions_repairmissionstates",
-      "gun_game_server_missions_test",
-      "gun_game_server_missions_test_testbuilddailybonusviewdoesnotmutatetable",
-      "gun_game_server_missions_test_testbuilddailybonusviewstates",
-      "gun_game_server_missions_test_testeverymissionhasdescription",
-      "gun_game_server_missions_test_testlevelfromexperience",
-      "gun_game_server_missions_test_testpickdailymissionsisdeterministic",
-      "gun_game_server_missions_test_testpickdailymissionsmetricvariety",
-      "gun_game_server_missions_test_testpickdailymissionsshape",
-      "gun_game_server_missions_test_testpickdailymissionsvariesbyday",
-      "gun_game_server_missions_test_testseasonpassrewardsalwaysgivesomething",
-      "gun_game_server_playermissionstate"
     ],
     "38": [
       "gun_game_server_demon_go_botruntime",
@@ -1372,22 +1370,22 @@
       "gun_game_server_abilities_test_wallahead"
     ],
     "40": [
-      "gun_game_server_handlers_missions_minint",
-      "gun_game_server_hub_creditassists",
-      "gun_game_server_hub_notedamage",
-      "gun_game_server_hub_notegrenadekill",
-      "gun_game_server_hub_notehealsgiven",
-      "gun_game_server_hub_onobjectivesloaded",
-      "gun_game_server_hub_pushobjectiveprogress",
-      "gun_game_server_hub_sendtouser",
-      "gun_game_server_hub_setobjectiveprogress",
-      "gun_game_server_liveobjective",
-      "gun_game_server_match_objectives",
-      "gun_game_server_match_objectives_buildobjectives",
-      "gun_game_server_match_objectives_go_gun_game_server_hub",
-      "gun_game_server_match_objectives_livedelta",
-      "gun_game_server_missionmetric",
-      "gun_game_server_seasonchallenge"
+      "gun_game_server_dailybonustier",
+      "gun_game_server_missions_builddailybonusview",
+      "gun_game_server_missions_dailybonustierbyneed",
+      "gun_game_server_missions_missionseed",
+      "gun_game_server_missions_pickdailymissions",
+      "gun_game_server_missions_test",
+      "gun_game_server_missions_test_testbuilddailybonusviewdoesnotmutatetable",
+      "gun_game_server_missions_test_testbuilddailybonusviewstates",
+      "gun_game_server_missions_test_testdailybonustierbyneedrejectsunknown",
+      "gun_game_server_missions_test_testeverymissionhasdescription",
+      "gun_game_server_missions_test_testlevelfromexperience",
+      "gun_game_server_missions_test_testpickdailymissionsisdeterministic",
+      "gun_game_server_missions_test_testpickdailymissionsmetricvariety",
+      "gun_game_server_missions_test_testpickdailymissionsshape",
+      "gun_game_server_missions_test_testpickdailymissionsvariesbyday",
+      "gun_game_server_missions_test_testseasonpassrewardsalwaysgivesomething"
     ],
     "41": [
       "gun_game_server_hub_hardening_test_testassistcreditedtorecentteammatedamager",
@@ -1442,54 +1440,6 @@
       "room"
     ],
     "44": [
-      "android_content_broadcastreceiver",
-      "android_content_context",
-      "android_content_intent",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_billingbroadcastreceiver",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_billingbroadcastreceiver_onreceive",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingbroadcastreceiver_java_override",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlebuyintentbundle",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlepurchaseresult",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_handlestorebroadcast",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onstorebroadcast",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_querypurchases",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_responsecode",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_succeedconnection"
-    ],
-    "45": [
-      "gun_game_server_handlers_missions_buildseasonpassresponse",
-      "gun_game_server_hub_loadobjectivesasync",
-      "gun_game_server_missions_buildseasonchallengeview",
-      "gun_game_server_missions_currentseasonpass",
-      "gun_game_server_missions_seasonpasslevelcost",
-      "gun_game_server_missions_seasonpassprogress",
-      "gun_game_server_missions_seasonpasstotalforlevel",
-      "gun_game_server_missions_seasonpassxprequired",
-      "gun_game_server_missions_test_testcurrentseasonpassnormalisesnewfields",
-      "gun_game_server_missions_test_testseasonchallengeview",
-      "gun_game_server_missions_test_testseasonpassmaxlevelbarstaysfull",
-      "gun_game_server_missions_test_testseasonpassprogress",
-      "gun_game_server_missions_test_testseasonpasstotalmatchesprogress",
-      "gun_game_server_playerseasonpass"
-    ],
-    "46": [
-      "gun_game_server_hub_finishobjectives",
-      "gun_game_server_match_objectives_persistmatchmissions",
-      "gun_game_server_matchparticipant",
-      "gun_game_server_missions_addseasonpassxp",
-      "gun_game_server_missions_applymatchtomissions",
-      "gun_game_server_missions_applymatchtoseasonstats",
-      "gun_game_server_missions_carryplayseconds",
-      "gun_game_server_missions_ensureseasonpass",
-      "gun_game_server_missions_incseasonpass",
-      "gun_game_server_missions_missiondeltas",
-      "gun_game_server_missions_test_testmissiondeltas",
-      "gun_game_server_missions_test_testplaytimeaccumulatessecondsacrossshortmatches",
-      "gun_game_server_season_race_db_test",
-      "gun_game_server_season_race_db_test_testseasonpasswritersdonoteraseeachother"
-    ],
-    "47": [
       "android_os_bundle",
       "android_os_ibinder",
       "android_os_parcel",
@@ -1504,7 +1454,7 @@
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_iabservice_iabservice_isbillingsupported",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_iabservice_iabservice_readbundle"
     ],
-    "48": [
+    "45": [
       "gun_game_server_abilities_test_testbombstockisthreepermatch",
       "gun_game_server_bomb_test",
       "gun_game_server_bomb_test_addvictim",
@@ -1519,7 +1469,7 @@
       "gun_game_server_hub_addbot",
       "gun_game_server_hub_applyloadout"
     ],
-    "49": [
+    "46": [
       "gun_game_server_dailybonusclaimbody",
       "gun_game_server_handlers_missions",
       "gun_game_server_handlers_missions_buildmissionsresponse",
@@ -1534,22 +1484,37 @@
       "gun_game_server_seasonpassbuybody",
       "gun_game_server_seasonpassclaimbody"
     ],
-    "50": [
-      "gun_game_server_dailybonustier",
-      "gun_game_server_dailymissiondef",
-      "gun_game_server_missiondifficulty",
-      "gun_game_server_missions",
-      "gun_game_server_missions_dailybonustierbyneed",
-      "gun_game_server_missions_seasonpassladder",
-      "gun_game_server_missions_seasonpasspremiumladder",
-      "gun_game_server_missions_seasonpasspremiumreward",
-      "gun_game_server_missions_seasonpassreward",
-      "gun_game_server_missions_test_testdailybonustierbyneedrejectsunknown",
-      "gun_game_server_missions_test_testpremiumladderbeatsfree",
-      "gun_game_server_seasonpassreward",
-      "gun_game_server_skins_test_testskinscomeonlyfrombattlepass"
+    "47": [
+      "gun_game_server_dailymissiondoc",
+      "gun_game_server_hub_loadobjectivesasync",
+      "gun_game_server_liveobjective",
+      "gun_game_server_match_objectives",
+      "gun_game_server_match_objectives_buildobjectives",
+      "gun_game_server_missions_buildseasonchallengeview",
+      "gun_game_server_missions_currentseasonpass",
+      "gun_game_server_missions_loadorcreatedailymissions",
+      "gun_game_server_missions_repairmissionstates",
+      "gun_game_server_missions_test_testcurrentseasonpassnormalisesnewfields",
+      "gun_game_server_missions_test_testseasonchallengeview",
+      "gun_game_server_playermissionstate",
+      "gun_game_server_playerseasonpass"
     ],
-    "51": [
+    "48": [
+      "gun_game_server_match_objectives_persistmatchmissions",
+      "gun_game_server_matchparticipant",
+      "gun_game_server_missions_addseasonpassxp",
+      "gun_game_server_missions_applymatchtomissions",
+      "gun_game_server_missions_applymatchtoseasonstats",
+      "gun_game_server_missions_carryplayseconds",
+      "gun_game_server_missions_ensureseasonpass",
+      "gun_game_server_missions_incseasonpass",
+      "gun_game_server_missions_missiondeltas",
+      "gun_game_server_missions_test_testmissiondeltas",
+      "gun_game_server_missions_test_testplaytimeaccumulatessecondsacrossshortmatches",
+      "gun_game_server_season_race_db_test",
+      "gun_game_server_season_race_db_test_testseasonpasswritersdonoteraseeachother"
+    ],
+    "49": [
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin_bindaction",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin_broadcastminversioncode",
@@ -1563,7 +1528,7 @@
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_bazaarbillingplugin_storereceiverclass",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_bazaarbillingplugin_java_override"
     ],
-    "52": [
+    "50": [
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_java_override",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin_bindaction",
@@ -1577,7 +1542,7 @@
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin_storepackage",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_myketbillingplugin_myketbillingplugin_storereceiverclass"
     ],
-    "53": [
+    "51": [
       "gun_game_server_achievements",
       "gun_game_server_achievements_achievementmetrics",
       "gun_game_server_achievements_buildachievementview",
@@ -1591,7 +1556,7 @@
       "gun_game_server_auth_db_test_testsessionsarecapped",
       "gun_game_server_unlockedachievement"
     ],
-    "54": [
+    "52": [
       "gun_game_server_anticheat_test",
       "gun_game_server_anticheat_test_iscloseangle",
       "gun_game_server_anticheat_test_radtodegt",
@@ -1605,20 +1570,35 @@
       "gun_game_server_hub_syncrot",
       "gun_game_server_weapon_balance_test_testserverclampsrotationspeed"
     ],
-    "55": [
-      "android_app_activity",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_deliver",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_onactivityresult",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_oncreate",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_ondestroy",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_billingproxyactivity_onsaveinstancestate",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_java_intent",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_billingproxyactivity_java_override",
-      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onproxyresult"
+    "53": [
+      "gun_game_server_dailymissiondef",
+      "gun_game_server_missiondifficulty",
+      "gun_game_server_missionmetric",
+      "gun_game_server_missions",
+      "gun_game_server_missions_seasonpassladder",
+      "gun_game_server_missions_seasonpasspremiumladder",
+      "gun_game_server_missions_seasonpasspremiumreward",
+      "gun_game_server_missions_seasonpassreward",
+      "gun_game_server_missions_test_testpremiumladderbeatsfree",
+      "gun_game_server_seasonchallenge",
+      "gun_game_server_seasonpassreward",
+      "gun_game_server_skins_test_testskinscomeonlyfrombattlepass"
     ],
-    "56": [
+    "54": [
+      "gun_game_server_handlers_missions_minint",
+      "gun_game_server_hub_creditassists",
+      "gun_game_server_hub_finishobjectives",
+      "gun_game_server_hub_notedamage",
+      "gun_game_server_hub_notegrenadekill",
+      "gun_game_server_hub_notehealsgiven",
+      "gun_game_server_hub_onobjectivesloaded",
+      "gun_game_server_hub_pushobjectiveprogress",
+      "gun_game_server_hub_sendtouser",
+      "gun_game_server_hub_setobjectiveprogress",
+      "gun_game_server_match_objectives_go_gun_game_server_hub",
+      "gun_game_server_match_objectives_livedelta"
+    ],
+    "55": [
       "tools_rig_normalize_skin",
       "tools_rig_normalize_skin_backup",
       "tools_rig_normalize_skin_character",
@@ -1630,6 +1610,18 @@
       "tools_rig_normalize_skin_rationale_40",
       "tools_rig_normalize_skin_shape",
       "tools_rig_normalize_skin_weapon"
+    ],
+    "56": [
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_override",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_java_signalinfo",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_dropconnection",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_getpluginsignals",
+      "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_storebillingplugin_onmaindestroy",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_java_override",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_java_signalinfo",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_getpluginname",
+      "android_plugins_rewarded_ads_src_com_coffeebaz_gungame_ads_rewardedadsplugin_rewardedadsplugin_getpluginsignals",
+      "org_godotengine_godot_plugin_signalinfo"
     ],
     "57": [
       "gun_game_server_lucky_box",
@@ -1736,6 +1728,16 @@
       "gun_game_server_store_currency_test_testseedkeepsdatabasediscount"
     ],
     "67": [
+      "gun_game_server_handlers_missions_buildseasonpassresponse",
+      "gun_game_server_missions_seasonpasslevelcost",
+      "gun_game_server_missions_seasonpassprogress",
+      "gun_game_server_missions_seasonpasstotalforlevel",
+      "gun_game_server_missions_seasonpassxprequired",
+      "gun_game_server_missions_test_testseasonpassmaxlevelbarstaysfull",
+      "gun_game_server_missions_test_testseasonpassprogress",
+      "gun_game_server_missions_test_testseasonpasstotalmatchesprogress"
+    ],
+    "68": [
       "tools_make_wind_swirls",
       "tools_make_wind_swirls_build",
       "tools_make_wind_swirls_draw_strand",
@@ -1745,7 +1747,7 @@
       "tools_make_wind_swirls_smoothstep",
       "tools_make_wind_swirls_strand"
     ],
-    "68": [
+    "69": [
       "gun_game_server_creategiftcoderequest",
       "gun_game_server_giftcode",
       "gun_game_server_handlers_gift_codes",
@@ -1754,7 +1756,7 @@
       "gun_game_server_handlers_gift_codes_randomgiftcode",
       "gun_game_server_redeemgiftcoderequest"
     ],
-    "69": [
+    "70": [
       "gun_game_server_game_modes_defaultgamemodes",
       "gun_game_server_game_modes_seedgamemodes",
       "gun_game_server_game_modes_test",
@@ -1763,7 +1765,7 @@
       "gun_game_server_game_modes_test_testsmallerteamspaymore",
       "gun_game_server_revenge_test_testrevengeisoneversusone"
     ],
-    "70": [
+    "71": [
       "https_proxy_agent",
       "package",
       "package_dependencies",
@@ -1771,7 +1773,7 @@
       "package_dependencies_qwen_code_sdk",
       "qwen_code_sdk"
     ],
-    "71": [
+    "72": [
       "tools_rig_arm_angles",
       "tools_rig_arm_angles_hand_of",
       "tools_rig_arm_angles_main",
@@ -1779,7 +1781,7 @@
       "tools_rig_arm_angles_skins",
       "tools_rig_arm_angles_solve"
     ],
-    "72": [
+    "73": [
       "tools_rig_swap_solver",
       "tools_rig_swap_solver_hand_of",
       "tools_rig_swap_solver_rationale_33",
@@ -1787,115 +1789,115 @@
       "tools_rig_swap_solver_solve",
       "tools_rig_swap_solver_swapped"
     ],
-    "73": [
+    "74": [
       "gun_game_server_hub_parsewsmessage",
       "gun_game_server_parse_test",
       "gun_game_server_parse_test_testparsewsmessageignoresserverownedfields",
       "gun_game_server_parse_test_testparsewsmessagereadsbombdistance",
       "gun_game_server_parse_test_testparsewsmessagereadseveryclientfield"
     ],
-    "74": [
+    "75": [
       "image",
       "tools_prepare_chat_emojis",
       "tools_prepare_chat_emojis_main",
       "tools_prepare_chat_emojis_process",
       "tools_prepare_chat_emojis_rationale_1"
     ],
-    "75": [
+    "76": [
       "tools_check_store_apk",
       "tools_check_store_apk_bad",
       "tools_check_store_apk_ok",
       "tools_check_store_apk_sh__entry",
       "tools_check_store_apk_warn"
     ],
-    "76": [
+    "77": [
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_mode",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_mode_broadcast",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_mode_none",
       "android_plugins_iap_billing_src_com_coffeebaz_gungame_iap_storebillingplugin_mode_service"
     ],
-    "77": [
+    "78": [
       "path",
       "tools_strip_white_bg",
       "tools_strip_white_bg_rationale_1",
       "tools_strip_white_bg_strip"
     ],
-    "78": [
+    "79": [
       "tools_rig_sweep_sniper",
       "tools_rig_sweep_sniper_main",
       "tools_rig_sweep_sniper_render",
       "tools_rig_sweep_sniper_score"
     ],
-    "79": [
+    "80": [
       "tools_rig_layout_check",
       "tools_rig_layout_check_pl2img",
       "tools_rig_layout_check_render"
     ],
-    "80": [
+    "81": [
       "tools_rig_scan_arms",
       "tools_rig_scan_arms_main",
       "tools_rig_scan_arms_score"
     ],
-    "81": [
+    "82": [
       "android_plugins_iap_billing_build",
       "android_plugins_iap_billing_build_sh__entry"
     ],
-    "82": [
+    "83": [
       "android_plugins_rewarded_ads_build",
       "android_plugins_rewarded_ads_build_sh__entry"
     ],
-    "83": [
+    "84": [
       "datamodel_balance_rule",
       "datamodel_shop_items_stats"
     ],
-    "84": [
+    "85": [
       "datamodel_item_levels",
       "datamodel_upgrade_ceiling"
     ],
-    "85": [
+    "86": [
       "tools_make_leaf_textures",
       "tools_make_leaf_textures_rationale_1"
     ],
-    "86": [
+    "87": [
       "tools_rig_analyze",
       "tools_rig_analyze_mask"
     ],
-    "87": [
+    "88": [
       "tools_rig_centerline",
       "tools_rig_centerline_m"
     ],
-    "88": [
+    "89": [
       "tools_rig_preview",
       "tools_rig_preview_sheet"
     ],
-    "89": [
+    "90": [
       "GeminiGDPlugin"
     ],
-    "90": [
+    "91": [
       "GodotAILicense"
     ],
-    "91": [
+    "92": [
       "datamodel_price_table"
     ],
-    "92": [
+    "93": [
       "datamodel_rarity_bonus"
     ],
-    "93": [
+    "94": [
       "gun_game_server_hub_go_botruntime"
     ],
-    "94": [
+    "95": [
       "gun_game_server_hub_hardening_test_go_arena"
     ],
-    "95": [
+    "96": [
       "pkg_gun_game_server"
     ],
-    "96": [
+    "97": [
       "tools_debug_two_clients"
     ],
-    "97": [
+    "98": [
       "tools_rig_gen_skin_table"
     ],
-    "98": [
+    "99": [
       "tools_rig_variants"
     ]
   },
@@ -1915,13 +1917,13 @@
     "12": 0.11764705882352941,
     "13": 0.07956989247311828,
     "14": 0.14942528735632185,
-    "15": 0.10591133004926108,
-    "16": 0.150997150997151,
+    "15": 0.150997150997151,
+    "16": 0.18153846153846154,
     "17": 0.22153846153846155,
     "18": 0.19,
-    "19": 0.1857707509881423,
-    "20": 0.16996047430830039,
-    "21": 0.16600790513833993,
+    "19": 0.16996047430830039,
+    "20": 0.16600790513833993,
+    "21": 0.14285714285714285,
     "22": 0.19913419913419914,
     "23": 0.16017316017316016,
     "24": 0.1471861471861472,
@@ -1931,32 +1933,32 @@
     "28": 0.13157894736842105,
     "29": 0.17894736842105263,
     "30": 0.18947368421052632,
-    "31": 0.18128654970760233,
-    "32": 0.21052631578947367,
+    "31": 0.1871345029239766,
+    "32": 0.18128654970760233,
     "33": 0.21052631578947367,
-    "34": 0.22875816993464052,
-    "35": 0.40522875816993464,
-    "36": 0.19117647058823528,
-    "37": 0.16911764705882354,
+    "34": 0.21052631578947367,
+    "35": 0.22875816993464052,
+    "36": 0.40522875816993464,
+    "37": 0.19117647058823528,
     "38": 0.25,
     "39": 0.30833333333333335,
-    "40": 0.21666666666666667,
+    "40": 0.16666666666666666,
     "41": 0.2916666666666667,
     "42": 0.21904761904761905,
     "43": 0.26666666666666666,
-    "44": 0.21978021978021978,
-    "45": 0.1978021978021978,
-    "46": 0.21978021978021978,
-    "47": 0.3076923076923077,
-    "48": 0.3076923076923077,
-    "49": 0.16666666666666666,
-    "50": 0.2948717948717949,
-    "51": 0.30303030303030304,
-    "52": 0.30303030303030304,
-    "53": 0.2878787878787879,
-    "54": 0.3939393939393939,
-    "55": 0.3090909090909091,
-    "56": 0.36363636363636365,
+    "44": 0.3076923076923077,
+    "45": 0.3076923076923077,
+    "46": 0.16666666666666666,
+    "47": 0.20512820512820512,
+    "48": 0.23076923076923078,
+    "49": 0.30303030303030304,
+    "50": 0.30303030303030304,
+    "51": 0.2878787878787879,
+    "52": 0.3939393939393939,
+    "53": 0.3484848484848485,
+    "54": 0.30303030303030304,
+    "55": 0.36363636363636365,
+    "56": 0.2,
     "57": 0.4222222222222222,
     "58": 0.2777777777777778,
     "59": 0.4166666666666667,
@@ -1967,19 +1969,19 @@
     "64": 0.42857142857142855,
     "65": 0.6071428571428571,
     "66": 0.42857142857142855,
-    "67": 0.35714285714285715,
-    "68": 0.47619047619047616,
-    "69": 0.38095238095238093,
-    "70": 0.3333333333333333,
-    "71": 0.5333333333333333,
-    "72": 0.4666666666666667,
-    "73": 0.6,
-    "74": 0.5,
-    "75": 0.7,
-    "76": 0.5,
+    "67": 0.39285714285714285,
+    "68": 0.35714285714285715,
+    "69": 0.47619047619047616,
+    "70": 0.38095238095238093,
+    "71": 0.3333333333333333,
+    "72": 0.5333333333333333,
+    "73": 0.4666666666666667,
+    "74": 0.6,
+    "75": 0.5,
+    "76": 0.7,
     "77": 0.5,
-    "78": 0.8333333333333334,
-    "79": 1.0,
+    "78": 0.5,
+    "79": 0.8333333333333334,
     "80": 1.0,
     "81": 1.0,
     "82": 1.0,
@@ -1998,7 +2000,8 @@
     "95": 1.0,
     "96": 1.0,
     "97": 1.0,
-    "98": 1.0
+    "98": 1.0,
+    "99": 1.0
   },
   "gods": [
     {
@@ -2065,44 +2068,44 @@
       "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
     },
     {
-      "source": "adminDecode()",
-      "target": "httpError()",
+      "source": "checkAndUnlockAchievements()",
+      "target": "col()",
       "source_files": [
-        "gun_game_server/admin_auth.go",
-        "gun_game_server/handlers.go"
+        "gun_game_server/achievements.go",
+        "gun_game_server/db.go"
       ],
       "confidence": "INFERRED",
       "relation": "calls",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "adminClanKickHandler()",
-      "target": "adminDecode()",
+      "source": "loadAchievementDefs()",
+      "target": "col()",
       "source_files": [
-        "gun_game_server/admin_game.go",
-        "gun_game_server/admin_auth.go"
+        "gun_game_server/achievements.go",
+        "gun_game_server/db.go"
       ],
       "confidence": "INFERRED",
       "relation": "calls",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "adminLogoutHandler()",
-      "target": "adminBasePath()",
+      "source": "persistProfileStats()",
+      "target": "col()",
       "source_files": [
-        "gun_game_server/admin_auth.go",
-        "gun_game_server/admin_security.go"
+        "gun_game_server/achievements.go",
+        "gun_game_server/db.go"
       ],
       "confidence": "INFERRED",
       "relation": "calls",
       "why": "inferred connection - not explicitly stated in source; bridges separate communities"
     },
     {
-      "source": "adminClanKickHandler()",
-      "target": "audit()",
+      "source": "seedAchievements()",
+      "target": "col()",
       "source_files": [
-        "gun_game_server/admin_game.go",
-        "gun_game_server/admin_auth.go"
+        "gun_game_server/achievements.go",
+        "gun_game_server/db.go"
       ],
       "confidence": "INFERRED",
       "relation": "calls",

@@ -188,6 +188,24 @@ func _build_extras() -> void:
 		(b as Button).add_theme_font_size_override("font_size", 17)
 	_message_button.text = "پیام"
 
+	# E1/E10: عضویت در کانالِ رسمیِ تلگرام — جدا از پشتیبانی، زیرِ همان ردیف
+	var channel := MenuUI.button("عضویت در کانال تلگرام — اخبار، کد هدیه و رویدادها", "dark", 17)
+	channel.icon = _telegram_button.icon
+	channel.expand_icon = true
+	channel.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	channel.add_theme_constant_override("icon_max_width", 26)
+	channel.add_theme_constant_override("h_separation", 10)
+	channel.add_theme_color_override("icon_normal_color", Color(0.16, 0.67, 0.93))
+	channel.custom_minimum_size = Vector2(0, 50)
+	channel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	channel.clip_text = true
+	channel.pressed.connect(func() -> void:
+		UIFx.press(channel, Global.open_telegram_channel)
+		_show_toast("کانال تلگرام باز شد"))
+	var support_col := row.get_parent()
+	support_col.add_child(channel)
+	support_col.move_child(channel, row.get_index() + 1)
+
 	# C10/E6 مزیت اتصال روشن گفته شود (قاب مثبت، بدون ترساندن) — جای خالی ستون هم پر می‌شود
 	_benefits = VBoxContainer.new()
 	_benefits.add_theme_constant_override("separation", 6)

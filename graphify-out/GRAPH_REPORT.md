@@ -9,7 +9,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b8b80dcd`
+- Built from commit: `c5b2d7f0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -29,13 +29,13 @@
 - skins.go
 - models.go
 - patch_scenes.py
-- org.godotengine.godot.plugin.UsedByGodot
 - bot_sense_test.go
+- StoreBillingPlugin
 - withDB
 - RoundState
-- StoreBillingPlugin
 - Hub
 - build_rig.py
+- org.godotengine.godot.plugin.UsedByGodot
 - context.Context
 - demon_test.go
 - addPlayer
@@ -45,31 +45,30 @@
 - Row Sheet UI Asset Preview Page
 - LoadArena
 - mustArena
+- BillingProxyActivity
 - go.mongodb.org/mongo-driver/bson.M
 - PlayerModel
 - weekly_rewards.go
 - handlers_chat.go
 - reconnect_test.go
 - .FindPath
-- missions_test.go
 - Hub
 - abilities_test.go
-- Hub
+- missions_test.go
 - NewHub
 - makeBot
 - Arena
-- android.content.Intent
-- buildSeasonPassResponse
-- applyMatchToSeasonStats
 - android.os.Bundle
 - applyLoadout
 - handlers_missions.go
-- missions.go
+- android.content.Intent
+- applyMatchToSeasonStats
 - BazaarBillingPlugin
 - MyketBillingPlugin
 - checkAndUnlockAchievements
 - angleDiff
-- BillingProxyActivity
+- missions.go
+- Hub
 - normalize_skin.py
 - lucky_box.go
 - time.Time
@@ -81,6 +80,7 @@
 - googleClaims
 - seedClaimPlayer
 - findGemPackByProduct
+- buildSeasonPassResponse
 - make_wind_swirls.py
 - handlers_gift_codes.go
 - defaultGameModes
@@ -123,14 +123,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `Row Sheet UI Asset Preview Page` --semantically_similar_to--> `Image Processing via Python Script, Not Context`  [INFERRED] [semantically similar]
   row_sheet.html → CLAUDE.md
-- `upgradeCharacterHandler()` --calls--> `jsonResponse()`  [INFERRED]
-  gun_game_server/skins.go → gun_game_server/handlers.go
-- `claimSeasonCupHandler()` --calls--> `jsonResponse()`  [INFERRED]
-  gun_game_server/handlers_cups.go → gun_game_server/handlers.go
-- `claimSeasonCupHandler()` --calls--> `seasonXPOf()`  [INFERRED]
-  gun_game_server/handlers_cups.go → gun_game_server/handlers_leaderboard.go
-- `claimSeasonCupHandler()` --calls--> `currentSeasonCups()`  [INFERRED]
-  gun_game_server/handlers_cups.go → gun_game_server/season_cups.go
+- `checkAndUnlockAchievements()` --calls--> `col()`  [INFERRED]
+  gun_game_server/achievements.go → gun_game_server/db.go
+- `loadAchievementDefs()` --calls--> `col()`  [INFERRED]
+  gun_game_server/achievements.go → gun_game_server/db.go
+- `persistProfileStats()` --calls--> `col()`  [INFERRED]
+  gun_game_server/achievements.go → gun_game_server/db.go
+- `seedAchievements()` --calls--> `col()`  [INFERRED]
+  gun_game_server/achievements.go → gun_game_server/db.go
 
 ## Import Cycles
 - None detected.
@@ -203,13 +203,13 @@ Nodes (27): go.mongodb.org/mongo-driver/bson/primitive.ObjectID, AchievementDef,
 Cohesion: 0.15
 Nodes (29): anim_idle(), anim_library(), anim_reset(), anim_shoot(), anim_subresource(), anim_walk(), bones_str(), build_bone_body() (+21 more)
 
-### Community 15 - "org.godotengine.godot.plugin.UsedByGodot"
-Cohesion: 0.11
-Nodes (11): android.content.ServiceConnection, android.os.Handler, SignalInfo, Override, SignalInfo, RewardedAdsPlugin, com.adivery.sdk.AdiveryListener, org.godotengine.godot.Godot (+3 more)
-
-### Community 16 - "bot_sense_test.go"
+### Community 15 - "bot_sense_test.go"
 Cohesion: 0.15
 Nodes (25): Hub, Player, senseHub(), TestBotDoesNotSeeBehindItself(), TestBotDoesNotSeeBeyondVisionRange(), TestBotDoesNotSeeThroughWalls(), TestBotDoesNotSenseAcrossMatches(), TestBotFacesTheDirectionItWalks() (+17 more)
+
+### Community 16 - "StoreBillingPlugin"
+Cohesion: 0.19
+Nodes (4): Intent, Override, StoreBillingPlugin, ServiceConnection
 
 ### Community 17 - "withDB"
 Cohesion: 0.22
@@ -219,17 +219,17 @@ Nodes (23): ApplyMatchOutcome(), ApplyMatchResult(), gameModeByID(), loadGameMod
 Cohesion: 0.19
 Nodes (5): DemonState, Hub, RoundState, LiveObjective, MatchOutcome
 
-### Community 19 - "StoreBillingPlugin"
-Cohesion: 0.19
-Nodes (4): Intent, Override, StoreBillingPlugin, ServiceConnection
-
-### Community 20 - "Hub"
+### Community 19 - "Hub"
 Cohesion: 0.17
 Nodes (6): awayState, inboxItem, MatchOf(), awayKey(), Hub, inMatchmaking()
 
-### Community 21 - "build_rig.py"
+### Community 20 - "build_rig.py"
 Cohesion: 0.17
 Nodes (22): arm_weights(), body_alpha(), body_cut_y(), body_weights(), build_part(), densify(), interior(), main() (+14 more)
+
+### Community 21 - "org.godotengine.godot.plugin.UsedByGodot"
+Cohesion: 0.11
+Nodes (11): android.content.ServiceConnection, android.os.Handler, SignalInfo, Override, SignalInfo, RewardedAdsPlugin, com.adivery.sdk.AdiveryListener, org.godotengine.godot.Godot (+3 more)
 
 ### Community 22 - "context.Context"
 Cohesion: 0.20
@@ -267,33 +267,33 @@ Nodes (19): TestHitActionIsRateLimited(), ArenaForMode(), LoadArena(), MapNameFo
 Cohesion: 0.19
 Nodes (18): Arena, mustArena(), TestArenaHasInteriorWalls(), TestArenaLoads(), TestLineOfSight(), TestMostOfTheArenaIsWalkable(), TestNearestFreeEscapesOutside(), TestOutsideIsBlocked() (+10 more)
 
-### Community 31 - "go.mongodb.org/mongo-driver/bson.M"
+### Community 31 - "BillingProxyActivity"
+Cohesion: 0.31
+Nodes (4): android.app.Activity, BillingProxyActivity, Intent, Override
+
+### Community 32 - "go.mongodb.org/mongo-driver/bson.M"
 Cohesion: 0.18
 Nodes (18): go.mongodb.org/mongo-driver/bson.M, fanOutMessage(), adminDashboardHandler(), adminOnlineHandler(), adminServerHandler(), dailyCounts(), Hub, humans() (+10 more)
 
-### Community 32 - "PlayerModel"
+### Community 33 - "PlayerModel"
 Cohesion: 0.21
 Nodes (18): cityPointsRow, buildSeasonCupsResponse(), cityLeaderboardEntry(), cityPointsStages(), cityStanding(), clansByID(), fillCityLeaderboard(), fillPlayerLeaderboard() (+10 more)
 
-### Community 33 - "weekly_rewards.go"
+### Community 34 - "weekly_rewards.go"
 Cohesion: 0.21
 Nodes (17): createWeeklyRun(), payWeeklyRun(), persianDigits(), runWeeklyRewards(), StartWeeklyRewardLoop(), TestPersianDigits(), TestWeeklyRewardsOnlyTopThree(), TestWeekStartIsSaturdayMidnight() (+9 more)
 
-### Community 34 - "handlers_chat.go"
+### Community 35 - "handlers_chat.go"
 Cohesion: 0.23
 Nodes (17): ChatMessageModel, allowChatSend(), broadcastChatMessage(), chatLastRead(), chatPeople(), cityRoomID(), containsString(), countChatUnread() (+9 more)
 
-### Community 35 - "reconnect_test.go"
+### Community 36 - "reconnect_test.go"
 Cohesion: 0.41
 Nodes (17): arenaPlayer(), connectFake(), drain(), dropFake(), firstOf(), Hub, rejoinFake(), TestAwayBudgetIsPerMatch() (+9 more)
 
-### Community 36 - ".FindPath"
+### Community 37 - ".FindPath"
 Cohesion: 0.19
 Nodes (4): Arena, PathPoint, pfNode, pfQueue
-
-### Community 37 - "missions_test.go"
-Cohesion: 0.17
-Nodes (16): DailyMissionDoc, buildDailyBonusView(), loadOrCreateDailyMissions(), missionSeed(), pickDailyMissions(), repairMissionStates(), TestBuildDailyBonusViewDoesNotMutateTable(), TestBuildDailyBonusViewStates() (+8 more)
 
 ### Community 38 - "Hub"
 Cohesion: 0.25
@@ -303,9 +303,9 @@ Nodes (3): BotRuntime, Hub, DemonState
 Cohesion: 0.31
 Nodes (15): abilityClient(), abilityPlayer(), corridorFree(), Arena, Hub, openCorridor(), runLaser(), TestGuardBlocksShotsAndBombs() (+7 more)
 
-### Community 40 - "Hub"
-Cohesion: 0.22
-Nodes (7): minInt(), LiveObjective, buildObjectives(), Hub, liveDelta(), MissionMetric, SeasonChallenge
+### Community 40 - "missions_test.go"
+Cohesion: 0.14
+Nodes (19): DailyMissionDoc, buildDailyBonusView(), loadOrCreateDailyMissions(), missionSeed(), pickDailyMissions(), repairMissionStates(), TestBuildDailyBonusViewDoesNotMutateTable(), TestBuildDailyBonusViewStates() (+11 more)
 
 ### Community 41 - "NewHub"
 Cohesion: 0.29
@@ -319,47 +319,43 @@ Nodes (14): math/rand.Rand, botSkillFor(), keysOf(), loadBotsNear(), makeBot(), 
 Cohesion: 0.27
 Nodes (4): Arena, clampF(), arenaFile, Room
 
-### Community 44 - "android.content.Intent"
-Cohesion: 0.22
-Nodes (5): android.content.BroadcastReceiver, android.content.Context, android.content.Intent, BillingBroadcastReceiver, Override
-
-### Community 45 - "buildSeasonPassResponse"
-Cohesion: 0.20
-Nodes (13): buildSeasonPassResponse(), buildSeasonChallengeView(), currentSeasonPass(), seasonPassLevelCost(), seasonPassProgress(), seasonPassTotalForLevel(), seasonPassXPRequired(), TestCurrentSeasonPassNormalisesNewFields() (+5 more)
-
-### Community 46 - "applyMatchToSeasonStats"
-Cohesion: 0.22
-Nodes (12): persistMatchMissions(), MatchParticipant, addSeasonPassXP(), applyMatchToMissions(), applyMatchToSeasonStats(), carryPlaySeconds(), ensureSeasonPass(), incSeasonPass() (+4 more)
-
-### Community 47 - "android.os.Bundle"
+### Community 44 - "android.os.Bundle"
 Cohesion: 0.31
 Nodes (4): android.os.Bundle, android.os.IBinder, android.os.Parcel, IabService
 
-### Community 48 - "applyLoadout"
+### Community 45 - "applyLoadout"
 Cohesion: 0.31
 Nodes (11): TestBombStockIsThreePerMatch(), addVictim(), bombHub(), Hub, TestApplyBombDamageIgnoresBadGeometry(), TestBombCooldownSurvivesRejoin(), TestBombRangeIsClamped(), TestBombRejectsNonFiniteInput() (+3 more)
 
-### Community 49 - "handlers_missions.go"
+### Community 46 - "handlers_missions.go"
 Cohesion: 0.17
 Nodes (12): DailyBonusClaimBody, buildMissionsResponse(), MissionClaimBody, dailyBonusMaxNeed(), missionDayEnd(), missionSecondsLeft(), TestDailyBonusTiersAreAscending(), TestMissionDayBoundary() (+4 more)
 
-### Community 50 - "missions.go"
-Cohesion: 0.29
-Nodes (12): DailyBonusTier, DailyMissionDef, MissionDifficulty, dailyBonusTierByNeed(), SeasonPassLadder(), SeasonPassPremiumLadder(), seasonPassPremiumReward(), seasonPassReward() (+4 more)
+### Community 47 - "android.content.Intent"
+Cohesion: 0.22
+Nodes (5): android.content.BroadcastReceiver, android.content.Context, android.content.Intent, BillingBroadcastReceiver, Override
 
-### Community 53 - "checkAndUnlockAchievements"
+### Community 48 - "applyMatchToSeasonStats"
+Cohesion: 0.27
+Nodes (10): persistMatchMissions(), MatchParticipant, addSeasonPassXP(), applyMatchToMissions(), applyMatchToSeasonStats(), carryPlaySeconds(), ensureSeasonPass(), incSeasonPass() (+2 more)
+
+### Community 51 - "checkAndUnlockAchievements"
 Cohesion: 0.29
 Nodes (10): achievementMetrics(), buildAchievementView(), checkAndUnlockAchievements(), loadAchievementDefs(), persistProfileStats(), guardStatus(), seedAuthPlayer(), TestProfileStatsFromRound() (+2 more)
 
-### Community 54 - "angleDiff"
+### Community 52 - "angleDiff"
 Cohesion: 0.39
 Nodes (10): isCloseAngle(), radToDegT(), TestCheatingClientCannotInstantTurnToFire(), TestClampRotationHandlesWrapBoundary(), TestClampRotationNeverExceedsMaxDelta(), TestClampRotationReachesCloseTargetsExactly(), angleDiff(), clampRotation() (+2 more)
 
-### Community 55 - "BillingProxyActivity"
-Cohesion: 0.31
-Nodes (4): android.app.Activity, BillingProxyActivity, Intent, Override
+### Community 53 - "missions.go"
+Cohesion: 0.29
+Nodes (12): DailyBonusTier, DailyMissionDef, MissionDifficulty, dailyBonusTierByNeed(), SeasonPassLadder(), SeasonPassPremiumLadder(), seasonPassPremiumReward(), seasonPassReward() (+4 more)
 
-### Community 56 - "normalize_skin.py"
+### Community 54 - "Hub"
+Cohesion: 0.22
+Nodes (7): minInt(), LiveObjective, buildObjectives(), Hub, liveDelta(), MissionMetric, SeasonChallenge
+
+### Community 55 - "normalize_skin.py"
 Cohesion: 0.36
 Nodes (10): backup(), character(), ensure_gdignore(), fit(), heavy_end(), main(), left' or 'right': which half of the silhouette holds more pixels., centroid, principal angle (deg), length along / across that axis. (+2 more)
 
@@ -403,51 +399,55 @@ Nodes (7): coinsOf(), postJSON(), seedClaimPlayer(), TestDailyChestClaimWorksWhe
 Cohesion: 0.43
 Nodes (5): currencyPack, findCurrencyPack(), findGemPackByProduct(), SeedCurrencyPacks(), TestSeedKeepsDatabaseDiscount()
 
-### Community 67 - "make_wind_swirls.py"
+### Community 67 - "buildSeasonPassResponse"
+Cohesion: 0.22
+Nodes (12): buildSeasonPassResponse(), buildSeasonChallengeView(), currentSeasonPass(), seasonPassLevelCost(), seasonPassProgress(), seasonPassTotalForLevel(), seasonPassXPRequired(), TestCurrentSeasonPassNormalisesNewFields() (+4 more)
+
+### Community 68 - "make_wind_swirls.py"
 Cohesion: 0.36
 Nodes (7): build(), draw_strand(), خطوطِ پیچانِ باد: سه بافتِ «وزش» می‌سازد. شکلِ مرجع: چند خطِ کشیده که با هم…, یک رشته: موجِ کشیده‌ای که سرش در یک مارپیچ جمع می‌شود., شکلِ رشته در d_alpha و «کجای خط»بودنِ هر پیکسل در d_par., smoothstep(), strand()
 
-### Community 68 - "handlers_gift_codes.go"
+### Community 69 - "handlers_gift_codes.go"
 Cohesion: 0.48
 Nodes (6): createGiftCodeRequest, GiftCode, createGiftCode(), normalizeGiftCode(), randomGiftCode(), redeemGiftCodeRequest
 
-### Community 69 - "defaultGameModes"
+### Community 70 - "defaultGameModes"
 Cohesion: 0.38
 Nodes (6): defaultGameModes(), seedGameModes(), TestDefaultGameModesAreWellFormed(), TestGameModeEconomyIsSane(), TestSmallerTeamsPayMore(), TestRevengeIsOneVersusOne()
 
-### Community 70 - "dependencies"
+### Community 71 - "dependencies"
 Cohesion: 0.33
 Nodes (5): https-proxy-agent, dependencies, https-proxy-agent, @qwen-code/sdk, @qwen-code/sdk
 
-### Community 71 - "arm_angles.py"
+### Community 72 - "arm_angles.py"
 Cohesion: 0.53
 Nodes (5): hand_of(), main(), Centroid of the wrist/hand end of the arm, in placed (shifted) coords., skins(), solve()
 
-### Community 72 - "solve"
+### Community 73 - "solve"
 Cohesion: 0.47
 Nodes (5): hand_of(), T = art-px translation of the mesh from its current (shifted) place., LeftArm back to art-left (screen right), RightArm to art-right (screen left)., solve(), swapped()
 
-### Community 73 - "parseWSMessage"
+### Community 74 - "parseWSMessage"
 Cohesion: 0.60
 Nodes (4): parseWSMessage(), TestParseWSMessageIgnoresServerOwnedFields(), TestParseWSMessageReadsBombDistance(), TestParseWSMessageReadsEveryClientField()
 
-### Community 74 - "prepare_chat_emojis.py"
+### Community 75 - "prepare_chat_emojis.py"
 Cohesion: 0.50
 Nodes (4): Image, main(), process(), آماده‌سازی ایموجی‌های چت برای بازی. عکس‌های خام (۱۲۵۴×۱۲۵۴، اکثراً با…
 
-### Community 75 - "check_store_apk.sh"
+### Community 76 - "check_store_apk.sh"
 Cohesion: 0.70
 Nodes (4): bad(), ok(), check_store_apk.sh script, warn()
 
-### Community 76 - "Mode"
+### Community 77 - "Mode"
 Cohesion: 0.50
 Nodes (4): Mode, BROADCAST, NONE, SERVICE
 
-### Community 77 - "strip_white_bg.py"
+### Community 78 - "strip_white_bg.py"
 Cohesion: 0.50
 Nodes (3): Path, پس‌زمینه‌ی سفیدِ لوگوهای مود را شفاف می‌کند و اندازه را به ۵۱۲ می‌رساند. python…, strip()
 
-### Community 78 - "sweep_sniper.py"
+### Community 79 - "sweep_sniper.py"
 Cohesion: 0.83
 Nodes (3): main(), render(), score()
 
@@ -460,11 +460,11 @@ Nodes (3): main(), render(), score()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `col()` connect `col` to `admin_auth.go`, `net/http.Request`, `Hub`, `handlers_auth.go`, `CharacterStats`, `handlers_clan.go`, `skins.go`, `withDB`, `context.Context`, `seasonCupDefs`, `go.mongodb.org/mongo-driver/bson.M`, `PlayerModel`, `weekly_rewards.go`, `handlers_chat.go`, `missions_test.go`, `makeBot`, `applyMatchToSeasonStats`, `checkAndUnlockAchievements`, `adRewardClaimHandler`, `seedClaimPlayer`, `findGemPackByProduct`, `handlers_gift_codes.go`, `defaultGameModes`?**
-  _High betweenness centrality (0.124) - this node is a cross-community bridge._
-- **Why does `Hub` connect `Hub` to `CharacterStats`, `Player`, `NewHub`, `handlers_clan.go`, `parseWSMessage`, `applyLoadout`, `RoundState`, `Hub`, `angleDiff`, `time.Time`, `time.Duration`?**
-  _High betweenness centrality (0.049) - this node is a cross-community bridge._
-- **Why does `PlayerModel` connect `PlayerModel` to `col`, `handlers_chat.go`, `matchmaking.go`, `net/http.Request`, `seasonCupDefs`, `handlers_auth.go`, `makeBot`, `handlers_clan.go`, `skins.go`, `buildSeasonPassResponse`, `models.go`, `withDB`, `checkAndUnlockAchievements`, `time.Time`, `MessageModel`, `adRewardClaimHandler`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+  _High betweenness centrality (0.100) - this node is a cross-community bridge._
+- **Why does `Hub` connect `Hub` to `CharacterStats`, `Player`, `NewHub`, `handlers_clan.go`, `applyLoadout`, `parseWSMessage`, `RoundState`, `Hub`, `angleDiff`, `time.Time`, `time.Duration`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Why does `PlayerModel` connect `PlayerModel` to `col`, `handlers_chat.go`, `net/http.Request`, `matchmaking.go`, `buildSeasonPassResponse`, `handlers_auth.go`, `seasonCupDefs`, `makeBot`, `handlers_clan.go`, `skins.go`, `models.go`, `withDB`, `checkAndUnlockAchievements`, `time.Time`, `MessageModel`, `adRewardClaimHandler`?**
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **Are the 176 inferred relationships involving `col()` (e.g. with `checkAndUnlockAchievements()` and `loadAchievementDefs()`) actually correct?**
   _`col()` has 176 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 103 inferred relationships involving `httpError()` (e.g. with `adminAPI()` and `adminDecode()`) actually correct?**

@@ -142,6 +142,9 @@ func _ready():
 	# دکمه‌ی پیام پایین صفحه → صحنه‌ی چت (خصوصی / شهر / جهانی)
 	UIFx.bind_press(chat_button, _open_chat)
 
+	# کنارِ چت: عضویت در کانالِ تلگرامِ بازی
+	_build_telegram_button()
+
 	# نشان قرمز پیام‌های خوانده‌نشده‌ی چت
 	if not Global.chat_unread_updated.is_connected(_refresh_chat_badge):
 		Global.chat_unread_updated.connect(_refresh_chat_badge)
@@ -346,6 +349,55 @@ func _open_city() -> void:
 
 func _open_chat() -> void:
 	get_tree().change_scene_to_file(CHAT_SCENE_PATH)
+
+
+const TELEGRAM_ICON := preload("res://assets/ui/profile_menu/settings_icon_telegram.svg")
+## آبیِ آشنای تلگرام فقط روی آیکن — نشانه‌ی شناخته‌شده (C4)، نه رنگِ تم
+const TELEGRAM_BLUE := Color(0.16, 0.67, 0.93)
+var _telegram_dot: Control = null
+
+## E1/E10: دکمه‌ی آرامِ «کانال ما» کنارِ چت. با «شروع» رقابت نمی‌کند (V5)؛ تا
+## اولین بار باز نشده یک نقطه‌ی طلایی کوچک دارد (E12) و بعد از آن ساده می‌ماند.
+func _build_telegram_button() -> void:
+	if chat_button == null:
+		return
+	# فقط آیکنِ تلگرام، هم‌اندازه‌ی دکمه‌ی چت — آیکن خودش گویاست (C4)
+	var b := MenuUI.button("", "dark", 16)
+	b.icon = TELEGRAM_ICON
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override("icon_max_width", 36)
+	b.add_theme_color_override("icon_normal_color", TELEGRAM_BLUE)
+	b.add_theme_color_override("icon_pressed_color", TELEGRAM_BLUE)
+	b.add_theme_color_override("icon_hover_color", TELEGRAM_BLUE)
+	b.add_theme_color_override("icon_focus_color", TELEGRAM_BLUE)
+	var side := chat_button.custom_minimum_size.y
+	b.custom_minimum_size = Vector2(side, side)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var row := chat_button.get_parent()
+	row.add_child(b)
+	row.move_child(b, chat_button.get_index() + 1)
+	UIFx.bind_press(b, func() -> void:
+		Global.open_telegram_channel()
+		if _telegram_dot != null:
+			_telegram_dot.visible = false)
+
+	_telegram_dot = Panel.new()
+	_telegram_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_telegram_dot.add_theme_stylebox_override("panel", MenuUI.box(MenuUI.GOLD, MenuUI.GOLD, 0, 6))
+	_telegram_dot.custom_minimum_size = Vector2(12, 12)
+	_telegram_dot.size = Vector2(12, 12)
+	_telegram_dot.anchor_left = 1.0
+	_telegram_dot.anchor_right = 1.0
+	_telegram_dot.position = Vector2(-8, -4)
+	b.add_child(_telegram_dot)
+	_telegram_dot.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_telegram_dot.offset_left = -10
+	_telegram_dot.offset_top = -4
+	_telegram_dot.offset_right = 2
+	_telegram_dot.offset_bottom = 8
+	_telegram_dot.visible = not Global.telegram_channel_opened()
 
 ## نشان قرمز روی دکمه‌ی چت — صفر یعنی اصلاً نشان داده نشود
 func _refresh_chat_badge(count: int) -> void:

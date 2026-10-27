@@ -163,6 +163,13 @@ const STAT_SCALE := 100.0
 const COL_BETTER := Color(0.3, 0.86, 0.42)
 const COL_WORSE := Color(1.0, 0.32, 0.32)
 const COL_REF := Color(1.0, 0.8, 0.26)
+## جدولِ آمارِ پنل: اندازه‌ی فونتِ ستون‌ها (عرضِ ستون‌ها از روی همین‌ها حساب می‌شود)
+const STAT_TITLE_SIZE := 17
+const STAT_VALUE_SIZE := 19
+const STAT_DELTA_SIZE := 15
+const STAT_FILL := Color(0.8, 0.08, 0.11, 0.95)
+## دکمه‌ی خریدِ پنل (بزرگ‌تر از ۴۸dp)
+const DETAIL_BTN_H := 62.0
 ## همه‌ی آیتم‌های کاتالوگ (برای پیدا کردنِ آمارِ آیتمِ تجهیزشده)
 var _catalog_items: Array = []
 
@@ -201,7 +208,7 @@ func _ready() -> void:
 		character_container = characters_tab.find_child("CharacterGrid", true, false)
 		if character_container:
 			_disable_horizontal_scroll(character_container)
-			_make_grid_responsive(character_container, CHARACTER_CARD_MIN_SIZE.x)
+			_make_grid_responsive(character_container, CHARACTER_CARD_MIN_SIZE)
 		else:
 			print("⚠️ CharacterGrid درون تب کاراکترها پیدا نشد!")
 
@@ -209,7 +216,7 @@ func _ready() -> void:
 		weapon_container = weapons_tab.find_child("WeaponGrid", true, false)
 		if weapon_container:
 			_disable_horizontal_scroll(weapon_container)
-			_make_grid_responsive(weapon_container, WEAPON_CARD_MIN_SIZE.x)
+			_make_grid_responsive(weapon_container, WEAPON_CARD_MIN_SIZE)
 		else:
 			print("⚠️ WeaponGrid درون تب تفنگ‌ها پیدا نشد!")
 
@@ -315,7 +322,10 @@ func _close_open_modal() -> bool:
 	return false
 
 
-func _make_grid_responsive(grid: Node, card_width: float) -> void:
+## ستون‌ها کلِ عرضِ ستونِ چپ را پر می‌کنند: تعدادِ ستون از عرضِ کارت (تا ۱۵٪ کوچک‌تر)
+## درمی‌آید و بعد کارت‌ها هم‌عرض کش می‌آیند (با همان نسبتِ ارتفاع). قبلاً کارت‌ها
+## اندازه‌ی ثابت داشتند و روی 16:9 فقط ۲ ستون با دو نوارِ خالیِ ۱۰۰ پیکسلی کنارشان جا می‌شد
+func _make_grid_responsive(grid: Node, card_size: Vector2) -> void:
 	var g := grid as GridContainer
 	if not g:
 		return
@@ -335,8 +345,21 @@ func _make_grid_responsive(grid: Node, card_width: float) -> void:
 	g.size_flags_horizontal = Control.SIZE_SHRINK_CENTER | Control.SIZE_EXPAND
 	var apply := func() -> void:
 		var gap: float = float(g.get_theme_constant("h_separation"))
-		var usable: float = scroll.size.x - 14.0
-		g.columns = clampi(int(floor((usable + gap) / (card_width + gap))), 1, 8)
+		# جای اسکرول‌بارِ باریک (۴px) + کمی هوا
+		var usable: float = scroll.size.x - 10.0
+		if usable <= 0.0:
+			return
+		var cols := clampi(int(floor((usable + gap) / (card_size.x * 0.85 + gap))), 1, 8)
+		var w := floorf((usable - gap * (cols - 1)) / cols)
+		var sz := Vector2(w, roundf(w * card_size.y / card_size.x))
+		g.columns = cols
+		g.set_meta("card_size", sz)
+		for c in g.get_children():
+			if c is Control:
+				(c as Control).custom_minimum_size = sz
+	g.child_entered_tree.connect(func(n: Node) -> void:
+		if n is Control and g.has_meta("card_size"):
+			(n as Control).custom_minimum_size = g.get_meta("card_size"))
 
 	scroll.resized.connect(apply)
 	apply.call_deferred()
@@ -662,7 +685,7 @@ func _render_featured_item(item: Dictionary) -> void:
 	if target and shop_card_scene:
 		var card := instantiate_card()
 		target.add_child(card)
-		setup_card_data(card, item)
+		setup_card_data(card, item, true)
 
 
 func instantiate_card() -> Control:
@@ -692,7 +715,11 @@ func _lock_card_size(card: Control, size: Vector2) -> void:
 	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
 
-func setup_card_data(card: Node, item: Dictionary) -> void:
+## showcase=true یعنی کارت در ویترینِ «ویژه» (هفتگی/خیلی ویژه) است: لمس همیشه
+## پنجره‌ی پیش‌نمایش را باز می‌کند، حتی اگر آیتم در کاتالوگ اسلحه/کاراکتر هم
+## باشد. قبلاً تصمیم از روی section گرفته می‌شد و لمسِ این کارت‌ها پنلِ جزئیاتِ
+## تبِ اسلحه/کاراکتر را عوض می‌کرد که در این تب دیده نمی‌شود — یعنی «هیچ اتفاقی».
+func setup_card_data(card: Node, item: Dictionary, showcase: bool = false) -> void:
 	if card.has_method("setup_card"):
 		card.setup_card(item)
 
@@ -705,7 +732,7 @@ func setup_card_data(card: Node, item: Dictionary) -> void:
 
 	if card.has_signal("card_clicked"):
 		var section: String = str(item.get("section", ""))
-		if section != SECTION_WEAPONS and section != SECTION_CHARACTERS:
+		if showcase or (section != SECTION_WEAPONS and section != SECTION_CHARACTERS):
 			# ویترین (هفتگی/خیلی ویژه): پیش‌نمایش + تأیید در یک پنجره (C11/C13)
 			if not card.card_clicked.is_connected(_open_item_preview):
 				card.card_clicked.connect(_open_item_preview)
@@ -795,14 +822,19 @@ func _apply_icon_shadow(icon: TextureRect) -> void:
 		shadow = TextureRect.new()
 		shadow.name = "RarityShadow"
 		shadow.show_behind_parent = true
-		shadow.expand_mode = icon.expand_mode
-		shadow.stretch_mode = icon.stretch_mode
-		shadow.position = Vector2(3, 3)
+		shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		shadow.modulate = Color(0, 0, 0, 0.75)
 		icon.add_child(shadow)
+		# به خودِ آیکن لنگر است تا وقتی کانتینر اندازه‌ی آیکن را عوض می‌کند جا نماند
+		shadow.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		shadow.offset_left = 3.0
+		shadow.offset_top = 3.0
+		shadow.offset_right = 3.0
+		shadow.offset_bottom = 3.0
 
+	shadow.expand_mode = icon.expand_mode
+	shadow.stretch_mode = icon.stretch_mode
 	shadow.texture = icon.texture
-	shadow.size = icon.size
 
 
 # ==========================================================
@@ -945,21 +977,13 @@ func _update_weapon_stat_bar(container: HBoxContainer, value: float, max_value: 
 		value_label.text = MissionArt.fa_number(int(value))
 		value_label.add_theme_font_override("font", MenuUI.FONT_NUM)
 
-	# اختلاف با آیتمِ فعلی: سبز بهتر، قرمز ضعیف‌تر (همیشه با علامتِ + / − هم)
-	var delta_label := container.get_node_or_null("DeltaLabel") as Label
-	if delta_label == null:
-		delta_label = Label.new()
-		delta_label.name = "DeltaLabel"
-		delta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		delta_label.custom_minimum_size.x = 34.0
-		delta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		delta_label.add_theme_font_override("font", MenuUI.FONT_NUM)
-		delta_label.add_theme_font_size_override("font_size", 15)
-		container.add_child(delta_label)
-		container.move_child(delta_label, 0)
+	# اختلاف با آیتمِ فعلی: سبز بهتر، قرمز ضعیف‌تر (همیشه با علامتِ + / − هم).
+	# ستونش همیشه جا دارد (متنِ خالی، نه پنهان) تا نوارِ ردیف‌ها با آمدن/رفتنِ اختلاف جابه‌جا نشود
+	var delta_label := _ensure_delta_label(container)
 	var delta := int(round(value - ref_value))
-	delta_label.visible = ref_value >= 0.0 and delta != 0
-	if delta_label.visible:
+	var show_delta := ref_value >= 0.0 and delta != 0
+	delta_label.text = ""
+	if show_delta:
 		delta_label.text = ("+" + MissionArt.fa_number(delta)) if delta > 0 else ("−" + MissionArt.fa_number(-delta))
 		delta_label.add_theme_color_override("font_color", COL_BETTER if delta > 0 else COL_WORSE)
 
@@ -1036,35 +1060,29 @@ func _equipped_name(category: String) -> String:
 	return MenuUI.weapon_name(equipped) if category == "weapon" else ""
 
 
-## راهنمای کوچکِ بالای نوارها: «خطِ طلایی: AK-47 (فعلیِ تو)»
+## راهنمای کوچکِ بالای نوارها: «خطِ طلایی: AK-47 (فعلیِ تو)» — اولین ردیفِ ستونِ آمار.
+## همیشه جایش هست (متنِ خالی = یک فاصله) تا جدول با عوض شدنِ آیتم بالا/پایین نپرد.
 func _set_compare_caption(first_row: HBoxContainer, category: String, shown_id: String) -> void:
-	if first_row == null or first_row.get_parent() == null:
+	var box := first_row.get_parent() as Control if first_row else null
+	if box == null:
 		return
-	var box := first_row.get_parent() as Control
-	var host := box.get_parent() as Control
-	if box == null or host == null:
-		return
-	# روی پنل و درست بالای نوارها، نه داخلِ VBox — وگرنه ردیفِ آخر را روی
-	# دکمه‌ی خرید هل می‌دهد (روی 20:9 جا تنگ است)
-	var cap := host.get_node_or_null("CompareCaption") as Label
+	var cap := box.get_node_or_null("CompareCaption") as Label
 	if cap == null:
-		cap = MenuUI.label("", 14, COL_REF)
+		cap = MenuUI.label(" ", 14, COL_REF)
 		cap.name = "CompareCaption"
 		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		host.add_child(cap)
-		var place := func() -> void:
-			cap.size = Vector2(box.size.x, 20.0)
-			cap.position = box.position - Vector2(0, 22.0)
-		box.resized.connect(place)
-		box.item_rect_changed.connect(place)
-		place.call_deferred()
+		cap.clip_text = true
+		cap.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		box.add_child(cap)
+		box.move_child(cap, 0)
 	var compare := not _equipped_stats(category, shown_id).is_empty()
 	var equipped_name := _equipped_name(category)
+	var text := ""
 	if compare:
-		cap.text = ("خطِ طلایی: %s (فعلیِ تو)" % equipped_name) if equipped_name != "" else "خطِ طلایی: انتخابِ فعلیِ تو"
-	else:
-		cap.text = "همین الان دستِ توست" if Global.is_equipped(shown_id, category) else ""
-	cap.visible = cap.text != ""
+		text = ("خطِ طلایی: %s (فعلیِ تو)" % equipped_name) if equipped_name != "" else "خطِ طلایی: انتخابِ فعلیِ تو"
+	elif Global.is_equipped(shown_id, category):
+		text = "همین الان دستِ توست"
+	cap.text = text if text != "" else " "
 
 
 # ==========================================================
@@ -1343,10 +1361,13 @@ func _place_lucky_overlays() -> void:
 	if lucky_price_label:
 		for k in ["anchor_left", "anchor_right", "anchor_top", "anchor_bottom"]:
 			lucky_price_label.set(k, 0.0)
-		lucky_price_label.offset_left = art.position.x + art.size.x * 0.1
-		lucky_price_label.offset_right = art.position.x + art.size.x * 0.48
-		lucky_price_label.offset_top = art.position.y + art.size.y * 0.805
-		lucky_price_label.offset_bottom = art.position.y + art.size.y * 0.945
+		# آیکنِ قلب در خودِ آرت است (x≈۰٫۲۹–۰٫۳۵، y≈۰٫۸۱–۰٫۹۲)؛ عدد درست سمتِ چپش، هم‌مرکز
+		# با آن — قبلاً وسطِ کلِ خانه بود و قلب روی رقمِ آخر می‌افتاد
+		lucky_price_label.offset_left = art.position.x + art.size.x * 0.04
+		lucky_price_label.offset_right = art.position.x + art.size.x * 0.275
+		lucky_price_label.offset_top = art.position.y + art.size.y * 0.81
+		lucky_price_label.offset_bottom = art.position.y + art.size.y * 0.925
+		lucky_price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 
 
 func _show_lucky_price(price: int) -> void:
@@ -2738,11 +2759,223 @@ func _ws_panel() -> Control:
 	return get_node_or_null("SectionMenu/WeaponsTab/Control2") as Control
 
 
+func _cs_rows() -> Array:
+	return [cs_stat_movement, cs_stat_accuracy, cs_stat_hand_speed, cs_stat_throwing, cs_stat_health, cs_stat_regen]
+
+
+func _ws_rows() -> Array:
+	return [ws_stat_power, ws_stat_accuracy, ws_stat_range, ws_stat_fire_rate, ws_stat_control]
+
+
 func _setup_detail_panels() -> void:
 	for btn in [cs_buy_button, ws_buy_button]:
 		if btn:
 			btn.focus_mode = Control.FOCUS_NONE
 			UIFx.bind_press_feedback(btn)
+	if ws_stat_fire_rate and ws_stat_fire_rate.has_node("TitleLabel"):
+		(ws_stat_fire_rate.get_node("TitleLabel") as Label).text = "سرعت"
+	# کاراکتر: عکسِ ایستاده کنارِ جدول؛ اسلحه: عکسِ افقی بالای جدول
+	_layout_detail_panel(_cs_panel(), cs_name_label, cs_rarity_icon, cs_character_image, cs_stat_movement, cs_buy_button, true)
+	_layout_detail_panel(_ws_panel(), ws_name_label, ws_rarity_icon, ws_weapon_image, ws_stat_power, ws_buy_button, false)
+	_align_stat_rows(_cs_rows())
+	_align_stat_rows(_ws_rows())
+
+
+## پنلِ جزئیات با کانتینر چیده می‌شود، نه offsetهای ثابتِ صحنه (که روی 4:3 جای خالیِ
+## بزرگ و روی 20:9 روبان روی ردیفِ آخر می‌انداخت):
+##   سرتیتر [آیکن][رده] ... [اسم]  /  بدنه: عکس + جدولِ آمار (کشسان)  /  پا: روبانِ «کم داری» + دکمه
+func _layout_detail_panel(panel: Control, name_l: Label, icon: TextureRect, img: TextureRect,
+		first_row: Control, btn: Button, image_beside: bool) -> void:
+	if panel == null or panel.has_node("Layout") or first_row == null or btn == null:
+		return
+	var stats_box := first_row.get_parent() as VBoxContainer
+	if stats_box == null:
+		return
+	for n in ["ColorRect", "Background"]:
+		var deco := panel.get_node_or_null(n) as Control
+		if deco:
+			deco.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var margin := MarginContainer.new()
+	margin.name = "Layout"
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 14)
+	panel.add_child(margin)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var frame := panel.get_node_or_null("ReferenceRect")
+	if frame:
+		panel.move_child(frame, -1)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 10)
+	margin.add_child(col)
+
+	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	header.add_theme_constant_override("separation", 10)
+	col.add_child(header)
+	if icon:
+		icon.reparent(header, false)
+		icon.custom_minimum_size = Vector2(34, 34)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if name_l:
+		name_l.reparent(header, false)
+		name_l.custom_minimum_size = Vector2.ZERO
+		name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_l.clip_text = true
+		name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		name_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_l.add_theme_font_size_override("font_size", 34)
+
+	var body: BoxContainer = HBoxContainer.new() if image_beside else VBoxContainer.new()
+	body.name = "Body"
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_theme_constant_override("separation", 14 if image_beside else 10)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(body)
+	if img:
+		img.reparent(body, false)
+		img.custom_minimum_size = Vector2.ZERO
+		img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		img.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		img.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		img.size_flags_stretch_ratio = 0.8 if image_beside else 1.0
+	stats_box.reparent(body, false)
+	stats_box.add_theme_constant_override("separation", 8)
+	stats_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	if image_beside:
+		stats_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		stats_box.size_flags_stretch_ratio = 1.2
+		stats_box.size_flags_vertical = Control.SIZE_FILL
+	else:
+		stats_box.size_flags_horizontal = Control.SIZE_FILL
+		stats_box.size_flags_vertical = Control.SIZE_SHRINK_END
+
+	var footer := VBoxContainer.new()
+	footer.name = "Footer"
+	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	footer.add_theme_constant_override("separation", 6)
+	col.add_child(footer)
+	footer.add_child(_make_need_ribbon())
+	btn.reparent(footer, false)
+	btn.custom_minimum_size = Vector2(0, DETAIL_BTN_H)
+	btn.size_flags_horizontal = Control.SIZE_FILL
+	# ردیفِ قیمت: آیکن و عدد هم‌ارتفاع و وسطِ دکمه
+	var price_row := btn.get_node_or_null("HBoxContainer") as HBoxContainer
+	if price_row:
+		price_row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		price_row.alignment = BoxContainer.ALIGNMENT_CENTER
+		price_row.add_theme_constant_override("separation", 10)
+		for c in price_row.get_children():
+			if c is TextureRect:
+				var ic := c as TextureRect
+				ic.custom_minimum_size = Vector2(34, 34)
+				ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			elif c is Label:
+				var pl := c as Label
+				pl.add_theme_font_override("font", MenuUI.FONT_NUM)
+				pl.add_theme_font_size_override("font_size", 30)
+				pl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+				pl.size_flags_vertical = Control.SIZE_FILL
+
+
+## جدولِ سه‌ستونه‌ی آمار: [اختلاف][عدد][نوار][عنوان]. عرضِ ستونِ عنوان از بلندترین
+## عنوانِ همین پنل، عدد و اختلاف از «۱۰۰» / «+۱۰۰» با Lalezar — پس نوارِ همه‌ی ردیف‌ها
+## از یک x شروع و به یک x ختم می‌شود (قبلاً هر ردیف به اندازه‌ی عنوانش جابه‌جا بود)
+func _align_stat_rows(rows: Array) -> void:
+	var title_w := 0.0
+	for row in rows:
+		var t := (row as Node).get_node_or_null("TitleLabel") as Label if row else null
+		if t:
+			title_w = maxf(title_w, MenuUI.FONT.get_string_size(t.text, HORIZONTAL_ALIGNMENT_LEFT, -1, STAT_TITLE_SIZE).x)
+	var value_w := MenuUI.FONT_NUM.get_string_size("۱۰۰", HORIZONTAL_ALIGNMENT_LEFT, -1, STAT_VALUE_SIZE).x
+	var delta_w := MenuUI.FONT_NUM.get_string_size("+۱۰۰", HORIZONTAL_ALIGNMENT_LEFT, -1, STAT_DELTA_SIZE).x
+	var row_h := ceilf(maxf(MenuUI.FONT.get_height(STAT_TITLE_SIZE), MenuUI.FONT_NUM.get_height(STAT_VALUE_SIZE)))
+	for row in rows:
+		var r := row as HBoxContainer
+		if r == null:
+			continue
+		r.add_theme_constant_override("separation", 10)
+		r.custom_minimum_size = Vector2(0, row_h)
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var d := _ensure_delta_label(r)
+		d.custom_minimum_size = Vector2(ceilf(delta_w) + 2.0, 0)
+		var v := r.get_node_or_null("ValueLabel") as Label
+		if v:
+			v.add_theme_font_override("font", MenuUI.FONT_NUM)
+			v.add_theme_font_size_override("font_size", STAT_VALUE_SIZE)
+			v.custom_minimum_size = Vector2(ceilf(value_w) + 2.0, 0)
+			v.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			v.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			v.size_flags_vertical = Control.SIZE_FILL
+		var bar := r.get_node_or_null("ColorRect") as ColorRect
+		if bar:
+			bar.custom_minimum_size = Vector2(48, 14)
+			bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			bar.color = Color(1, 1, 1, 0.1)
+			var fill := bar.get_node_or_null("ColorRect") as ColorRect
+			if fill:
+				fill.color = STAT_FILL
+		var t := r.get_node_or_null("TitleLabel") as Label
+		if t:
+			t.add_theme_font_override("font", MenuUI.FONT)
+			t.add_theme_font_size_override("font_size", STAT_TITLE_SIZE)
+			t.add_theme_color_override("font_color", Color(0.88, 0.88, 0.92))
+			t.custom_minimum_size = Vector2(ceilf(title_w) + 2.0, 0)
+			t.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			t.size_flags_vertical = Control.SIZE_FILL
+		for n in ["DeltaLabel", "ValueLabel", "ColorRect", "TitleLabel"]:
+			var c := r.get_node_or_null(n)
+			if c:
+				r.move_child(c, -1)
+
+
+func _ensure_delta_label(container: HBoxContainer) -> Label:
+	var delta_label := container.get_node_or_null("DeltaLabel") as Label
+	if delta_label == null:
+		delta_label = Label.new()
+		delta_label.name = "DeltaLabel"
+		delta_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		delta_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		delta_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		delta_label.size_flags_vertical = Control.SIZE_FILL
+		delta_label.add_theme_font_override("font", MenuUI.FONT_NUM)
+		delta_label.add_theme_font_size_override("font_size", STAT_DELTA_SIZE)
+		container.add_child(delta_label)
+		container.move_child(delta_label, 0)
+	return delta_label
+
+
+## روبانِ «X کم داری» ردیفِ خودش را بالای دکمه دارد (قبلاً روی لبه‌ی دکمه شناور بود
+## و روی ردیفِ آخرِ آمار می‌افتاد)
+func _make_need_ribbon() -> PanelContainer:
+	var rib := PanelContainer.new()
+	rib.name = "NeedRibbon"
+	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rib.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var sb := MenuUI.box(Color(0.04, 0.04, 0.05, 0.95), Color(MenuUI.GOLD, 0.7), 1, 9)
+	sb.content_margin_left = 12
+	sb.content_margin_right = 12
+	sb.content_margin_top = 1
+	sb.content_margin_bottom = 1
+	rib.add_theme_stylebox_override("panel", sb)
+	var l := MenuUI.label("", 15, MenuUI.TEXT)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	rib.add_child(l)
+	rib.visible = false
+	return rib
 
 
 ## C12: تا رسیدنِ کاتالوگ، کارت‌های اسکلتیِ چشمک‌زن — نه صفحه‌ی یخ‌زده یا پنلِ ساختگی
@@ -3001,29 +3234,21 @@ func _set_detail_state(btn: Button, item: Dictionary) -> void:
 	if price_label and price_label != badge:
 		price_label.add_theme_font_override("font", MenuUI.FONT_NUM)
 		price_label.add_theme_color_override("font_color", colors[2] if state == "buy" else MenuUI.MUTED)
-	# روبانِ «X کم داری» روی لبه‌ی بالای دکمه — بی‌قرمزی، فقط عدد و راهِ بعدی
-	var rib := btn.get_node_or_null("NeedRibbon") as PanelContainer
+	# روبانِ «X کم داری» در ردیفِ خودش، درست بالای دکمه — بی‌قرمزی، فقط عدد و راهِ بعدی
+	var host := btn.get_parent()
+	var rib := host.get_node_or_null("NeedRibbon") as PanelContainer if host else null
+	if rib == null and host:
+		rib = _make_need_ribbon()
+		host.add_child(rib)
+		host.move_child(rib, btn.get_index())
 	if rib == null:
-		rib = PanelContainer.new()
-		rib.name = "NeedRibbon"
-		rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var sb := MenuUI.box(Color(0.04, 0.04, 0.05, 0.95), Color(MenuUI.GOLD, 0.7), 1, 9)
-		sb.content_margin_left = 10
-		sb.content_margin_right = 10
-		rib.add_theme_stylebox_override("panel", sb)
-		rib.add_child(MenuUI.label("", 14, MenuUI.TEXT))
-		rib.anchor_left = 0.5
-		rib.anchor_right = 0.5
-		rib.grow_horizontal = Control.GROW_DIRECTION_BOTH
-		rib.grow_vertical = Control.GROW_DIRECTION_BOTH
-		btn.add_child(rib)
+		return
 	rib.visible = state == "short"
 	if rib.visible:
 		var ct := _item_cost_type(item)
 		var have := Global.gems if ct == "gems" else Global.coins
 		(rib.get_child(0) as Label).text = "%s %s کم داری — بزن تا راهش رو ببینی" % [
 			MissionArt.fa_grouped(_item_price(item) - have), Sheet.unit_name(ct)]
-		rib.reset_size()
 
 
 ## V2 روی پنل: کپسولِ رده کنارِ آیکنِ لوزی
@@ -3037,7 +3262,11 @@ func _set_panel_badge(icon_rect: TextureRect, rarity: String) -> void:
 		old.queue_free()
 	var badge := Rarity.badge(rarity, 16)
 	badge.name = "PanelRarityBadge"
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	host.add_child(badge)
+	if host is BoxContainer:
+		host.move_child(badge, icon_rect.get_index() + 1)
+		return
 	var place := func() -> void:
 		if not is_instance_valid(badge):
 			return
@@ -3057,9 +3286,12 @@ func _highlight_selected(container: Node, item_id: String) -> void:
 
 ## V7 عکسِ پنل با انتخابِ کارتِ تازه کوتاه «می‌پرد»
 func _pop_detail(img: Control) -> void:
-	var panel := img.get_parent() as Control if img else null
-	if panel:
-		panel.visible = true
+	# عکس حالا داخلِ کانتینرهای پنل است؛ خودِ پنل را بالاتر پیدا می‌کنیم
+	var n: Node = img.get_parent() if img else null
+	while n != null and n != _cs_panel() and n != _ws_panel():
+		n = n.get_parent()
+	if n is Control:
+		(n as Control).visible = true
 	if img == null or not img.is_inside_tree():
 		return
 	img.pivot_offset = img.size * Vector2(0.5, 0.8)

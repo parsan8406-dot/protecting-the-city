@@ -955,3 +955,25 @@ func on_chat_message() -> void:
 # r3 social (E1): صفحه‌ی شهر با «چت شهر» صحنه‌ی چت را روی کانال شهر باز می‌کند.
 # صحنه‌ی چت مصرف و خالی‌اش می‌کند. مقادیر: "" / "global" / "city" / "private"
 var requested_chat_channel: String = ""
+
+# کانالِ رسمیِ تلگرامِ بازی (اخبار، کد هدیه، رویدادها) — E1/E10.
+# هر وقت آدرس عوض شد فقط همین خط. پشتیبانی آدرسِ جدای خودش را دارد (settings_tab).
+const TELEGRAM_CHANNEL := "https://t.me/coffee_baz"
+const _TELEGRAM_CFG := "user://telegram.cfg"
+
+
+## کانال را در تلگرام (یا مرورگر) باز می‌کند و یادش می‌ماند که بازیکن یک بار رفته
+func open_telegram_channel() -> void:
+	OS.shell_open(TELEGRAM_CHANNEL)
+	var cfg := ConfigFile.new()
+	cfg.load(_TELEGRAM_CFG)
+	cfg.set_value("channel", "opened", true)
+	cfg.save(_TELEGRAM_CFG)
+
+
+## آیا بازیکن تا حالا کانال را باز کرده؟ (برای نقطه‌ی «جدید» روی دکمه)
+func telegram_channel_opened() -> bool:
+	var cfg := ConfigFile.new()
+	if cfg.load(_TELEGRAM_CFG) != OK:
+		return false
+	return bool(cfg.get_value("channel", "opened", false))
