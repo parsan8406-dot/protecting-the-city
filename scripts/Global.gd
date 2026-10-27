@@ -619,6 +619,8 @@ func fetch_player_data():
 	if err != OK:
 		http_request.queue_free()
 		print("❌ خطا در ارسال درخواست به سرور")
+		# C12: نوارِ «اتصال قطع شد» + تلاشِ خودکار (Network.report_http_failure)
+		Network.report_http_failure(fetch_player_data)
 		player_data_failed.emit()
 
 ## هر جای دیگه پروژه (مثلاً بعد از خرید موفق توی شاپ) کافیه این تابع صدا زده بشه
@@ -630,6 +632,12 @@ func refresh_player_data():
 var ban_message := ""
 
 func _on_request_completed(result, response_code, headers, body):
+	# قطعیِ شبکه بن‌بست نیست: نوارِ وضعیت + تلاشِ دوباره‌ی خودکار با فاصله‌ی
+	# رو‌به‌افزایش (C12/E13). جوابِ واقعیِ سرور (۴۰۱/۴۰۳/...) مسیرِ خودش را دارد.
+	if Network.is_net_failure(int(result), int(response_code)):
+		Network.report_http_failure(fetch_player_data)
+	elif response_code == 200:
+		Network.report_http_ok()
 	if response_code == 403:
 		var err = JSON.parse_string(body.get_string_from_utf8())
 		if typeof(err) == TYPE_DICTIONARY and str(err.get("code", "")) == "banned":

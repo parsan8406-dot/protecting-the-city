@@ -1191,7 +1191,13 @@ func _on_status(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 			if _state == "searching":
 				_center_sub.text = "اتصال ضعیف است، در حال تلاش..."
 				_center_sub.add_theme_color_override("font_color", COL_WARN)
+			# همان نوارِ مشترکِ «اتصال قطع شد»؛ تلاشِ دوباره را خودِ این صفحه
+			# (POLL_EVERY) انجام می‌دهد. سرور هم قطعیِ کوتاه را از صف بیرون
+			# نمی‌اندازد (reconnect.go: جای صف ۲۵ ثانیه نگه داشته می‌شود).
+			if Network.is_net_failure(result, code):
+				Network.report_http_failure()
 		return
+	Network.report_http_ok()
 	if _fail_count >= 3 and _state == "searching":
 		_center_sub.text = "بازیکن‌های هم‌سطحِ تو پیدا می‌شوند"
 		_center_sub.add_theme_color_override("font_color", COL_DIM)

@@ -188,6 +188,14 @@ func _ready():
 		Network.demon_blast_fired.connect(_on_demon_blast_fired)
 	if not Network.demon_slain.is_connected(_on_demon_slain):
 		Network.demon_slain.connect(_on_demon_slain)
+	# اتصالِ دوباره وسطِ مسابقه: با قطعی کنترل‌ها یخ می‌زنند (سرور هم ما را
+	# یخ‌زده و آسیب‌ناپذیر نگه می‌دارد)، با برگشت دوباره باز می‌شوند. پرده‌ی
+	# وضعیت را خودِ Network نشان می‌دهد (net_status_overlay.gd).
+	if not is_offline_scene:
+		if not Network.link_lost.is_connected(_on_link_lost):
+			Network.link_lost.connect(_on_link_lost)
+		if not Network.rejoin_result.is_connected(_on_rejoin_result):
+			Network.rejoin_result.connect(_on_rejoin_result)
 
 	# ورود به زمین را به سرور اعلام کن — عمداً بعد از وصل کردنِ سیگنال‌ها،
 	# تا اولین update_players که جواب می‌آید شنونده داشته باشد.
@@ -686,6 +694,9 @@ func _on_players_updated(players_dict):
 				node.set_team(_is_ally(players_dict[username]))
 			# سرعتِ پایه‌ی هر بازیکن برای مرزِ انیمیشنِ دویدن (player_s.gd)
 			var pd_s = players_dict[username]
+			# اتصالش افتاده و سرور جایش را نگه داشته (reconnect.go)
+			if typeof(pd_s) == TYPE_DICTIONARY and node is Node2D:
+				_mark_away(node, bool(pd_s.get("away", false)))
 			# سقفِ جانِ همین بازیکن (با عوض کردنِ کاراکتر/سطح عوض می‌شود)
 			if typeof(pd_s) == TYPE_DICTIONARY and "max_health" in node:
 				var mh := _max_hp_of(pd_s)
@@ -1489,6 +1500,9 @@ func _notification(what: int) -> void:
 			_on_app_paused()
 		NOTIFICATION_EXIT_TREE:
 			get_tree().set_quit_on_go_back(true)
+			# از زمین بیرون رفتیم: قطعیِ بعدی دیگر «برگشت به مسابقه» نیست
+			if not is_offline_scene:
+				Network.end_match()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1512,6 +1526,62 @@ func _on_back() -> void:
 	_on_menu_pressed()
 
 
+## اتصال افتاد وسطِ مسابقه: جوی‌استیک، نشانه‌گیریِ بمب و شلیکِ خودکار یخ
+## می‌زنند تا بازیکن «بدونِ سرور» بازی نکند و بعد به جای سرور نپرد. (C12/E13)
+var _net_frozen := false
+var _phys_before_freeze := true
+
+func _on_link_lost() -> void:
+	if is_offline_scene or _match_ended or _net_frozen or not Network.in_match:
+		return
+	_net_frozen = true
+	if bomb_aiming:
+		bomb_aiming = false
+		bomb_touch_index = -1
+		CombatFX.bomb_aim_hide()
+	if joystick != null and joystick.has_method("set_enabled"):
+		joystick.set_enabled(false)
+	_phys_before_freeze = $Player.is_physics_processing()
+	$Player.set_physics_process(false)
+
+
+## جوابِ سرور به «برم گردان». ok: همان مسابقه، همان جا و جان — spawn و
+## health_update و update_players پشتِ همین پیام آمده‌اند. match_over: صفحه‌ی
+## نتیجه با پیام‌های بعدی باز می‌شود. بقیه (expired): پرده‌ی وضعیت پیامِ
+## صادقانه و دکمه‌ی «بازگشت به منو» را نشان می‌دهد و کنترل‌ها یخ می‌مانند.
+func _on_rejoin_result(ok: bool, _reason: String) -> void:
+	if not ok or not _net_frozen:
+		return
+	_net_frozen = false
+	$Player.set_physics_process(_phys_before_freeze)
+	var menu_open := _settings != null and _settings.visible
+	if joystick != null and joystick.has_method("set_enabled") and not _spectating \
+			and not _match_ended and not menu_open:
+		joystick.set_enabled(true)
+
+
+## بازیکنی که اتصالش افتاده (سرور: away) نیمه‌شفاف و با برچسبِ «اتصال قطع» —
+## تا بقیه بفهمند چرا تیرشان به او نمی‌خورد و چرا تکان نمی‌خورد.
+func _mark_away(node: Node2D, away: bool) -> void:
+	var tag := node.get_node_or_null("AwayTag") as Label
+	var shown := tag != null and tag.visible
+	if away == shown:
+		return
+	if away and tag == null:
+		tag = MenuUI.label("اتصال قطع", 18, MenuUI.MUTED)
+		tag.name = "AwayTag"
+		tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tag.size = Vector2(140, 26)
+		tag.position = Vector2(-70, -104)
+		tag.z_index = 5
+		tag.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+		tag.add_theme_constant_override("shadow_offset_y", 2)
+		node.add_child(tag)
+	if tag != null:
+		tag.visible = away
+	node.modulate.a = 0.5 if away else 1.0
+
+
 ## اپ رفت پس‌زمینه (تماس، minimize). آنلاین نمی‌شود بازی را نگه داشت —
 ## بقیه دارند بازی می‌کنند — فقط دویدن و نشانه‌گیری رها می‌شوند تا انگشتِ
 ## «گیر کرده» بعد از برگشت بازیکن را راه نبرد. بازیِ سریع توقف می‌کند.
@@ -1522,7 +1592,7 @@ func _on_app_paused() -> void:
 		CombatFX.bomb_aim_hide()
 	var menu_open := _settings != null and _settings.visible
 	if joystick != null and joystick.has_method("set_enabled") and not _spectating and not menu_open \
-			and not _match_ended:
+			and not _match_ended and not _net_frozen:
 		joystick.set_enabled(false)
 		joystick.set_enabled(true)
 

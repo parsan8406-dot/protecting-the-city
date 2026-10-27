@@ -98,12 +98,19 @@ var _wanted := false
 ## سوکتِ مرده: روی اینترنتِ موبایل (عوض شدنِ وای‌فای/دیتا، تونل، آسانسور)
 ## اتصالِ TCP اغلب بی‌صدا می‌میرد و وب‌سوکت تا ده‌ها ثانیه «باز» می‌ماند —
 ## بازیکن وسطِ مسابقه یخ می‌زد و هیچ تلاشی برای اتصالِ دوباره نمی‌شد.
-## HUDِ بازی هر ۲ ثانیه پینگ می‌فرستد؛ اگر پینگ داریم می‌فرستیم ولی این‌قدر
-## هیچ پیامی نرسیده، سوکت را دور می‌اندازیم و فوراً از نو وصل می‌شویم.
-const DEAD_SOCKET_MS := 7000
-## پینگی که از این قدیمی‌تر باشد یعنی کسی منتظرِ جواب نیست (منو) — آن‌جا
-## سکوتِ طولانی طبیعی است و نباید اتصال را بشکنیم.
-const PING_ACTIVE_MS := 3000
+## HUDِ بازی هر ۲ ثانیه پینگ می‌فرستد (و منوها هر KEEPALIVE_MENU_MS)؛ اگر
+## پینگ داریم می‌فرستیم ولی این‌قدر هیچ پیامی نرسیده، سوکت را دور می‌اندازیم
+## و فوراً از نو وصل می‌شویم.
+##
+## ۵ ثانیه (قبلاً ۷): یعنی دو پینگِ پشتِ‌سرِهمِ بی‌جواب. تشخیصِ اشتباه حالا
+## ارزان است — سرور جای بازیکن را reconnectGrace (۲۵ ثانیه) نگه می‌دارد و
+## اتصالِ دوباره در کسری از ثانیه همان مسابقه را برمی‌گرداند — ولی تشخیصِ
+## دیر یعنی چند ثانیه بازیِ یخ‌زده بی‌هیچ توضیحی. سرور هم سوکتِ بی‌صدای
+## داخلِ مسابقه را بعد از ۱۰ ثانیه خودش می‌بندد (staleLinkAfter).
+const DEAD_SOCKET_MS := 5000
+## پینگی که از این قدیمی‌تر باشد یعنی کسی منتظرِ جواب نیست — سکوتِ
+## طولانی آن‌جا طبیعی است و نباید اتصال را بشکنیم.
+const PING_ACTIVE_MS := 5000
 var _last_rx_ms := 0
 var _last_ping_ms := 0
 ## اولین پینگی که هنوز بعد از آن هیچ پیامی نرسیده (۰ = منتظرِ جوابی نیستیم).
@@ -117,6 +124,11 @@ const INBOUND_BUFFER := 1 << 20
 
 func _ready():
 	Global.player_data_loaded.connect(connect_to_server)
+	# C12: نوار/پرده‌ی «اتصال قطع شد» — یک بار، برای همه‌ی صحنه‌ها
+	# (deferred: SafeArea و LoadingScreen بعد از Network بار می‌شوند)
+	var overlay = NET_STATUS_OVERLAY.new()
+	overlay.name = "NetStatusOverlay"
+	add_child.call_deferred(overlay)
 
 ## آدرس وب‌سوکت از همان آدرس پایه‌ی HTTP ساخته می‌شود (http→ws، https→wss)
 func _ws_url() -> String:
@@ -133,6 +145,9 @@ func connect_to_server():
 		return
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = INBOUND_BUFFER
+	_connect_started_ms = Time.get_ticks_msec()
+	if link_down:
+		reconnect_attempt += 1
 	var err = socket.connect_to_url(_ws_url())
 	if err != OK:
 		print("❌ خطا در اتصال به سرور")
@@ -150,8 +165,9 @@ func reset_connection() -> void:
 ## سوکت را بی‌معطلی دور می‌اندازد و دوباره وصل می‌شود (بدونِ backoff).
 ## close() روی اتصالِ مرده تا ده‌ها ثانیه در CLOSING می‌ماند، پس منتظرش
 ## نمی‌مانیم و یک WebSocketPeerِ تازه می‌سازیم.
-func _force_reconnect() -> void:
+func _force_reconnect(down_since_ms: int = 0) -> void:
 	print("⚠️ مدتی پیامی از سرور نرسید — اتصالِ دوباره")
+	_mark_link_down(down_since_ms)
 	if socket.get_ready_state() != WebSocketPeer.STATE_CLOSED:
 		socket.close()
 	socket = WebSocketPeer.new()
@@ -159,34 +175,88 @@ func _force_reconnect() -> void:
 	_last_ping_ms = 0
 	_ping_wait_since = 0
 	_reconnect_at = -1.0
-	_reconnect_delay = RECONNECT_MIN
+	_reconnect_delay = RECONNECT_MIN_MATCH if in_match else RECONNECT_MIN
 	connect_to_server()
 
 func _schedule_reconnect() -> void:
 	if not _wanted or _reconnect_at > 0.0:
 		return
+	_mark_link_down()
+	# وسطِ مسابقه هر ثانیه مهم است (مهلتِ سرور ۲۵ ثانیه است): ۱، ۲، ۴، ۴، ...
+	# توی منو آرام‌تر تا باتری و سرور هدر نروند: ۲، ۴، ۸، ... ۲۰
+	var lo := RECONNECT_MIN_MATCH if in_match else RECONNECT_MIN
+	var hi := RECONNECT_MAX_MATCH if in_match else RECONNECT_MAX
+	_reconnect_delay = clampf(_reconnect_delay, lo, hi)
 	_reconnect_at = Time.get_ticks_msec() / 1000.0 + _reconnect_delay
-	_reconnect_delay = minf(_reconnect_delay * 2.0, RECONNECT_MAX)
+	_reconnect_delay = minf(_reconnect_delay * 2.0, hi)
 
 func _notification(what: int) -> void:
-	# برگشت از پس‌زمینه (تماس، مینیمایز): اگر اتصال افتاده، همان لحظه وصل شو
-	if what == NOTIFICATION_APPLICATION_RESUMED or what == NOTIFICATION_APPLICATION_FOCUS_IN:
-		if _wanted and not Global.offline_mode \
-				and socket.get_ready_state() == WebSocketPeer.STATE_CLOSED:
-			_reconnect_at = -1.0
-			_reconnect_delay = RECONNECT_MIN
-			connect_to_server()
+	match what:
+		NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT:
+			if _paused_at_ms == 0:
+				_paused_at_ms = Time.get_ticks_msec()
+		NOTIFICATION_APPLICATION_RESUMED, NOTIFICATION_APPLICATION_FOCUS_IN:
+			var away_ms := 0
+			var since := _paused_at_ms
+			if _paused_at_ms > 0:
+				away_ms = Time.get_ticks_msec() - _paused_at_ms
+			_paused_at_ms = 0
+			_on_app_back(away_ms, since)
+
+## برگشت از پس‌زمینه (تماس، مینیمایز، قفلِ صفحه) یا یک یخ‌زدگیِ طولانی.
+##
+## سرور سوکتِ بی‌صدای داخلِ مسابقه را بعد از ۱۰ ثانیه می‌بندد، ولی کلاینت
+## تا وقتی چیزی نفرستد خبردار نمی‌شود؛ پس بعد از غیبتِ طولانی منتظرِ نگهبان
+## نمی‌مانیم و همان لحظه دوباره وصل می‌شویم (سرور با rejoin همان مسابقه را
+## برمی‌گرداند). غیبتِ کوتاه فقط یک پینگِ آزمایشی می‌فرستد.
+func _on_app_back(away_ms: int, since_ms: int) -> void:
+	_last_frame_ms = Time.get_ticks_msec()
+	if not _wanted or Global.offline_mode:
+		return
+	var state := socket.get_ready_state()
+	# روی دسکتاپ FOCUS_OUT برنامه را متوقف نمی‌کند و پیام‌ها می‌رسند؛ فقط وقتی
+	# واقعاً مدتی هیچ پیامی نرسیده سوکت را از نو می‌سازیم
+	var stale := Time.get_ticks_msec() - _last_rx_ms >= RESUME_FORCE_MS
+	if state == WebSocketPeer.STATE_CLOSED:
+		_reconnect_at = -1.0
+		_reconnect_delay = RECONNECT_MIN_MATCH if in_match else RECONNECT_MIN
+		_mark_link_down(since_ms)
+		connect_to_server()
+	elif state == WebSocketPeer.STATE_OPEN and stale and away_ms >= 1000:
+		_force_reconnect(since_ms)
+	elif state == WebSocketPeer.STATE_OPEN:
+		send_ping()
 
 func _process(_delta):
 	# بازی سریع آفلاین است — نه چیزی می‌فرستیم نه چیزی می‌خوانیم، وگرنه
 	# بازیکن وسطِ تمرینِ تک‌نفره در دنیای آنلاین هم ظاهر می‌شود.
 	if Global.offline_mode:
 		return
+	var frame_ms := Time.get_ticks_msec()
+	# یخ‌زدگیِ طولانیِ کلِ برنامه بدونِ اعلانِ پس‌زمینه (بعضی گوشی‌ها/دسکتاپ)
+	if _last_frame_ms > 0 and frame_ms - _last_frame_ms >= RESUME_FORCE_MS and _paused_at_ms == 0:
+		_on_app_back(frame_ms - _last_frame_ms, _last_frame_ms)
+	_last_frame_ms = frame_ms
+	_tick_http_retries(frame_ms)
 	if _reconnect_at > 0.0 and Time.get_ticks_msec() / 1000.0 >= _reconnect_at:
 		_reconnect_at = -1.0
 		connect_to_server()
 	socket.poll()
 	var state = socket.get_ready_state()
+	# اتصالی که هیچ‌وقت باز نمی‌شود (DNS/TCP روی اینترنتِ ضعیف) نباید تا
+	# timeoutِ سیستم‌عامل معطل بماند
+	var connect_limit := CONNECT_TIMEOUT_MATCH_MS if in_match else CONNECT_TIMEOUT_MS
+	if state == WebSocketPeer.STATE_CONNECTING and _connect_started_ms > 0 \
+			and frame_ms - _connect_started_ms > connect_limit:
+		print("⚠️ اتصال به سرور باز نشد — تلاش دوباره")
+		socket.close()
+		socket = WebSocketPeer.new()
+		is_connected = false
+		_mark_link_down()
+		# همین حالا هم connect_limit صبر کرده‌ایم؛ backoffِ اضافه لازم نیست
+		_reconnect_at = -1.0
+		connect_to_server()
+		return
 	if state == WebSocketPeer.STATE_OPEN:
 		if not is_connected:
 			is_connected = true
@@ -197,12 +267,27 @@ func _process(_delta):
 			# همان joinِ آرنا کافی است (هویت را هم می‌رساند). قبلاً joinِ منو و
 			# joinِ آرنا در یک فریم می‌رفتند و سرور دومی را دور می‌ریخت —
 			# زمینِ خالی و تایمرِ --:--.
-			send_join_request(_arena_join_pending)
+			if in_match and _match_joined:
+				# وسطِ مسابقه قطع شده بودیم: به همان مسابقه برگرد (سرور با
+				# پیامِ rejoin جواب می‌دهد و همه‌چیز را دوباره می‌فرستد)
+				_send_rejoin()
+			else:
+				send_join_request(_arena_join_pending)
+				if _arena_join_pending:
+					_match_joined = true
+				_on_link_up()
 			_arena_join_pending = false
 			connected.emit()
 		if _arena_join_pending:
 			_arena_join_pending = false
 			send_join_request(true)
+			_match_joined = true
+		# جوابِ rejoin نرسید (join زیرِ بار دور ریخته شد / چکِ توکن خطا داد)
+		if awaiting_rejoin and Time.get_ticks_msec() - _rejoin_sent_ms > REJOIN_RESEND_MS:
+			_send_rejoin()
+		# منو: پینگِ سبک تا سوکتِ مرده این‌جا هم دیده شود (HUD در مسابقه خودش می‌فرستد)
+		if not in_match and Time.get_ticks_msec() - _last_ping_ms > KEEPALIVE_MENU_MS:
+			send_ping()
 		if socket.get_available_packet_count() > 0:
 			_last_rx_ms = Time.get_ticks_msec()
 		while socket.get_available_packet_count() > 0:
@@ -243,7 +328,14 @@ func _process(_delta):
 						bomb_thrown.emit(data)
 					elif msg_type == "bomb_explosion":
 						bomb_explosion.emit(data)
+					elif msg_type == "rejoin":
+						_on_rejoin_reply(bool(data.get("ok", false)), str(data.get("reason", "")))
 					elif msg_type == "spawn":
+						if data.has("reconnect_grace"):
+							reconnect_grace = maxf(float(data["reconnect_grace"]), 1.0)
+						# سرورِ قدیمی rejoin نمی‌شناسد و مستقیم spawn می‌فرستد
+						if awaiting_rejoin:
+							_on_rejoin_reply(true, "legacy")
 						arena_assigned.emit(
 							str(data.get("map", "map")),
 							float(data.get("shield_seconds", 0.0)),
@@ -270,6 +362,9 @@ func _process(_delta):
 						round_state_updated.emit(
 							data.get("alive", {}), int(data.get("seconds_left", 0)))
 					elif msg_type == "match_over":
+						# مسابقه تمام شد: قطعیِ بعد از این دیگر «برگشت به مسابقه» ندارد
+						in_match = false
+						_match_joined = false
 						round_info["final_score"] = data.get("score", {})
 						# در حالتِ شکار، عددی که روی صفحه‌ی پایان معنی دارد
 						# آسیبِ زده‌شده به شیطان است نه تعدادِ کشته
@@ -328,7 +423,8 @@ func _process(_delta):
 ## joinِ معمولی (موقعِ باز شدنِ سوکت) فقط به سرور می‌گوید این کلاینت کیست،
 ## تا چت و نوتیف برایش مسیر پیدا کند — زمینِ بازی را شروع نمی‌کند.
 ## joinِ آرنا (arena = true) است که بات‌ها و راند را می‌سازد.
-func send_join_request(arena: bool = false):
+## rejoin یعنی «وسطِ همین مسابقه قطع شدم، برم گردان» (سرور: reconnect.go).
+func send_join_request(arena: bool = false, rejoin: bool = false):
 	if not is_connected:
 		return
 	var data = {
@@ -338,6 +434,8 @@ func send_join_request(arena: bool = false):
 		# حسابِ وصل‌شده به گوگل بدون توکن دستگاه وارد هاب نمی‌شود
 		"token": Global.session_token,
 	}
+	if rejoin:
+		data["rejoin"] = true
 	socket.send_text(JSON.stringify(data))
 
 
@@ -364,8 +462,12 @@ func enter_arena() -> void:
 	# round_state هنوز نوارِ جانِ شیطان و فلشِ راهنما را روی صفحه دارد.
 	round_info.clear()
 	demon_info.clear()
+	# از این لحظه هر قطعی‌ای یعنی «برگرد به همین مسابقه»
+	in_match = true
+	awaiting_rejoin = false
 	if is_connected:
 		send_join_request(true)
+		_match_joined = true
 	else:
 		_arena_join_pending = true
 
@@ -421,6 +523,7 @@ func send_ping() -> void:
 
 ## بیرون رفتن از مسابقه وسطِ بازی (سوکت برای چت و منو باز می‌ماند)
 func send_leave_arena() -> void:
+	end_match()
 	if is_connected:
 		socket.send_text(JSON.stringify({"type": "leave_arena"}))
 
@@ -453,3 +556,185 @@ func death_killer(username: String) -> String:
 	if str(last_death.get("username", "")) != username:
 		return ""
 	return str(last_death.get("killer", ""))
+
+
+# ==================== اتصالِ دوباره (C12 بازخورد، E13 ناکامی) ====================
+## اینترنتِ موبایل مدام چند ثانیه‌ای قطع می‌شود. سرور جای بازیکنِ قطع‌شده را
+## در مسابقه reconnect_grace ثانیه نگه می‌دارد (gun_game_server/reconnect.go)؛
+## این‌جا قطعی زود و بی‌خطا تشخیص داده می‌شود، تلاش‌ها با فاصله‌ی کوتاه تکرار
+## می‌شوند و با باز شدنِ سوکت به همان مسابقه برمی‌گردیم. پرده/نوارِ وضعیت
+## (net_status_overlay.gd) فقط همین متغیرها را می‌خواند.
+
+const NET_STATUS_OVERLAY := preload("res://scripts/net_status_overlay.gd")
+
+## سوکت افتاد (یک بار برای هر قطعی)
+signal link_lost
+## اتصال برگشت — وسطِ مسابقه یعنی سرور rejoin را قبول کرد
+signal link_restored
+## جوابِ سرور به «برم گردان». reason وقتی ok نیست: match_over (در نبودت تمام
+## شد؛ نتیجه پشتش می‌آید) یا expired (مهلت تمام شد و جایت آزاد شد)
+signal rejoin_result(ok: bool, reason: String)
+## وضعیتِ درخواست‌های HTTP عوض شد (http_failing)
+signal http_state_changed
+
+## وسطِ مسابقه فاصله‌ی تلاش‌ها کوتاه است (۱، ۲، ۴، ۴ ...): مهلتِ سرور محدود است
+const RECONNECT_MIN_MATCH := 1.0
+const RECONNECT_MAX_MATCH := 4.0
+## سوکتی که این‌قدر در CONNECTING مانده کنار گذاشته می‌شود (وای‌فایِ بی‌اینترنت
+## و شبکه‌ای که بسته‌ها را بی‌صدا دور می‌ریزد اتصال را تا ده‌ها ثانیه معلق
+## نگه می‌دارند). وسطِ مسابقه کوتاه‌تر: در ۲۵ ثانیه مهلت چند تلاش جا شود.
+const CONNECT_TIMEOUT_MS := 8000
+const CONNECT_TIMEOUT_MATCH_MS := 5000
+## توی منو هر این‌قدر یک پینگِ سبک (HUDِ مسابقه هر ۲ ثانیه خودش می‌فرستد)
+const KEEPALIVE_MENU_MS := 4000
+## بیشتر از این در پس‌زمینه/یخ‌زده = سوکت را همان لحظه از نو بساز (سرور
+## سوکتِ بی‌صدای مسابقه را بعد از ۱۰ ثانیه می‌بندد)
+const RESUME_FORCE_MS := 8000
+## جوابِ rejoin این‌قدر نیامد: دوباره بفرست
+const REJOIN_RESEND_MS := 4000
+## فاصله‌ی تلاشِ دوباره‌ی درخواست‌های HTTPِ شکست‌خورده (ثانیه)
+const HTTP_RETRY_MIN := 3.0
+const HTTP_RETRY_MAX := 20.0
+
+## داخلِ یک مسابقه‌ی آنلاین هستیم (از enter_arena تا match_over / خروج)
+var in_match := false
+## joinِ آرنای همین مسابقه واقعاً رفته (پس قطعی یعنی rejoin، نه ورودِ اول)
+var _match_joined := false
+## سوکت دوباره باز شده و منتظرِ جوابِ rejoin هستیم
+var awaiting_rejoin := false
+var _rejoin_sent_ms := 0
+## اتصال افتاده و هنوز برنگشته
+var link_down := false
+## از کِی (ticks_msec) — اگر اپ در پس‌زمینه بوده، از لحظه‌ی رفتن
+var link_down_since_ms := 0
+## چندمین تلاش از این قطعی
+var reconnect_attempt := 0
+## مهلتِ سرور (ثانیه) — با spawn.reconnect_grace به‌روز می‌شود
+var reconnect_grace := 25.0
+var _connect_started_ms := 0
+var _paused_at_ms := 0
+var _last_frame_ms := 0
+
+## یک درخواستِ HTTP به‌خاطرِ شبکه شکست خورده و هنوز درست نشده
+var http_failing := false
+var _http_retries: Array[Callable] = []
+var _http_retry_at_ms := 0
+var _http_retry_delay := HTTP_RETRY_MIN
+
+
+func _mark_link_down(since_ms: int = 0) -> void:
+	if link_down or not _wanted or Global.offline_mode:
+		return
+	link_down = true
+	awaiting_rejoin = false
+	reconnect_attempt = 0
+	var now := Time.get_ticks_msec()
+	link_down_since_ms = since_ms if since_ms > 0 and since_ms <= now else now
+	link_lost.emit()
+
+
+func _on_link_up() -> void:
+	if not link_down:
+		return
+	link_down = false
+	reconnect_attempt = 0
+	link_restored.emit()
+
+
+func _send_rejoin() -> void:
+	awaiting_rejoin = true
+	_rejoin_sent_ms = Time.get_ticks_msec()
+	send_join_request(true, true)
+
+
+func _on_rejoin_reply(ok: bool, reason: String) -> void:
+	if not awaiting_rejoin and not link_down:
+		return
+	awaiting_rejoin = false
+	if not ok:
+		# مسابقه‌ای برای برگشتن نیست؛ سوکت سالم است و برای منو/نتیجه می‌ماند
+		in_match = false
+		_match_joined = false
+	link_down = false
+	reconnect_attempt = 0
+	rejoin_result.emit(ok, reason)
+	if ok:
+		link_restored.emit()
+
+
+## از صحنه‌ی مسابقه بیرون رفتیم (خروج، پایان، عوض شدنِ صحنه)
+func end_match() -> void:
+	in_match = false
+	_match_joined = false
+	awaiting_rejoin = false
+	_arena_join_pending = false
+
+
+## ثانیه‌های مانده از مهلتِ برگشت (تخمینِ محتاطِ سمتِ کلاینت: از لحظه‌ی
+## قطعی؛ سرور دیرتر از ما می‌فهمد، پس واقعیت همیشه کمی بیشتر است)
+func grace_left() -> float:
+	if not link_down and not awaiting_rejoin:
+		return reconnect_grace
+	return maxf(reconnect_grace - (Time.get_ticks_msec() - link_down_since_ms) / 1000.0, 0.0)
+
+
+## دکمه‌ی «تلاش دوباره»: همین حالا، بدونِ صبر برای نوبتِ بعدی
+func retry_now() -> void:
+	if Global.offline_mode:
+		return
+	if http_failing:
+		_http_retry_delay = HTTP_RETRY_MIN
+		_http_retry_at_ms = 1   # همین فریم
+	if not _wanted:
+		return
+	var state := socket.get_ready_state()
+	if link_down or state != WebSocketPeer.STATE_OPEN:
+		_reconnect_delay = RECONNECT_MIN_MATCH if in_match else RECONNECT_MIN
+		_force_reconnect()
+	elif awaiting_rejoin:
+		_send_rejoin()
+
+
+## آیا این شکستِ HTTP از شبکه است (نه جوابِ واقعیِ سرور مثل ۴۰۰/۴۰۳)؟
+## ۵۰۲/۵۰۳/۵۰۴ یعنی CDN به سرور نرسید — آن هم قطعی است.
+static func is_net_failure(result: int, code: int) -> bool:
+	return result != HTTPRequest.RESULT_SUCCESS or code == 0 or code == 502 or code == 503 or code == 504
+
+
+## یک درخواستِ HTTP به‌خاطرِ شبکه شکست خورد: نوارِ «اتصال قطع شد» نشان داده
+## و retry با فاصله‌ی رو‌به‌افزایش دوباره صدا زده می‌شود (Callable خالی یعنی
+## خودِ صفحه دوباره تلاش می‌کند و فقط نوار لازم است). صفحه با موفقیتِ بعدی
+## report_http_ok() را صدا می‌زند.
+func report_http_failure(retry: Callable = Callable()) -> void:
+	if Global.offline_mode:
+		return
+	var was := http_failing
+	http_failing = true
+	if retry.is_valid() and not _http_retries.has(retry):
+		_http_retries.append(retry)
+	if _http_retry_at_ms == 0:
+		_http_retry_at_ms = Time.get_ticks_msec() + int(_http_retry_delay * 1000.0)
+	if not was:
+		http_state_changed.emit()
+
+
+func report_http_ok() -> void:
+	_http_retry_delay = HTTP_RETRY_MIN
+	if not http_failing:
+		return
+	http_failing = false
+	_http_retries.clear()
+	_http_retry_at_ms = 0
+	http_state_changed.emit()
+
+
+func _tick_http_retries(now_ms: int) -> void:
+	if _http_retry_at_ms == 0 or now_ms < _http_retry_at_ms:
+		return
+	_http_retry_at_ms = 0
+	_http_retry_delay = minf(_http_retry_delay * 2.0, HTTP_RETRY_MAX)
+	var calls := _http_retries.duplicate()
+	_http_retries.clear()
+	for c in calls:
+		if c.is_valid():
+			c.call()

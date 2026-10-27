@@ -87,6 +87,8 @@ func kickFromHub(username string) int {
 	runOnHub(func(h *Hub) {
 		for c := range h.clients {
 			if c.username == username {
+				// بیرون انداختن مهلتِ برگشت (reconnect.go) ندارد
+				c.noGrace = true
 				_ = c.conn.Close()
 				n++
 			}

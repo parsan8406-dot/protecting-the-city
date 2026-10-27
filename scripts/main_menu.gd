@@ -273,11 +273,16 @@ func fetch_player_data():
 	
 	if err != OK:
 		print("❌ خطا در ارسال درخواست HTTP:", err)
+		Network.report_http_failure(fetch_player_data)
 
 func _on_http_request_request_completed(result: int, response_code: int, headers: PackedStringArray, body: PackedByteArray):
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
 		print("❌ خطا در دریافت اطلاعات از سرور. کد status:", response_code)
+		# C12/E13: قطعیِ شبکه بن‌بست نیست — نوارِ وضعیت و تلاشِ دوباره‌ی خودکار
+		if Network.is_net_failure(result, response_code):
+			Network.report_http_failure(fetch_player_data)
 		return
+	Network.report_http_ok()
 
 	var json_string = body.get_string_from_utf8()
 	var json = JSON.new()

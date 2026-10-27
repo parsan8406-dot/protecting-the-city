@@ -745,6 +745,13 @@ type Player struct {
 	// hub.bombsUsed است تا با join دوباره پر نشود؛ این فقط برای نمایش است.
 	BombsLeft int `json:"bombs_left"`
 
+	// Away اتصالش افتاده و جایش reconnectGrace نگه داشته شده (reconnect.go):
+	// یخ‌زده و آسیب‌ناپذیر. AwayLeft ثانیه‌های مانده تا آزاد شدنِ جایش — مثل
+	// ShieldLeft قبل از هر پخش پر می‌شود. هر دو omitempty تا کلاینتِ قدیمی و
+	// پیامِ معمولی دست نخورند.
+	Away     bool    `json:"away,omitempty"`
+	AwayLeft float64 `json:"away_left,omitempty"`
+
 	// Arena زمینی که این بازیکن روی آن بازی می‌کند — لحظه‌ی join از روی حالتِ
 	// مسابقه انتخاب می‌شود (arena.go → ArenaForMode). هر اعتبارسنجیِ حرکت،
 	// خطِ دید و انفجار باید از همین بخواند، نه از زمینِ سراسری.

@@ -404,7 +404,8 @@ func (h *Hub) pickTarget(me *Player) *Player {
 	var best *Player
 	bestD := math.Inf(1)
 	for _, other := range h.players {
-		if other.Username == me.Username || other.Health <= 0 {
+		// غایب (اتصالش افتاده) یخ‌زده و آسیب‌ناپذیر است؛ بات وقتش را رویش هدر نمی‌دهد
+		if other.Username == me.Username || other.Health <= 0 || other.Away {
 			continue
 		}
 		// فقط داخلِ همان مسابقه — بات نباید به بازیکنِ زمینِ دیگر شلیک کند

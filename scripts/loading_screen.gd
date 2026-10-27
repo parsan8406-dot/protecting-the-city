@@ -54,6 +54,10 @@ var _boot_generation := -1
 var _quitting := false
 ## چند ثانیه پیامِ قطعی دیده شود و بعد بازی بسته شود
 const QUIT_DELAY_SEC := 3.0
+## شروعِ بازی بدونِ اینترنت: به‌جای بستنِ بازی، تلاشِ دوباره (خودکار + دکمه)
+var _boot_retrying := false
+var _boot_attempt := 1
+var _retry_btn: Button
 
 var _root: Control
 var _safe: MarginContainer
@@ -104,6 +108,8 @@ func begin(steps: Dictionary, title: String = "در حال بارگذاری") ->
 	_title.text = title
 	_status.text = "لطفاً صبر کنید..."
 	_status.add_theme_color_override("font_color", MenuUI.MUTED)
+	if _retry_btn != null:
+		_retry_btn.visible = false
 	_root.modulate.a = 1.0
 	visible = true
 	_redraw_bar()
@@ -178,7 +184,8 @@ func _start_boot() -> void:
 	_boot_generation = _generation
 	_status.text = "در حال دریافت اطلاعات از سرور..."
 	Global.player_data_loaded.connect(_on_boot_player_loaded, CONNECT_ONE_SHOT)
-	Global.player_data_failed.connect(_on_boot_player_failed, CONNECT_ONE_SHOT)
+	# نه ONE_SHOT: هر تلاشِ دوباره‌ی ناموفق دوباره همین را صدا می‌زند
+	Global.player_data_failed.connect(_on_boot_player_failed)
 	Global.modes_synced.connect(func() -> void:
 		if _generation == _boot_generation:
 			complete("modes", "اتصال به سرور بازی..."), CONNECT_ONE_SHOT)
@@ -206,11 +213,14 @@ func _check_boot_scene() -> void:
 func _on_boot_player_loaded() -> void:
 	if _generation != _boot_generation:
 		return
+	_boot_retrying = false
+	_retry_btn.visible = false
+	_status.add_theme_color_override("font_color", MenuUI.MUTED)
 	complete("player", "دریافت تنظیمات بازی...")
 
 
 func _on_boot_player_failed() -> void:
-	if _generation != _boot_generation:
+	if _generation != _boot_generation or not _active:
 		return
 	# حسابِ قفل‌شده خودش به صفحه‌ی تنظیمات می‌رود؛ پیامِ خطا فقط برای قطعی است
 	if Global.account_locked:
@@ -220,7 +230,30 @@ func _on_boot_player_failed() -> void:
 	if not Global.ban_message.is_empty():
 		_fail_and_quit(Global.ban_message)
 		return
-	_fail_and_quit("اتصال به سرور برقرار نشد — اینترنت را چک کن")
+	# E13: قطعیِ اینترنت دیگر یعنی «بازی بسته می‌شود» نیست — تلاشِ خودکار
+	# (Network.report_http_failure → Global.fetch_player_data) + دکمه‌ی دستی
+	_enter_boot_retry("اتصال به سرور برقرار نشد — دوباره تلاش می‌کنیم")
+
+
+## C12: وضعیتِ صادقانه («تلاشِ چندم») به‌جای بستنِ بازی؛ نوار عقب نمی‌رود
+func _enter_boot_retry(message: String) -> void:
+	if _quitting:
+		return
+	_boot_attempt += 1
+	_boot_retrying = true
+	_elapsed = 0.0
+	_slow_shown = true
+	_status.text = message
+	_status.add_theme_color_override("font_color", MenuUI.GOLD)
+	_retry_btn.visible = true
+
+
+func _on_boot_retry_pressed() -> void:
+	_status.text = "در حال تلاشِ دوباره..."
+	if Network.http_failing:
+		Network.retry_now()
+	else:
+		Global.fetch_player_data()
 
 
 ## بدونِ سرور بازی قابل‌استفاده نیست: پیام را نشان بده و از بازی خارج شو
@@ -254,7 +287,13 @@ func _process(delta: float) -> void:
 			_status.text = "کمی بیشتر طول کشید، لطفاً صبر کنید..."
 		if _elapsed > TIMEOUT_SEC and _loading_path == "":
 			if _generation == _boot_generation:
-				_fail_and_quit("پاسخ سرور دیر رسید — اینترنت را چک کن")
+				if _steps.has("player") and float(_steps["player"]["p"]) >= 1.0:
+					# دیتای بازیکن رسیده و فقط سوکت/حالت‌ها مانده: وارد منو شو؛
+					# نوارِ «اتصال قطع شد» آن‌جا خودش تلاش می‌کند (C12)
+					for id in _steps:
+						_steps[id]["p"] = 1.0
+				else:
+					_enter_boot_retry("پاسخ سرور دیر رسید — دوباره تلاش می‌کنیم")
 			else:
 				fail("پاسخ سرور دیر رسید")
 
@@ -478,6 +517,13 @@ func _build_glass() -> Control:
 	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_status.clip_text = true
 	body.add_child(_status)
+	# فقط وقتی شروعِ بازی به سرور نرسید دیده می‌شود (۴۸dp+، طلایی = اقدام)
+	_retry_btn = MenuUI.button("تلاش دوباره", "gold", 22)
+	_retry_btn.custom_minimum_size = Vector2(240, 64)
+	_retry_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_retry_btn.visible = false
+	_retry_btn.pressed.connect(_on_boot_retry_pressed)
+	body.add_child(_retry_btn)
 	body.add_child(_build_tip_row())
 	return glass
 

@@ -275,6 +275,8 @@ func (h *Hub) clearRoundState(r *RoundState) {
 		}
 		// موجودیِ بمب مالِ همین مسابقه بود
 		delete(h.bombsUsed, r.MatchID+":"+name)
+		// بودجه‌ی غیبت هم (reconnect.go)
+		delete(h.awayUsed, awayKey(r.MatchID, name))
 	}
 	// قفلِ توانایی‌ها به مسابقه‌ی بعد نمی‌رود: دکمه‌ها در مسابقه‌ی تازه آماده
 	// نشان داده می‌شوند و سرور هم باید همین را قبول کند
@@ -308,12 +310,17 @@ func (h *Hub) abandonRound(matchID string) {
 	ReleaseMatch(r.MatchID)
 }
 
+// applyMatchOutcomeFn همان ApplyMatchOutcome؛ متغیر است تا تست‌های اتصالِ
+// دوباره بدونِ مونگو مسیرِ match_reward را بسنجند.
+var applyMatchOutcomeFn = ApplyMatchOutcome
+
 // grantResultAsync پاداشِ یک نفر را در دیتابیس ثبت و به خودش خبر می‌دهد.
+// اگر همان لحظه قطع باشد (غایب)، پیام در صندوقش می‌ماند تا برگردد.
 func (h *Hub) grantResultAsync(username, modeID string, outcome MatchOutcome, kills int) {
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 		defer cancel()
-		res, err := ApplyMatchOutcome(ctx, username, modeID, outcome, kills)
+		res, err := applyMatchOutcomeFn(ctx, username, modeID, outcome, kills)
 		if err != nil {
 			fmt.Printf("⚠️ match result for %s: %v\n", username, err)
 			return
@@ -325,7 +332,7 @@ func (h *Hub) grantResultAsync(username, modeID string, outcome MatchOutcome, ki
 			payload[k] = v
 		}
 		data, _ := json.Marshal(payload)
-		queueNotify(userMessage{username: username, data: data})
+		queueNotify(userMessage{username: username, data: data, kind: "match_reward"})
 	}()
 }
 
@@ -697,6 +704,12 @@ func (h *Hub) broadcastMatchOver(r *RoundState, winnerTeam string, draw bool) {
 	}
 	data, _ := json.Marshal(payload)
 	h.queueBroadcastTo(r.MatchID, data)
+	// غایب‌ها این لحظه سوکتی ندارند؛ نتیجه در صندوقشان می‌ماند تا برگردند
+	for name := range r.Humans {
+		if h.away[name] != nil && h.sessions[name] == nil {
+			h.stashFor(name, "match_over", data)
+		}
+	}
 }
 
 // broadcastRespawn تولدِ دوباره: کلاینت بازیکن را همان‌جا برمی‌گرداند و

@@ -123,7 +123,8 @@ func (h *Hub) livePlayerOf(client *Client) *Player {
 		return nil
 	}
 	p, ok := h.players[client.username]
-	if !ok || p.Health <= 0 {
+	// غایب (اتصالش افتاده) هیچ توانایی‌ای نمی‌زند — reconnect.go
+	if !ok || p.Health <= 0 || p.Away {
 		return nil
 	}
 	return p
@@ -216,9 +217,10 @@ func isGuarded(p *Player, now time.Time) bool {
 	return p != nil && now.Before(p.GuardUntil)
 }
 
-// canBeHurt هدف همین حالا آسیب‌پذیر است؟ (نه محافظِ تولد، نه سپرِ دستی)
+// canBeHurt هدف همین حالا آسیب‌پذیر است؟ (نه محافظِ تولد، نه سپرِ دستی،
+// نه غایبی که اتصالش افتاده و جایش نگه داشته شده — reconnect.go)
 func canBeHurt(p *Player, now time.Time) bool {
-	return p != nil && p.Health > 0 && !now.Before(p.InvulnerableUntil) && !isGuarded(p, now)
+	return p != nil && p.Health > 0 && !p.Away && !now.Before(p.InvulnerableUntil) && !isGuarded(p, now)
 }
 
 // ----------------------------------------------------------------- لیزر

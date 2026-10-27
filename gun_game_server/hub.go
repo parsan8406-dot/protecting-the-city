@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -251,6 +252,13 @@ type Client struct {
 	lastShoot time.Time       // زمان آخرین شلیک (برای rate limiting)
 	lastHit   time.Time       // زمان آخرین ضربه‌ی ثبت‌شده (rate limiting)
 	closed    bool            // کانالِ send بسته شده — دیگر نه پیامی می‌گیرد نه اکشنی
+	// lastRx لحظه‌ی آخرین پیامِ رسیده (UnixNano). روی گوروتینِ readPump نوشته و
+	// روی هاب خوانده می‌شود، پس اتمیک است (reconnect.go → closeSilentLinks).
+	lastRx atomic.Int64
+	// idleClosed سرور خودش این سوکتِ بی‌صدا را بسته — یک بار کافی است
+	idleClosed bool
+	// noGrace قطعِ این سوکت مهلتِ برگشت ندارد (بیرون انداختن از پنلِ مدیریت)
+	noGrace bool
 }
 
 // Hub مرکزی برای مدیریت تمام اتصالات و state بازی
@@ -297,6 +305,14 @@ type Hub struct {
 	// شدند؛ پاک‌سازیِ بازیکنشان در انتهای همان چرخه‌ی Run انجام می‌شود تا
 	// وسطِ پیمایشِ h.clients دوباره broadcast تو در تو نزنیم.
 	dropped []*Client
+
+	// اتصالِ دوباره (reconnect.go): غایب‌هایی که جایشان نگه داشته شده،
+	// بودجه‌ی غیبتِ هر نفر در هر مسابقه ("match:username") و پیام‌های پایانِ
+	// مسابقه که به غایب نرسیده‌اند. همه فقط روی گوروتینِ Run.
+	away         map[string]*awayState
+	awayUsed     map[string]time.Duration
+	inbox        map[string][]inboxItem
+	lastAwayScan time.Time
 }
 
 // userMessage یک پیام بلادرنگ برای یک یا چند بازیکن مشخص
@@ -310,6 +326,9 @@ type userMessage struct {
 	usernames []string // چند گیرنده (مثلاً اعضای یک شهر)
 	everyone  bool     // همه‌ی بازیکن‌های متصل
 	data      []byte
+	// kind اگر پر باشد و گیرنده همین حالا وصل نباشد ولی غایب باشد، پیام در
+	// صندوقش نگه داشته می‌شود (match_reward — reconnect.go → stashFor)
+	kind string
 }
 
 // isRecipient بررسی می‌کند این پیام برای فلان بازیکن هست یا نه
@@ -405,6 +424,9 @@ func NewHub() *Hub {
 		playerRound:      make(map[string]string),
 		adminCalls:       make(chan func(h *Hub), 16),
 		sessions:         make(map[string]*Client),
+		away:             make(map[string]*awayState),
+		awayUsed:         make(map[string]time.Duration),
+		inbox:            make(map[string][]inboxItem),
 	}
 }
 
@@ -451,15 +473,21 @@ func (h *Hub) runOnce(lastBotTick *time.Time) {
 
 		// پیام بلادرنگ فقط برای یک بازیکن
 		case nm := <-h.notify:
+			delivered := false
 			for client := range h.clients {
 				if client.username == "" || !nm.isRecipient(client.username) {
 					continue
 				}
 				select {
 				case client.send <- nm.data:
+					delivered = true
 				default:
 					h.dropClient(client)
 				}
+			}
+			// پاداشِ پایانِ مسابقه‌ی کسی که همین حالا قطع است گم نشود
+			if !delivered && nm.kind != "" {
+				h.stashFor(nm.username, nm.kind, nm.data)
 			}
 
 		// کارهای پنل مدیریت (admin_live.go)
@@ -484,6 +512,7 @@ func (h *Hub) runOnce(lastBotTick *time.Time) {
 			h.stepBots(dt)
 			h.tickAbilities(now)
 			h.tickRounds()
+			h.tickAway(now)
 		}
 	}
 }
@@ -520,10 +549,22 @@ func (h *Hub) flushDropped() {
 // cleanupClient بازیکنِ یک سوکتِ بسته‌شده را از زمین و راند و صف بیرون
 // می‌آورد — فقط اگر همین سوکت هنوز صاحبِ آن نام کاربری باشد.
 func (h *Hub) cleanupClient(client *Client) {
+	h.cleanupSession(client, !client.noGrace)
+}
+
+// cleanupSession همان cleanupClient؛ grace=false یعنی بدونِ مهلتِ برگشت
+// (عوض شدنِ حساب روی همین سوکت، بیرون انداختن).
+func (h *Hub) cleanupSession(client *Client, grace bool) {
 	if client.username == "" || h.sessions[client.username] != client {
 		return
 	}
 	delete(h.sessions, client.username)
+	// قطعیِ موبایل اغلب چند ثانیه‌ای است: جای بازیکن در مسابقه (یا صف) تا
+	// reconnectGrace نگه داشته می‌شود (reconnect.go)
+	if grace && h.beginGrace(client.username) {
+		return
+	}
+	h.forgetAway(client.username)
 	mid := h.matchIDOf(client.username)
 	// قطعِ اتصال = حذف از راند. وگرنه اگر کسی وسطِ بازی ببندد، تیمش
 	// هیچ‌وقت «تمام» نمی‌شود و راند تا آخرِ تایمر بی‌خود ادامه پیدا می‌کند.
@@ -588,6 +629,10 @@ func (h *Hub) validateHit(shooter *Player, targetUsername string) bool {
 	if shooter.Health <= 0 || targetPlayer.Health <= 0 {
 		return false
 	}
+	// غایب (اتصالش افتاده) نه تیر می‌زند نه تیر می‌خورد — reconnect.go
+	if shooter.Away || targetPlayer.Away {
+		return false
+	}
 	// فقط داخلِ همان مسابقه — نه از یک زمین به زمینِ دیگر
 	if targetPlayer.MatchID != shooter.MatchID {
 		return false
@@ -637,7 +682,7 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 		// همین سوکت قبلاً با نامِ دیگری وارد شده بود: بازیکنِ قبلی را
 		// پاک کن تا یتیم در h.players نماند.
 		if client.username != "" && client.username != msg.Username {
-			h.cleanupClient(client)
+			h.cleanupSession(client, false)
 		}
 		// همین نام با سوکتِ دیگری هم وصل است (اتصالِ دوباره بعد از قطعیِ
 		// شبکه): سوکتِ قدیمی بی‌صدا کنار می‌رود و پاک‌سازی‌اش اجرا نمی‌شود.
@@ -651,21 +696,10 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 		// یا joinِ تکراری): بازیکنِ زنده دست نمی‌خورد. قبلاً یک Playerِ تازه
 		// با جانِ پر و محافظِ تولد جایش می‌نشست — مُرده زنده می‌شد و یک
 		// کلاینتِ دستکاری‌شده با join پشتِ‌سرِهم همیشه شکست‌ناپذیر بود.
-		if old, ok := h.players[msg.Username]; ok && old.InArena && old.MatchID != "" {
-			if m := MatchOf(msg.Username); m != nil && m.MatchID == old.MatchID {
-				if msg.Arena {
-					shield := time.Until(old.InvulnerableUntil)
-					if shield < 0 {
-						shield = 0
-					}
-					h.sendSpawn(client, old.X, old.Y, MapNameForMode(m.ModeID), ThemeOfMatch(msg.Username), shield)
-					if r := h.rounds[old.MatchID]; r != nil {
-						h.broadcastRoundState(r)
-					}
-				}
-				h.broadcastPlayerUpdate()
-				return
-			}
+		// برگشت از غیبت، resync و «مسابقه در نبودت تمام شد» همه در reconnect.go.
+		handled, quiet := h.handleRejoin(client, &msg)
+		if handled {
+			return
 		}
 		// تجهیزات از دیتابیس خوانده می‌شود، نه از پیام کلاینت: هرچه بازیکن
 		// در فروشگاه انتخاب کرده همان بارگذاری می‌شود و کلاینت نمی‌تواند
@@ -771,8 +805,13 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 			// به‌صورتِ «اهداف» سمتِ چپِ صفحه نشان داده می‌شوند
 			h.loadObjectivesAsync(msg.Username, newPlayer.MatchID)
 		}
-		// کلاینت باید از همین‌جا شروع کند
-		h.sendSpawn(client, spawnX, spawnY, MapNameForMode(myMode), ThemeOfMatch(msg.Username), myRules.SpawnShield)
+		// کلاینت باید از همین‌جا شروع کند (جز وقتی برگشت به مسابقه رد شد و
+		// کلاینت دارد به صفحه‌ی نتیجه/منو می‌رود)
+		if !quiet {
+			h.sendSpawn(client, spawnX, spawnY, MapNameForMode(myMode), ThemeOfMatch(msg.Username), myRules.SpawnShield)
+		}
+		// نتیجه‌ی مسابقه‌ای که در نبودش تمام شد
+		h.flushInbox(client)
 		// ثبت آنلاین شدن در دیتابیس
 		go SetPlayerOnline(msg.Username, true)
 		fmt.Printf("🎮 Player joined: %s (HP: %d)\n", msg.Username, maxHealth)
@@ -833,6 +872,11 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 		if !exists {
 			return
 		}
+		// غایب یخ‌زده است؛ فقط حرکت از سوکتِ تازه‌ی خودش یعنی «برگشتم»
+		// (کلاینتِ قدیمی که بعد از اتصالِ دوباره joinِ آرنا نمی‌فرستد)
+		if p.Away && !h.resumeByMove(client, p) {
+			return
+		}
 		// زمان سپری‌شده از آخرین حرکت — هم برای سقفِ سرعتِ جابه‌جایی هم چرخش
 		now := time.Now()
 		dt := now.Sub(p.LastMoveTime).Seconds()
@@ -883,7 +927,7 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 			return
 		}
 		shooter, exists := h.players[client.username]
-		if !exists {
+		if !exists || shooter.Away {
 			return
 		}
 		// بررسی rate limiting: همان فاصله‌ای که خودِ کاراکتر/سلاح روی کلاینت
@@ -984,7 +1028,7 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 			return
 		}
 		player, exists := h.players[client.username]
-		if !exists || player.Health <= 0 {
+		if !exists || player.Health <= 0 || player.Away {
 			return
 		}
 		// health_regen (فروشگاه) اینجا واقعی می‌شود: هم مقدار هر بار درمان
@@ -1008,7 +1052,7 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 			return
 		}
 		player, exists := h.players[client.username]
-		if !exists || player.Health <= 0 {
+		if !exists || player.Health <= 0 || player.Away {
 			return
 		}
 		// کول‌داون بر اساس نام کاربری — با join دوباره ریست نمی‌شود
@@ -1121,6 +1165,7 @@ func (h *Hub) handleAction(client *Client, msg WSMessage) {
 			return
 		}
 		mid := h.matchIDOf(client.username)
+		h.forgetAway(client.username)
 		h.onPlayerEliminated(client.username)
 		delete(h.players, client.username)
 		delete(h.playerRound, client.username)
@@ -1323,6 +1368,13 @@ func (h *Hub) broadcastPlayerUpdate() {
 			p.ShieldLeft = left
 		}
 		refreshAbilityTimers(p, now)
+		// ثانیه‌های مانده تا آزاد شدنِ جای غایب — بقیه «اتصال قطع» می‌بینند
+		p.AwayLeft = 0
+		if aw := h.away[name]; aw != nil && p.Away {
+			if left := aw.deadline.Sub(now).Seconds(); left > 0 {
+				p.AwayLeft = left
+			}
+		}
 		if p.MatchID == "" && !p.InArena {
 			continue
 		}
@@ -1348,6 +1400,10 @@ func (h *Hub) sendSpawn(client *Client, x, y float64, mapName, theme string, shi
 		"map":            mapName,
 		"theme":          theme,
 		"shield_seconds": shield.Seconds(),
+		// مهلتِ برگشت بعد از قطعیِ اتصال — کلاینت شمارش معکوسش را با این می‌سازد
+		// (همان بودجه‌ی باقی‌مانده‌ی این مسابقه، تا شمارشِ کلاینت هیچ‌وقت بیشتر
+		// از واقعیت قول ندهد)
+		"reconnect_grace": h.graceBudgetOf(client.username).Seconds(),
 	})
 	h.sendTo(client, data)
 }
@@ -1513,6 +1569,7 @@ func (c *Client) readPump() {
 			}
 			break
 		}
+		c.lastRx.Store(time.Now().UnixNano())
 
 		// پارس JSON پیام
 		var raw map[string]interface{}
