@@ -1,7 +1,7 @@
 class_name ChatChannelCard
 extends Button
 ## کارت یک کانال در ستون چپ صفحه‌ی چت (جهانی / شهر / دوستان).
-## کارت انتخاب‌شده آبیِ درخشان می‌شود و نشان قرمز تعداد پیام‌های خوانده‌نشده را
+## کارت انتخاب‌شده قاب طلایی می‌گیرد و نشان قرمز تعداد پیام‌های خوانده‌نشده را
 ## نشان می‌دهد.
 
 @export var channel: String = ""
@@ -60,4 +60,6 @@ func _refresh() -> void:
 	add_theme_stylebox_override("normal", style)
 	add_theme_stylebox_override("pressed", style)
 	add_theme_stylebox_override("hover", style)
-	_icon.modulate = Color.WHITE if _selected else Color(0.78, 0.85, 0.95, 1.0)
+	# V2 طلایی = «اینجایی»؛ بقیه خنثی
+	_icon.modulate = MenuUI.GOLD if _selected else Color(0.75, 0.75, 0.78, 1.0)
+	_title_label.add_theme_color_override("font_color", MenuUI.GOLD if _selected else MenuUI.TEXT)

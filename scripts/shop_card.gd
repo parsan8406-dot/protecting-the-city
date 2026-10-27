@@ -1,6 +1,11 @@
 extends Control
 
 signal buy_requested(item_data: Dictionary)
+## لمسِ هر جای کارت (عکس یا نوارِ قیمت) → پیش‌نمایش + تأیید در shop.gd (C11/C13)
+signal card_clicked(item_data: Dictionary)
+
+const Rarity := preload("res://scripts/psych_shop_rarity.gd")
+const ART_FOLDERS := ["res://assets/characters/", "res://assets/items/", "res://assets/weapons/"]
 
 @onready var background: TextureRect = $Background
 @onready var border: ReferenceRect = $Border
@@ -49,8 +54,8 @@ func _ready():
 
 	if price_bar:
 		price_bar.mouse_filter = Control.MOUSE_FILTER_PASS
-		if not price_bar.gui_input.is_connected(_on_price_bar_gui_input):
-			price_bar.gui_input.connect(_on_price_bar_gui_input)
+	if not gui_input.is_connected(_on_card_gui_input):
+		gui_input.connect(_on_card_gui_input)
 
 func setup_card(data: Dictionary) -> void:
 	current_item_data = data
@@ -58,26 +63,52 @@ func setup_card(data: Dictionary) -> void:
 	if name_label:
 		name_label.text = data.get("name", "")
 	
-	# ۱. بارگذاری عکس آیتم
-	var raw_img_path: String = data.get("image_path", data.get("icon", ""))
-	var loaded_tex: Texture2D = load_image_safely(raw_img_path)
+	# ۱. عکسِ آیتم از روی item_id (سرور image_path را خالی می‌فرستد؛ قبلاً کارت‌های
+	# ویترین بی‌عکس بودند — V6)
+	var loaded_tex: Texture2D = null
+	var item_id := str(data.get("item_id", data.get("id", ""))).strip_edges()
+	if item_id != "":
+		for folder in ART_FOLDERS:
+			if ResourceLoader.exists(folder + item_id + ".png"):
+				loaded_tex = load(folder + item_id + ".png")
+				break
+	if loaded_tex == null:
+		loaded_tex = load_image_safely(str(data.get("image_path", data.get("icon", ""))))
 	
 	if item_texture:
 		item_texture.texture = loaded_tex
 
 	# ۲. تنظیم پس‌زمینه و اِعمال شیدر چرخشی استاندارد روی بردر
-	var rarity = data.get("rarity", "rare")
-	var base_color = RARITY_COLORS.get(rarity, Color.WHITE)
-	
-	apply_dynamic_gradient(base_color)
+	# V2 پالتِ مشترکِ رده + لوزی‌ها
+	var rarity := Rarity.of(data)
+	var base_color := Rarity.color(rarity)
+	if background:
+		background.texture = Rarity.gradient(rarity, true)
 	apply_border_shader_effect(base_color)
+	var pips := get_node_or_null("RarityPips") as Control
+	if pips == null:
+		pips = Rarity.pips(rarity, 8.0)
+		pips.name = "RarityPips"
+		add_child(pips)
+	pips.set("tier", Rarity.TIER[rarity])
+	pips.set("tint", base_color)
+	pips.visible = Rarity.TIER[rarity] > 0
+	pips.custom_minimum_size.x = maxf(1.0, Rarity.TIER[rarity]) * 10.0
+	pips.size = pips.custom_minimum_size
+	pips.position = Vector2(5, 24)
+	pips.queue_redraw()
+	if name_label:
+		name_label.add_theme_font_size_override("font_size", 15)
+		# نام روی عکسِ شلوغ هم خوانا بماند
+		name_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+		name_label.add_theme_constant_override("outline_size", 5)
 	
 	# ۳. قیمت و تخفیف
 	var original_price = int(data.get("original_price", data.get("price", 0)))
 	var discount_percent = int(data.get("discount_percent", data.get("discount", 0)))
 	var final_price = int(data.get("final_price", 0))
 	
-	if final_price == 0 and original_price > 0:
+	if final_price == 0 and original_price > 0 and not data.has("final_price"):
 		if discount_percent > 0:
 			final_price = original_price - int(original_price * (discount_percent / 100.0))
 		else:
@@ -118,7 +149,7 @@ func apply_border_shader_effect(base_color: Color) -> void:
 	mat.shader = BORDER_SHADER
 	
 	# پارامترهای شیدر:
-	mat.set_shader_parameter("border_color", base_color.lightened(0.2))
+	mat.set_shader_parameter("border_color", base_color)
 	mat.set_shader_parameter("spark_color", Color(2.5, 2.5, 2.5, 0.45)) # نور سفید ملایم و نیمه‌شفاف
 	mat.set_shader_parameter("speed", randf_range(0.8, 1.2))            # سرعت چرخشی متغیر
 	mat.set_shader_parameter("spark_size", 0.06)                        # عرض نور محو
@@ -157,32 +188,32 @@ func apply_dynamic_gradient(main_color: Color) -> void:
 	grad_tex.fill_from = Vector2(0.5, 0.3)
 	background.texture = grad_tex
 
-## خرید فقط با «رها کردنِ» انگشت روی نوارِ قیمت، و فقط اگر انگشت تقریباً
-## جابه‌جا نشده باشد — قبلاً همان لحظه‌ی فشردن خرید می‌زد، پس شروعِ اسکرول
-## از روی کارت پنجره‌ی خرید را باز می‌کرد.
+## لمسِ کارت فقط با «رها کردنِ» انگشت و فقط اگر انگشت تقریباً جابه‌جا نشده باشد —
+## شروعِ اسکرول از روی کارت هیچ پنجره‌ای باز نمی‌کند. خرید دیگر مستقیم نیست:
+## پیش‌نمایش با قیمت و دکمه‌ی طلایی باز می‌شود (C13).
 ##
 ## فقط رویدادِ تاچ: روی PC هم emulate_touch_from_mouse همین را می‌سازد.
-func _on_price_bar_gui_input(event: InputEvent) -> void:
+func _on_card_gui_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		var screen_pos := _screen_pos(event.position)
 		if event.pressed:
 			_touch_down = true
 			_touch_start = screen_pos
-			UIFx.press_scale(price_bar, true)
+			UIFx.press_scale(self, true)
 			return
 		var was_down := _touch_down
 		_touch_down = false
-		UIFx.press_scale(price_bar, false)
+		UIFx.press_scale(self, false)
 		if was_down and screen_pos.distance_to(_touch_start) < TAP_SLOP:
-			UIFx.tap(self, func() -> void: buy_requested.emit(current_item_data))
+			LocalSettings.vibrate(15)
+			UIFx.tap(self, func() -> void: card_clicked.emit(current_item_data))
 		return
 
 	if event is InputEventScreenDrag and _touch_down:
 		if _screen_pos(event.position).distance_to(_touch_start) >= TAP_SLOP:
-			# این یک اسکرول است؛ رها کردنِ بعدی دیگر خرید حساب نمی‌شود
 			_touch_down = false
-			UIFx.press_scale(price_bar, false)
+			UIFx.press_scale(self, false)
 
-## مختصاتِ محلیِ نوارِ قیمت → پیکسلِ صفحه (مستقل از اسکرولِ لیست)
+## مختصاتِ محلیِ کارت → پیکسلِ صفحه (مستقل از اسکرول)
 func _screen_pos(local_pos: Vector2) -> Vector2:
-	return price_bar.get_global_transform_with_canvas() * local_pos
+	return get_global_transform_with_canvas() * local_pos

@@ -26,6 +26,7 @@ const CONFETTI := preload("res://scripts/psych_results_confetti.gd")
 ## آرتِ «ارتقا» کنارِ «تا ارتقا به …» (اگر نباشد همان آیکنِ صحنه)
 const UP_ART := "res://assets/ui/psych/result_level_up.png"
 const PsychProgress := preload("res://scripts/psych_results_progress.gd")
+const ProgFx := preload("res://scripts/psych_prog_fx.gd")
 
 const DEFAULT_TIERS := [
 	{"id": "bronze", "name": "برنز", "min": 0, "max": 1000},
@@ -54,10 +55,12 @@ const RULES := [
 	"کاپ هیچ‌وقت از صفر کمتر نمی‌شود.",
 ]
 
-const COLOR_TEXT := Color(0.9, 0.93, 1.0, 1.0)
-const COLOR_MUTED := Color(0.68, 0.74, 0.84, 1.0)
-const COLOR_GOLD := Color(0.97, 0.78, 0.3, 1.0)
-const COLOR_BLUE := Color(0.3, 0.6, 1.0, 1.0)
+## پالت MenuUI (سیاه/قرمز/طلایی) — این صفحه قبلاً سرمه‌ای/آبی بود
+const COLOR_TEXT := MenuUI.TEXT
+const COLOR_MUTED := MenuUI.MUTED
+const COLOR_GOLD := MenuUI.GOLD
+## اکسنتِ اصلی (قبلاً آبی) — حالا قرمزِ تم
+const COLOR_BLUE := MenuUI.RED
 
 const MAIN_MENU_SCENE := "res://secense/main_menu.tscn"
 const RANKING_SCENE := "res://secense/ranking_screen.tscn"
@@ -132,6 +135,8 @@ func _ready() -> void:
 	_http.request_completed.connect(_on_profile_received)
 
 	_style_top_bar()
+	# آرتِ پس‌زمینه‌ی سرمه‌ای → خاکستریِ گرم؛ شعله‌های دو طرف سرِ جایشان (V2)
+	ProgFx.desaturate(get_node("BgImage") as CanvasItem, Color(0.95, 0.8, 0.78))
 	UIFx.bind_press(_back_button, _go_back)
 	# «؟» صفحه‌ی قوانین رنک را باز/بسته می‌کند
 	UIFx.bind_press(_help_button, func() -> void: _show_page(not _rules_page.visible))
@@ -213,7 +218,7 @@ func _style_top_bar() -> void:
 	if profile:
 		profile.visible = false
 
-	var pill := _make_box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 8)
+	var pill := _make_box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 8)
 	pill.content_margin_left = 10
 	pill.content_margin_right = 6
 	pill.content_margin_top = 3
@@ -224,7 +229,7 @@ func _style_top_bar() -> void:
 			p.add_theme_stylebox_override("panel", pill)
 
 	# قاب مربعی پشت آیکن‌های پیام/دوستان/تنظیمات (پشت خود دکمه کشیده می‌شود)
-	var box := _make_box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 7)
+	var box := _make_box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 7)
 	for path in ["HBoxContainer/HBoxContainer3/MessagesButton",
 			"HBoxContainer/HBoxContainer3/FriendsButton",
 			"HBoxContainer/HBoxContainer3/SettingsButton"]:
@@ -297,8 +302,9 @@ func _show_page(rules: bool) -> void:
 
 func _set_active_nav(active: Button) -> void:
 	if _nav_active_style == null:
-		_nav_active_style = _make_box(Color(0.05, 0.2, 0.45, 0.92), Color(0.3, 0.65, 1.0), 2, 6)
-		_nav_active_style.shadow_color = Color(0.15, 0.5, 1.0, 0.45)
+		# همان منوی کناریِ رتبه‌بندی و شهر (ranking_screen/city): تبِ فعال طلایی
+		_nav_active_style = _make_box(Color(0.28, 0.2, 0.04, 0.95), COLOR_GOLD, 2, 6)
+		_nav_active_style.shadow_color = Color(1.0, 0.75, 0.2, 0.25)
 		_nav_active_style.shadow_size = 8
 		_nav_active_style.content_margin_left = 14
 		_nav_active_style.content_margin_right = 12
@@ -330,7 +336,7 @@ func _show_toast(text: String) -> void:
 		_toast.add_theme_font_override("font", (_nav_rank.get_node("Row/Label") as Label).get_theme_font("font"))
 		_toast.add_theme_font_size_override("font_size", 16)
 		_toast.add_theme_color_override("font_color", COLOR_TEXT)
-		var style := _make_box(Color(0.03, 0.08, 0.18, 0.95), COLOR_BLUE, 1, 8)
+		var style := _make_box(Color(0.06, 0.055, 0.055, 0.96), MenuUI.GOLD_DEEP, 1, 8)
 		style.content_margin_left = 18
 		style.content_margin_right = 18
 		style.content_margin_top = 8
@@ -498,6 +504,10 @@ func _build_ladder() -> void:
 		var chip := TIER_CHIP_SCENE.instantiate()
 		chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_tiers_row.add_child(chip)
+		if i > 0:
+			# جداکننده‌ی قبلی بداند به کدام ستون می‌رسد (ارتفاعِ خطِ مسیر = وسطِ نشان)
+			_tiers_row.get_child(_tiers_row.get_child_count() - 2).set_meta("chip", chip)
+			_tiers_row.get_child(_tiers_row.get_child_count() - 2).set_meta("index", i)
 		chip.setup(_tier_view(i), false)
 		_tier_chips.append(chip)
 
@@ -514,26 +524,35 @@ func _refresh_ladder() -> void:
 		_tier_chips[i].setup(_tier_view(i), i == _current_index, state, _left_to_next, _near_next)
 	for i in _tier_chips.size():
 		_tier_chips[i].play_pop(0.04 * float(i))
+	for c in _tiers_row.get_children():
+		if c.has_meta("index"):
+			(c as Control).queue_redraw()
 
 func _tier_view(index: int) -> Dictionary:
 	var tier: Dictionary = _tiers[index].duplicate()
 	tier["sub"] = TIER_SUBS.get(str(tier.get("id", "")), "")
 	return tier
 
-## خط عمودی بین دو ستون با فلش «›» آبی وسطش — با draw کشیده می‌شود
+## V3/C9 «مسیرِ قهرمانی»: بینِ هر دو ستون یک تکه مسیر هم‌ارتفاعِ وسطِ نشان‌ها
+## با فلشِ «›». تا رنکِ فعلی طلایی (پیموده‌شده)، بعدش خاکستری (هنوز نه).
 func _make_separator() -> Control:
 	var sep := Control.new()
 	sep.custom_minimum_size = Vector2(18, 0)
 	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	sep.draw.connect(func() -> void:
 		var c := sep.size * 0.5
-		var line := Color(0.3, 0.42, 0.6, 0.4)
-		sep.draw_line(Vector2(c.x, 6), Vector2(c.x, c.y - 14), line, 1.0)
-		sep.draw_line(Vector2(c.x, c.y + 14), Vector2(c.x, sep.size.y - 6), line, 1.0)
+		var chip: Control = sep.get_meta("chip", null)
+		if chip != null and is_instance_valid(chip):
+			var badge := chip.get_node_or_null("Margin/Body/BadgeSlot") as Control
+			if badge != null and badge.size.y > 0.0:
+				c.y = badge.get_global_rect().get_center().y - sep.get_global_rect().position.y
+		var walked := int(sep.get_meta("index", 99)) <= _current_index
+		var col := COLOR_GOLD if walked else Color(0.36, 0.35, 0.36, 0.9)
+		sep.draw_line(Vector2(-14, c.y), Vector2(sep.size.x + 14, c.y), Color(col, 0.55 if walked else 0.4), 3.0)
 		var points := PackedVector2Array([
-			c + Vector2(-4, -9), c + Vector2(4, 0), c + Vector2(-4, 9)
+			c + Vector2(-4, -8), c + Vector2(4, 0), c + Vector2(-4, 8)
 		])
-		sep.draw_polyline(points, COLOR_BLUE, 3.0, true)
+		sep.draw_polyline(points, col, 3.0, true)
 	)
 	return sep
 

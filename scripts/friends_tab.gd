@@ -18,6 +18,11 @@ const FRIEND_ROW_SCENE := preload("res://secense/friend_row.tscn")
 const GIFT_DIALOG_SCENE := preload("res://secense/gift_dialog.tscn")
 ## E10 یادآوری هدیه‌ی روزانه
 const PsychSocialGift := preload("res://scripts/psych_social_gift.gd")
+## E1/E10 «با هم بازی کنیم» + ظاهر مشترک دور ۳
+const PsychProfileInvite := preload("res://scripts/psych_profile_invite.gd")
+const UI := preload("res://scripts/psych_profile_ui.gd")
+const ICON_DUEL := preload("res://assets/ui/profile_menu/friend_icon_duel.svg")
+const ICON_COPY := preload("res://assets/ui/profile_menu/icon_copy.svg")
 const CHAT_SCENE := "res://secense/chat.tscn"
 
 ## وقتی تب باز است، هر چند ثانیه وضعیت آنلاین تازه شود.
@@ -74,6 +79,9 @@ var _busy := false
 var _loaded_once := false
 var _toast_tween: Tween
 var _success_message := ""
+var _invite_button: Button
+var _empty_action: Button
+var _skeleton: Control
 
 # ------------------------------------------------------------------ آماده‌سازی
 
@@ -104,6 +112,7 @@ func _ready() -> void:
 
 	UIScroll.attach(_scroll)
 	_apply_social_art()
+	_build_round3()
 	_toast.visible = false
 	_set_detail_empty()
 	_refresh_filter_chips()
@@ -157,6 +166,7 @@ func refresh() -> void:
 # ------------------------------------------------------------------ پاسخ سرور
 
 func _on_friends_received(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	_clear_skeleton()
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
 		# لیستِ قبلی (اگر بود) سر جایش می‌ماند؛ فقط وقتی چیزی نداریم خطا نشان بده
 		if _friends.is_empty():
@@ -227,9 +237,21 @@ func _build_list() -> void:
 	else:
 		for child in _list.get_children():
 			child.queue_free()
+		# C14/V3 دو گروه: آنلاین‌ها اول (همان‌هایی که الان می‌شود با آن‌ها بازی کرد)
+		var online_shown := 0
+		for f in shown:
+			if f is Dictionary and bool(f.get("is_online", false)):
+				online_shown += 1
+		var offline_header_done := false
+		if online_shown > 0:
+			_list.add_child(UI.group_header("آنلاین — %s" % MenuUI.fa(online_shown), MenuUI.GREEN))
 		for f in shown:
 			if not (f is Dictionary):
 				continue
+			if not bool(f.get("is_online", false)) and not offline_header_done:
+				offline_header_done = true
+				if online_shown > 0:
+					_list.add_child(UI.group_header("آفلاین — %s" % MenuUI.fa(shown.size() - online_shown)))
 			var row: FriendRow = FRIEND_ROW_SCENE.instantiate()
 			row.setup(f)
 			row.row_selected.connect(_select)
@@ -244,13 +266,17 @@ func _build_list() -> void:
 	_scroll.visible = not empty
 	_empty_box.visible = empty
 	_retry_button.visible = false
+	_empty_action.visible = empty
 	if empty:
+		# E1/E10 حالت خالی گرم با یک کار پیشنهادی
 		if _friends.is_empty():
-			_empty_label.text = "هنوز دوستی اضافه نکرده‌ای"
-			_empty_hint.text = "آیدی دوستت را در باکس «افزودن دوست» بزن، یا آیدی خودت را برایش بفرست."
+			_empty_label.text = "تیمت هنوز خالیه!"
+			_empty_hint.text = "آیدی خودت را برای رفیقت بفرست، یا آیدی او را در «افزودن دوست» بزن."
+			_empty_action.text = "کپی آیدی من"
 		else:
 			_empty_label.text = "الان هیچ دوستی آنلاین نیست"
-			_empty_hint.text = "برای دیدن همه، «همه» را بزن."
+			_empty_hint.text = "یه پیام بده تا بیاد — یا «همه» را بزن."
+			_empty_action.text = "نمایش همه"
 
 	# انتخاب قبلی حفظ می‌شود؛ وگرنه اولین دوست
 	var selected := _find_friend(_selected_id)
@@ -264,11 +290,14 @@ func _build_list() -> void:
 	_refresh_row_selection()
 
 func _show_list_error(message: String) -> void:
+	_clear_skeleton()
 	_scroll.visible = false
 	_empty_box.visible = true
 	_empty_label.text = message
-	_empty_hint.text = ""
+	_empty_hint.text = "" if "اینترنت" in message else "اینترنت را بررسی کن و دوباره امتحان کن"
 	_retry_button.visible = true
+	if _empty_action != null:
+		_empty_action.visible = false
 
 func _find_friend(player_id: String) -> Dictionary:
 	if player_id.is_empty():
@@ -330,6 +359,9 @@ func _apply_detail(data: Dictionary) -> void:
 
 	_detail_avatar.texture = MenuUI.avatar_texture(str(data.get("avatar_id", "")))
 	_refresh_gift_button()
+	# V5 یک دکمه‌ی طلایی: دوستِ آنلاین → «دعوت به بازی»، وگرنه «پیام»
+	_invite_button.visible = online
+	MenuUI.style_button(_message_button, "dark" if online else "gold")
 	if changed:
 		_detail_avatar_slot.pivot_offset = _detail_avatar_slot.size * 0.5
 		_detail_avatar_slot.scale = Vector2(0.9, 0.9)
@@ -340,6 +372,8 @@ func _set_detail_empty() -> void:
 	_selected_id = ""
 	for c in [_detail_top, _detail_meta_row, _detail_actions, _remove_button]:
 		c.visible = false
+	if _invite_button != null:
+		_invite_button.visible = false
 	_detail_hint.visible = true
 
 # ------------------------------------------------------------------ دکمه‌ها
@@ -565,3 +599,74 @@ func _play_intro() -> void:
 		var t := create_tween()
 		t.tween_interval(0.035 * i)
 		t.tween_property(row, "modulate:a", 1.0, 0.20).set_trans(Tween.TRANS_SINE)
+
+# ------------------------------------------------------------------ دور ۳
+
+func _build_round3() -> void:
+	# شبکه‌ی موبایل ناپایدار است: درخواست آویزان بعد از ۱۲ ثانیه خطا + «تلاش دوباره» می‌دهد
+	if _http.timeout <= 0.0:
+		_http.timeout = 12.0
+	if _action_http.timeout <= 0.0:
+		_action_http.timeout = 12.0
+	# E1/E10 دعوت به بازی — بالای ردیف دکمه‌ها، فقط برای دوستِ آنلاین
+	_invite_button = MenuUI.button("دعوت به بازی", "gold", 19)
+	_invite_button.icon = ICON_DUEL
+	_invite_button.expand_icon = true
+	_invite_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_invite_button.add_theme_constant_override("icon_max_width", 28)
+	_invite_button.add_theme_constant_override("h_separation", 10)
+	_invite_button.visible = false
+	_invite_button.pressed.connect(_on_invite_pressed)
+	var body := _detail_actions.get_parent()
+	body.add_child(_invite_button)
+	body.move_child(_invite_button, _detail_actions.get_index())
+
+	# C13 حذف دوست کوچک و کنار؛ رنگ قرمز فقط روی متن
+	_remove_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_remove_button.custom_minimum_size = Vector2(150, 44)
+	_remove_button.add_theme_font_size_override("font_size", 15)
+
+	var add_title := get_node_or_null("Columns/SideColumn/AddPanel/Margin/Body/TitleLabel") as Label
+	if add_title != null:
+		add_title.add_theme_color_override("font_color", MenuUI.TEXT)
+	_copy_button.icon = ICON_COPY
+	_copy_button.expand_icon = true
+	_copy_button.add_theme_constant_override("icon_max_width", 22)
+
+	_empty_action = MenuUI.button("", "gold", 17)
+	_empty_action.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_empty_action.custom_minimum_size = Vector2(220, MenuUI.TOUCH_H)
+	_empty_action.visible = false
+	_empty_action.pressed.connect(_on_empty_action_pressed)
+	_empty_box.add_child(_empty_action)
+
+	# C12 تا جواب اول، ردیف‌های اسکلتی به‌جای لیست خالی
+	_skeleton = UI.skeleton(4, 64)
+	_list.add_child(_skeleton)
+
+func _clear_skeleton() -> void:
+	if _skeleton != null and is_instance_valid(_skeleton):
+		_skeleton.queue_free()
+	_skeleton = null
+
+func _on_empty_action_pressed() -> void:
+	UIFx.press(_empty_action)
+	if _friends.is_empty():
+		_on_copy_id_pressed()
+	else:
+		_set_filter("all")
+
+func _on_invite_pressed() -> void:
+	UIFx.press(_invite_button)
+	var friend := _find_friend(_selected_id)
+	if friend.is_empty():
+		return
+	_invite_button.disabled = true
+	PsychProfileInvite.send(self, _selected_id, str(friend.get("username", "")), func(ok: bool, message: String) -> void:
+		if not is_instance_valid(_invite_button):
+			return
+		_invite_button.disabled = false
+		if ok:
+			LocalSettings.vibrate(25)
+			UI.pop(_invite_button, 1.06)
+		_show_toast(message))

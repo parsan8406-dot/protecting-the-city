@@ -16,10 +16,13 @@ extends PanelContainer
 ##   list.add_child(row)
 ##   row.setup_player(entry)   یا   row.setup_city(entry)
 
-const COLOR_TEXT := Color(0.94, 0.96, 1.0, 1.0)
-const COLOR_MUTED := Color(0.62, 0.7, 0.82, 1.0)
-const COLOR_GOLD := Color(0.97, 0.78, 0.3, 1.0)
-const COLOR_SILVER := Color(0.8, 0.86, 0.95, 1.0)
+const COLOR_TEXT := Color(0.96, 0.96, 0.97, 1.0)
+const COLOR_MUTED := Color(0.62, 0.62, 0.66, 1.0)
+const COLOR_GOLD := Color(1.0, 0.8, 0.26, 1.0)
+const COLOR_SILVER := Color(0.82, 0.84, 0.88, 1.0)
+## V1 جابه‌جایی از آخرین بازدید: سبز بالا، قرمز پایین (همیشه با فلش، نه فقط رنگ — V2)
+const COLOR_UP := Color(0.35, 0.86, 0.45, 1.0)
+const COLOR_DOWN := Color(1.0, 0.36, 0.33, 1.0)
 const COLOR_BRONZE := Color(0.88, 0.56, 0.3, 1.0)
 
 ## رنگ تاج و قاب سه رتبه‌ی اول
@@ -42,6 +45,7 @@ const PLACE_COLORS := {1: COLOR_GOLD, 2: COLOR_SILVER, 3: COLOR_BRONZE}
 
 ## رتبه‌ی این ردیف در جدول
 var position_in_table := 0
+var _move_label: Label = null
 
 ## استایل‌ها بین همه‌ی ردیف‌ها مشترک‌اند — یک بار ساخته می‌شوند
 static var _styles: Dictionary = {}
@@ -110,11 +114,29 @@ func setup_city(entry: Dictionary) -> void:
 func set_compact(compact: bool) -> void:
 	_city_cell.visible = not compact
 
+## E9/V1 «▲۳» کنار اسم: چند پله از آخرین باری که این جدول را دیدی جابه‌جا شده.
+## عدد از مقایسه‌ی دو پاسخ واقعیِ سرور می‌آید (ranking_screen نگهش می‌دارد)، ساختگی نیست.
+func set_movement(delta: int) -> void:
+	if _move_label == null:
+		_move_label = Label.new()
+		_move_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_move_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		_move_label.add_theme_font_override("font", _points_label.get_theme_font("font"))
+		_move_label.add_theme_font_size_override("font_size", 14)
+		var name_row := _name_label.get_parent()
+		name_row.add_child(_move_label)
+		name_row.move_child(_move_label, _name_label.get_index())
+	_move_label.visible = delta != 0
+	if delta == 0:
+		return
+	_move_label.text = ("▲%s" if delta > 0 else "▼%s") % MissionArt.fa_number(absi(delta))
+	_move_label.add_theme_color_override("font_color", COLOR_UP if delta > 0 else COLOR_DOWN)
+
 ## یک چشمک کوتاه — وقتی به جایگاه خودم پریده‌ایم
 func flash() -> void:
 	var base := modulate
 	var t := create_tween()
-	t.tween_property(self, "modulate", Color(1.3, 1.3, 1.5, base.a), 0.16)
+	t.tween_property(self, "modulate", Color(1.4, 1.3, 1.05, base.a), 0.16)
 	t.tween_property(self, "modulate", base, 0.42)
 
 # ------------------------------------------------------------------ ظاهر
@@ -132,7 +154,7 @@ static func _avatar_texture(avatar_id: String) -> Texture2D:
 			_fallback_avatar = AvatarPicker.load_avatar_texture(ids[0])
 	return _fallback_avatar
 
-## تاج و رنگ سه رتبه‌ی اول، قاب آبی ردیف خودم
+## تاج و رنگ سه رتبه‌ی اول، قاب طلایی ردیف خودم
 func _apply_place(pos: int, is_me: bool) -> void:
 	position_in_table = pos
 	_pos_label.text = MissionArt.fa_number(pos) if pos > 0 else "—"
@@ -168,19 +190,20 @@ static func _style(key: String) -> StyleBoxFlat:
 			s.shadow_color = Color(0.97, 0.7, 0.2, 0.28)
 			s.shadow_size = 6
 		"top2":
-			s.bg_color = Color(0.07, 0.13, 0.25, 0.92)
+			s.bg_color = Color(0.13, 0.13, 0.15, 0.92)
 			s.border_color = Color(COLOR_SILVER, 0.85)
 		"top3":
 			s.bg_color = Color(0.2, 0.11, 0.05, 0.88)
 			s.border_color = Color(COLOR_BRONZE, 0.85)
 		"me":
-			s.bg_color = Color(0.05, 0.2, 0.45, 0.92)
-			s.border_color = Color(0.3, 0.65, 1.0)
+			# V5 ردیف خودم تنها ردیفِ پرنورِ جدول (به‌جز سه نفر اول)
+			s.bg_color = Color(0.22, 0.16, 0.04, 0.95)
+			s.border_color = COLOR_GOLD
 			s.set_border_width_all(2)
-			s.shadow_color = Color(0.15, 0.5, 1.0, 0.35)
+			s.shadow_color = Color(1.0, 0.75, 0.2, 0.3)
 			s.shadow_size = 6
 		_:
-			s.bg_color = Color(0.03, 0.06, 0.12, 0.85)
-			s.border_color = Color(0.2, 0.32, 0.5, 0.55)
+			s.bg_color = Color(0.075, 0.075, 0.085, 0.88)
+			s.border_color = Color(0.24, 0.24, 0.27, 0.6)
 	_styles[key] = s
 	return s

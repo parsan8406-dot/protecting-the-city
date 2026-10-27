@@ -277,8 +277,8 @@ func _make_picker_button(min_size: Vector2) -> Button:
 # ------------------------------------------------------------------ به‌روزرسانی نمایش
 
 func _refresh_picker() -> void:
-	var off := CityUI.box(Color(0.03, 0.06, 0.12, 0.9), Color(0.22, 0.32, 0.48, 0.7), 1, 8)
-	var on := CityUI.box(Color(0.06, 0.2, 0.44, 0.95), CityUI.GOLD, 2, 8)
+	var off := CityUI.box(Color(0.08, 0.08, 0.09, 0.9), Color(0.28, 0.28, 0.31, 0.7), 1, 8)
+	var on := CityUI.box(Color(0.28, 0.2, 0.04, 0.95), CityUI.GOLD, 2, 8)
 	for i in _symbol_buttons.size():
 		_apply_picker_style(_symbol_buttons[i], on if i == _preview.symbol else off)
 	for i in _color_buttons.size():

@@ -943,3 +943,7 @@ func on_chat_message() -> void:
 	_chat_refresh_timer.timeout.connect(func() -> void:
 		_chat_refresh_timer = null
 		refresh_chat_unread())
+
+# r3 social (E1): صفحه‌ی شهر با «چت شهر» صحنه‌ی چت را روی کانال شهر باز می‌کند.
+# صحنه‌ی چت مصرف و خالی‌اش می‌کند. مقادیر: "" / "global" / "city" / "private"
+var requested_chat_channel: String = ""

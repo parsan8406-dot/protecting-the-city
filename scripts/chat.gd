@@ -55,6 +55,15 @@ const MAX_MESSAGES := 150
 const EMOJI_CELL := 48
 const EMOJI_PREVIEW_SIZE := 22
 
+const CITY_SCENE_PATH := "res://secense/city.tscn"
+const PROFILE_MENU_SCENE_PATH := "res://secense/profile_menu.tscn"
+## E10/C12 واکنش سریع: جمله‌های کوتاهی که با یک لمس فرستاده می‌شوند
+## (تایپ روی گوشیِ افقی سخت است). ایموجی‌های اخیر کنارشان می‌آیند.
+const QUICK_PHRASES := ["سلام!", "GG", "بزن بریم!"]
+const QUICK_EMOJIS := 4
+const RECENT_EMOJI_PATH := "user://chat_recent_emoji.cfg"
+const ICON_EMPTY_CHAT := preload("res://assets/chat/icons/message.svg")
+
 @onready var _overview_http: HTTPRequest = $OverviewHTTPRequest
 @onready var _history_http: HTTPRequest = $HistoryHTTPRequest
 @onready var _send_http: HTTPRequest = $SendHTTPRequest
@@ -154,6 +163,26 @@ var _channel_menu: PopupMenu
 var _dialog: Node = null
 var _back_frame := -1
 
+## C12 «پیام‌های جدید»: تعداد پیام‌هایی که وقتی بالا بودی رسیدند + دکمه‌ی شناور
+var _new_below := 0
+var _jump_pill: Button = null
+## خطِ «پیام‌های جدید» بالای این پیام می‌نشیند (اولین پیامِ خوانده‌نشده هنگام باز کردن)
+var _unread_anchor_id := ""
+## تعداد خوانده‌نشده‌های اتاق در لحظه‌ی باز کردن (از overview)
+var _open_unread := 0
+var _first_history := false
+var _anchor_pending := false
+## نوار واکنش سریع بالای ورودی
+var _quick_bar: HBoxContainer = null
+var _recent_emojis: Array[String] = []
+## جعبه‌ی حالت خالی/خطای وسط صفحه (آیکن + متن + یک دکمه‌ی پیشنهادی)
+var _empty_box: VBoxContainer = null
+var _empty_icon: TextureRect = null
+var _empty_action: Button = null
+var _empty_callback: Callable = Callable()
+## کارت «شهر من» در ستون چپ (جای تصویر تزئینی خالی)
+var _city_box: VBoxContainer = null
+
 # ------------------------------------------------------------------ آماده‌سازی
 
 func _ready() -> void:
@@ -202,6 +231,12 @@ func _ready() -> void:
 	_toast.visible = false
 	_preview_bar.visible = false
 
+	_style_send_button()
+	_build_empty_box()
+	_build_quick_bar()
+	_build_jump_pill()
+	_build_city_box()
+
 	# پیام بلادرنگ از سرور
 	if not Network.chat_message_received.is_connected(_on_chat_message):
 		Network.chat_message_received.connect(_on_chat_message)
@@ -220,8 +255,17 @@ func _ready() -> void:
 	_pending_peer = str(Global.requested_chat_peer)
 	Global.requested_chat_peer = ""
 
-	_select_people_tab(PEOPLE_FRIENDS)
-	_select_channel(CHANNEL_PRIVATE if not _pending_peer.is_empty() else CHANNEL_GLOBAL)
+	# E1 از صفحه‌ی شهر با «چت شهر» آمده‌ایم → همان کانال (Global.requested_chat_channel)
+	var wanted = Global.get("requested_chat_channel")
+	if wanted != null:
+		Global.set("requested_chat_channel", "")
+	var start := CHANNEL_GLOBAL
+	if not _pending_peer.is_empty():
+		start = CHANNEL_PRIVATE
+	elif wanted is String and CHANNEL_TITLES.has(wanted):
+		start = wanted
+	_select_people_tab(PEOPLE_CITY if start == CHANNEL_CITY else PEOPLE_FRIENDS)
+	_select_channel(start)
 	refresh_overview()
 
 func _exit_tree() -> void:
@@ -293,7 +337,9 @@ func _open_group_room(card: Dictionary) -> void:
 	if not bool(card.get("available", true)):
 		_open_room = {}
 		_apply_header()
-		_set_room_empty(str(card.get("hint", "برای چت شهر باید عضو یک شهر باشی")))
+		_set_room_empty("هنوز عضو هیچ شهری نیستی — با هم‌شهری‌ها اینجا هماهنگ کن و با هم بالا برید")
+		# E1 ارتباط: راهِ عضویت همین‌جاست، نه یک متنِ بن‌بست
+		_set_empty_action("پیدا کردن شهر", func() -> void: get_tree().change_scene_to_file(CITY_SCENE_PATH))
 		return
 	_open_conversation(card)
 
@@ -305,8 +351,8 @@ func _open_channel_menu() -> void:
 		_channel_menu.add_theme_font_size_override("font_size", 19)
 		_channel_menu.add_theme_constant_override("v_separation", 18)
 		var panel := StyleBoxFlat.new()
-		panel.bg_color = Color(0.035, 0.065, 0.11, 0.98)
-		panel.border_color = Color(0.25, 0.6, 1.0, 1.0)
+		panel.bg_color = Color(0.06, 0.06, 0.07, 0.98)
+		panel.border_color = MenuUI.GOLD_DEEP
 		panel.set_border_width_all(1)
 		panel.set_corner_radius_all(8)
 		panel.set_content_margin_all(8)
@@ -353,6 +399,7 @@ func _on_overview_received(result: int, response_code: int, _headers: PackedStri
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
 		if _overview.is_empty():
 			_set_room_empty("اتصال به سرور برقرار نشد — دوباره تلاش می‌کنیم ...")
+			_set_empty_action("تلاش دوباره", refresh_overview)
 			_people_empty.text = "اتصال به سرور برقرار نشد"
 			_people_empty.visible = true
 			_people_scroll.visible = false
@@ -381,6 +428,7 @@ func _on_overview_received(result: int, response_code: int, _headers: PackedStri
 
 	_update_cards()
 	_build_people_list()
+	_refresh_city_box()
 
 	match _channel:
 		CHANNEL_PRIVATE:
@@ -467,8 +515,11 @@ func _build_conversation_list() -> void:
 
 	if rows.is_empty():
 		_conv_scroll.visible = false
-		_show_room_hint("هنوز دوستی نداری — از منوی کاربر → دوستان، با آیدی دوست اضافه کن"
-			if not _overview.is_empty() else "در حال گرفتن لیست دوستان ...")
+		if _overview.is_empty():
+			_show_room_hint("در حال گرفتن لیست دوستان ...")
+		else:
+			_show_room_hint("هنوز دوستی نداری — روی آواتارِ هر کسی در چت جهانی بزن و درخواست بده")
+			_set_empty_action("پیدا کردن دوست", _open_friends)
 		return
 
 	_room_hint.visible = false
@@ -537,8 +588,13 @@ func _open_conversation(data: Dictionary) -> void:
 		_seen_ids.clear()
 		_online.clear()
 		_stick_to_bottom = true
-		_clear_messages()
-		_show_room_hint("در حال گرفتن پیام‌ها ...")
+		_new_below = 0
+		_unread_anchor_id = ""
+		_open_unread = int(data.get("unread", 0))
+		_first_history = true
+		_update_jump_pill()
+		# C12 اسکلتِ پیام‌ها به‌جای صفحه‌ی یخ‌زده تا تاریخچه برسد
+		_show_skeleton()
 		# پاسخ درخواست قبلی (اتاق دیگر) دیگر به درد نمی‌خورد
 		_history_http.cancel_request()
 		_loading_history = false
@@ -548,6 +604,7 @@ func _open_conversation(data: Dictionary) -> void:
 	_text_edit.editable = true
 	_send_button.disabled = false
 	_on_text_changed(_text_edit.text)
+	_refresh_quick_bar()
 
 ## هدر بالای ستون وسط: آیکون کانال یا آواتار دوست، عنوان، وضعیت
 func _apply_header() -> void:
@@ -563,23 +620,25 @@ func _apply_header() -> void:
 		_title_button.text = str(_open_room.get("username", "—"))
 		_room_status.text = "آنلاین" if online else ChatBubble.last_seen_text(str(_open_room.get("last_seen_at", "")))
 		_room_status.add_theme_color_override("font_color",
-			Color(0.2, 0.85, 0.38, 1.0) if online else Color(0.55, 0.62, 0.72, 1.0))
+			Color(0.2, 0.85, 0.38, 1.0) if online else MenuUI.MUTED)
 		return
 
-	_room_status.add_theme_color_override("font_color", Color(0.55, 0.62, 0.72, 1.0))
+	_room_status.add_theme_color_override("font_color", MenuUI.MUTED)
 	match _channel:
 		CHANNEL_GLOBAL:
 			_room_icon.texture = ICON_GLOBAL
 			_title_button.text = CHANNEL_TITLES[CHANNEL_GLOBAL]
 			var online_count := int(_overview.get("online_count", 0))
-			_room_status.text = ("%d بازیکن آنلاین" % online_count) if online_count > 0 else ""
+			# V1 حضور: سبزِ «آنلاین» یعنی آدمِ واقعی آن طرف هست
+			_room_status.text = ("● %s بازیکن آنلاین" % MenuUI.fa(online_count)) if online_count > 0 else ""
+			_room_status.add_theme_color_override("font_color", Color(0.3, 0.86, 0.42, 1.0))
 		CHANNEL_CITY:
 			_room_icon.texture = ICON_CITY
 			var city_title := str(_open_room.get("title", ""))
 			_title_button.text = CHANNEL_TITLES[CHANNEL_CITY] if city_title.is_empty() \
 				else "%s  «%s»" % [CHANNEL_TITLES[CHANNEL_CITY], city_title]
 			var members := int(_open_room.get("member_count", 0))
-			_room_status.text = ("%d عضو" % members) if members > 0 else ""
+			_room_status.text = ("%s عضو" % MenuUI.fa(members)) if members > 0 else ""
 		_:
 			_room_icon.texture = ICON_FRIENDS
 			_title_button.text = CHANNEL_TITLES[CHANNEL_PRIVATE]
@@ -591,15 +650,20 @@ func _set_room_empty(hint: String) -> void:
 	_show_room_hint(hint)
 	_input_row.visible = false
 	_preview_bar.visible = false
+	_refresh_quick_bar()
 
 ## راهنمای وسط صفحه (به‌جای لیست پیام‌ها) نشان داده می‌شود
 func _show_room_hint(text: String) -> void:
 	_room_hint.text = text
 	_room_hint.visible = true
+	_empty_box.visible = true
+	_set_empty_action("", Callable())
 	_messages_scroll.visible = false
+	_update_jump_pill()
 
 func _hide_room_hint() -> void:
 	_room_hint.visible = false
+	_empty_box.visible = false
 	_messages_scroll.visible = true
 
 # ------------------------------------------------------------------ تاریخچه
@@ -639,6 +703,7 @@ func _on_history_received(result: int, response_code: int, _headers: PackedStrin
 			if typeof(parsed) == TYPE_DICTIONARY and (parsed as Dictionary).has("error"):
 				reason = str((parsed as Dictionary)["error"])
 			_show_room_hint(reason)
+			_set_empty_action("تلاش دوباره", func() -> void: _request_history(true))
 		return
 
 	var json := JSON.new()
@@ -683,9 +748,19 @@ func _on_history_received(result: int, response_code: int, _headers: PackedStrin
 			added += 1
 
 	if _messages.is_empty():
-		_show_room_hint("هنوز پیامی اینجا نیست — اولین نفر باش")
+		_clear_messages()
+		_show_room_hint("هنوز پیامی اینجا نیست — اولین نفر باش!")
+		# E10 یخ‌شکن: یک لمس تا اولین پیام
+		_set_empty_action("سلام کن 👋", func() -> void: _send_text("سلام!"))
 	else:
 		_hide_room_hint()
+
+	# اولین تاریخچه‌ی اتاق: خطِ «پیام‌های جدید» بالای اولین خوانده‌نشده
+	if _first_history:
+		_first_history = false
+		if _open_unread > 0 and _open_unread < _messages.size():
+			_unread_anchor_id = str(_messages[_messages.size() - _open_unread].get("message_id", ""))
+			_anchor_pending = true
 
 	if added > 0:
 		_rebuild_messages()
@@ -746,6 +821,9 @@ func _drop_oldest() -> void:
 			head.queue_free()
 			var fresh := _make_bubble(_messages[0], true, _bubble_width())
 			_messages_box.move_child(fresh, 0)
+			head = fresh
+		# اولین حبابِ لیست همیشه قرصِ روزش را دارد
+		head.set_separators(ChatBubble.day_label(_stamps[0]), head.has_unread_divider())
 
 func _clear_messages() -> void:
 	for child in _messages_box.get_children():
@@ -761,7 +839,7 @@ func _bubble_width() -> float:
 	return width
 
 ## یک حباب برای یک پیام، تهِ لیست
-func _make_bubble(message: Dictionary, show_header: bool, width: float) -> Node:
+func _make_bubble(message: Dictionary, show_header: bool, width: float, day_text: String = "") -> Node:
 	var sender_id := str(message.get("sender_id", ""))
 	var bubble := CHAT_BUBBLE_SCENE.instantiate()
 	bubble.set_meta(&"show_header", show_header)
@@ -770,36 +848,72 @@ func _make_bubble(message: Dictionary, show_header: bool, width: float) -> Node:
 	bubble.set_available_width(width)
 	bubble.setup(message, sender_id == str(Global.player_id),
 		bool(_online.get(sender_id, false)), show_header, _leaders.has(sender_id))
+	# C1 قرصِ روز و خطِ «پیام‌های جدید»
+	var anchor := not _unread_anchor_id.is_empty() and str(message.get("message_id", "")) == _unread_anchor_id
+	bubble.set_separators(day_text, anchor)
 	return bubble
 
 ## حباب‌ها را با _messages هم‌گام می‌کند. پیامِ تازه‌ای که تهِ لیست نشسته
 ## فقط حبابِ خودش را می‌گیرد؛ از نو ساختنِ همه فقط وقتی لازم است که پیامی
 ## وسطِ تاریخچه نشسته یا وضعیتِ آنلاین/رهبرها عوض شده.
-func _rebuild_messages() -> void:
-	if _needs_rebuild or _shown > _messages.size() \
-			or _shown != _messages_box.get_child_count():
+func _rebuild_messages(live: bool = false) -> void:
+	var full := _needs_rebuild or _shown > _messages.size() \
+			or _shown != _messages_box.get_child_count()
+	if full:
 		_clear_messages()
 
 	var width := _bubble_width()
+	var fresh_from_others := 0
+	var anchor_bubble: Control = null
 	for i in range(_shown, _messages.size()):
 		var message: Dictionary = _messages[i]
+		var new_day := i == 0 or ChatBubble.local_day(_stamps[i]) != ChatBubble.local_day(_stamps[i - 1])
 		# پیام‌های پشت‌سرهمِ یک نفر در فاصله‌ی کوتاه، هدر تکراری نمی‌گیرند
 		var show_header := true
-		if i > 0:
+		if i > 0 and not new_day:
 			show_header = str(message.get("sender_id", "")) != str(_messages[i - 1].get("sender_id", "")) \
 				or _stamps[i] - _stamps[i - 1] > GROUP_WINDOW_SECONDS
-		_make_bubble(message, show_header, width)
+		var bubble := _make_bubble(message, show_header, width,
+			ChatBubble.day_label(_stamps[i]) if new_day else "") as ChatBubble
+		if bubble.has_unread_divider():
+			anchor_bubble = bubble
+		if live and not full:
+			bubble.pop_in()
+			if str(message.get("sender_id", "")) != str(Global.player_id):
+				fresh_from_others += 1
 	_shown = _messages.size()
 
-	if _stick_to_bottom:
+	if anchor_bubble != null and _anchor_pending:
+		_anchor_pending = false
+		# C12 بازیکن از همان جایی ادامه می‌دهد که خواندنش تمام شده بود
+		_stick_to_bottom = false
+		_scroll_to_control(anchor_bubble)
+	elif _stick_to_bottom:
 		_scroll_to_bottom()
+	elif fresh_from_others > 0:
+		_new_below += fresh_from_others
+		_update_jump_pill()
 
-func _scroll_to_bottom() -> void:
+func _scroll_to_bottom(smooth: bool = false) -> void:
 	# دو فریم صبر تا کانتینر ارتفاع نهایی حباب‌ها را حساب کند
 	await get_tree().process_frame
 	await get_tree().process_frame
-	if is_instance_valid(_messages_scroll):
-		_messages_scroll.scroll_vertical = int(_messages_scroll.get_v_scroll_bar().max_value)
+	if not is_instance_valid(_messages_scroll):
+		return
+	var target := int(_messages_scroll.get_v_scroll_bar().max_value)
+	if smooth and absi(target - _messages_scroll.scroll_vertical) < 4000:
+		create_tween().tween_property(_messages_scroll, "scroll_vertical", target, 0.28) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	else:
+		_messages_scroll.scroll_vertical = target
+
+## خطِ «پیام‌های جدید» کمی پایین‌تر از بالای دید
+func _scroll_to_control(control: Control) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if is_instance_valid(_messages_scroll) and is_instance_valid(control):
+		_messages_scroll.scroll_vertical = maxi(int(control.position.y) - 24, 0)
+		_on_messages_scrolled(_messages_scroll.scroll_vertical)
 
 func _on_messages_resized() -> void:
 	var width := _messages_scroll.size.x
@@ -813,6 +927,9 @@ func _on_messages_resized() -> void:
 func _on_messages_scrolled(value: float) -> void:
 	var bar := _messages_scroll.get_v_scroll_bar()
 	_stick_to_bottom = value >= bar.max_value - bar.page - 40.0
+	if _stick_to_bottom:
+		_new_below = 0
+	_update_jump_pill()
 
 # ------------------------------------------------------------------ ایموجی
 
@@ -875,11 +992,13 @@ func _insert_emoji(id: String) -> void:
 	_text_edit.text = _text_edit.text.substr(0, caret) + token + _text_edit.text.substr(caret)
 	_text_edit.caret_column = caret + token.length()
 	_on_text_changed(_text_edit.text)
+	_remember_emoji(id)
 
 func _set_emoji_panel(open: bool) -> void:
 	if _emoji_button.button_pressed != open:
 		_emoji_button.set_pressed_no_signal(open)
 	_emoji_panel.visible = open and _input_row.visible
+	_refresh_quick_bar()
 	if _emoji_panel.visible:
 		_fit_emoji_columns()
 		# کیبورد گوشی جای پنل را می‌گیرد؛ وقتی پنل باز است بسته شود
@@ -892,6 +1011,7 @@ func _set_emoji_panel(open: bool) -> void:
 ## متن با توکن ایموجی داخل LineEdit به شکل «:e01:» دیده می‌شود؛ این نوار
 ## کوچک بالای ورودی همان متن را با عکس‌ها نشان می‌دهد.
 func _on_text_changed(text: String) -> void:
+	_refresh_quick_bar()
 	var has_emoji := ChatEmoji.count(text) > 0
 	_preview_bar.visible = has_emoji and _input_row.visible
 	if has_emoji:
@@ -1068,6 +1188,12 @@ func _on_send_pressed() -> void:
 		return
 
 	UIFx.tap(_send_button)
+	_send_text(text)
+
+## فرستادنِ یک متن (از ورودی، واکنش سریع یا دکمه‌ی «سلام کن»)
+func _send_text(text: String) -> void:
+	if _sending or _open_room.is_empty() or text.strip_edges().is_empty():
+		return
 
 	var payload := {
 		"username": Global.my_username,
@@ -1110,9 +1236,10 @@ func _on_send_completed(result: int, response_code: int, _headers: PackedStringA
 			var message = (parsed as Dictionary)["message"]
 			if message is Dictionary and str((message as Dictionary).get("room", "")) == str(_open_room.get("room", "")):
 				_stick_to_bottom = true
+				_new_below = 0
 				if _append_message(message):
 					_hide_room_hint()
-					_rebuild_messages()
+					_rebuild_messages(true)
 		refresh_overview()
 		return
 
@@ -1133,7 +1260,7 @@ func _on_chat_message(data: Dictionary) -> void:
 	if room == str(_open_room.get("room", "")):
 		if _append_message(data):
 			_hide_room_hint()
-			_rebuild_messages()
+			_rebuild_messages(true)
 		# بازیکن دارد همین گفتگو را نگاه می‌کند، پس پیام خوانده حساب می‌شود
 		_mark_open_room_read()
 		return
@@ -1257,3 +1384,285 @@ func _fade_in_children(list: Container) -> void:
 
 func _go_home() -> void:
 	get_tree().change_scene_to_file(MAIN_MENU_SCENE_PATH)
+
+func _open_friends() -> void:
+	Global.request_profile_tab("friends")
+	get_tree().change_scene_to_file(PROFILE_MENU_SCENE_PATH)
+
+# ------------------------------------------------------------ round 3: ظاهر و حالت‌ها
+
+## V5 تنها دکمه‌ی اصلیِ صفحه: «فرستادن» طلایی
+func _style_send_button() -> void:
+	for c in ["icon_normal_color", "icon_hover_color", "icon_focus_color"]:
+		_send_button.add_theme_color_override(c, Color(1.0, 0.88, 0.55, 1.0))
+	_send_button.add_theme_color_override("icon_pressed_color", Color.WHITE)
+	_send_button.add_theme_color_override("icon_disabled_color", MenuUI.DIM)
+	_emoji_button.add_theme_color_override("icon_pressed_color", MenuUI.GOLD)
+
+## E1/E10 جعبه‌ی خالی/خطا: آیکن + متن + یک کارِ پیشنهادی (به‌جای متنِ بن‌بست)
+func _build_empty_box() -> void:
+	var col := _room_hint.get_parent()
+	_empty_box = VBoxContainer.new()
+	_empty_box.name = "EmptyBox"
+	_empty_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_empty_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_empty_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_empty_box.add_theme_constant_override("separation", 12)
+	_empty_box.visible = false
+	col.add_child(_empty_box)
+	col.move_child(_empty_box, _room_hint.get_index())
+	_empty_icon = MenuUI.icon(ICON_EMPTY_CHAT, 56, Color(1, 1, 1, 0.35))
+	_empty_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_empty_box.add_child(_empty_icon)
+	_room_hint.reparent(_empty_box)
+	_room_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_room_hint.custom_minimum_size = Vector2(220, 0)
+	_empty_action = MenuUI.button("", "dark", 17)
+	_empty_action.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_empty_action.custom_minimum_size = Vector2(180, MenuUI.TOUCH_H)
+	_empty_action.add_theme_color_override("font_color", MenuUI.GOLD)
+	_empty_action.visible = false
+	_empty_action.pressed.connect(func() -> void:
+		if _empty_callback.is_valid():
+			UIFx.tap(_empty_action, _empty_callback))
+	_empty_box.add_child(_empty_action)
+
+func _set_empty_action(text: String, callback: Callable) -> void:
+	if _empty_action == null:
+		return
+	_empty_callback = callback
+	_empty_action.text = text
+	_empty_action.visible = not text.is_empty() and callback.is_valid()
+
+## C12 اسکلتِ پیام‌ها: چند حبابِ خاکستریِ تپنده تا تاریخچه برسد (ارزان: فقط تویینِ آلفا)
+func _show_skeleton() -> void:
+	_clear_messages()
+	_hide_room_hint()
+	var widths := [0.46, 0.3, 0.52, 0.24, 0.38]
+	for i in widths.size():
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.alignment = BoxContainer.ALIGNMENT_END if i % 3 == 2 else BoxContainer.ALIGNMENT_BEGIN
+		row.custom_minimum_size = Vector2(0, 58)
+		var bar := Panel.new()
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.custom_minimum_size = Vector2(maxf(_bubble_width(), 300.0) * float(widths[i]), 40)
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		bar.add_theme_stylebox_override("panel", MenuUI.box(Color(0.14, 0.14, 0.15, 1.0), Color(0, 0, 0, 0), 0, 10))
+		row.add_child(bar)
+		_messages_box.add_child(row)
+		row.modulate.a = 0.35
+		var t := row.create_tween().set_loops()
+		t.tween_interval(0.08 * i)
+		t.tween_property(row, "modulate:a", 0.8, 0.5).set_trans(Tween.TRANS_SINE)
+		t.tween_property(row, "modulate:a", 0.35, 0.5).set_trans(Tween.TRANS_SINE)
+	_shown = 0
+
+# --------------------------------------------------- واکنش سریع (E10 / C12)
+
+func _build_quick_bar() -> void:
+	_load_recent_emojis()
+	_quick_bar = HBoxContainer.new()
+	_quick_bar.name = "QuickBar"
+	_quick_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_quick_bar.add_theme_constant_override("separation", 8)
+	_quick_bar.clip_contents = true
+	_quick_bar.visible = false
+	var col := _input_row.get_parent()
+	col.add_child(_quick_bar)
+	col.move_child(_quick_bar, _input_row.get_index())
+	_quick_bar.resized.connect(_fit_quick_bar)
+	_input_row.visibility_changed.connect(_refresh_quick_bar)
+	_fill_quick_bar()
+
+func _fill_quick_bar() -> void:
+	for child in _quick_bar.get_children():
+		child.queue_free()
+	for i in mini(QUICK_EMOJIS, _recent_emojis.size()):
+		var id: String = _recent_emojis[i]
+		var chip := _quick_chip("")
+		chip.icon = ChatEmoji.texture_of(id)
+		chip.expand_icon = true
+		chip.add_theme_constant_override("icon_max_width", 30)
+		chip.custom_minimum_size = Vector2(56, 48)
+		chip.pressed.connect(func() -> void:
+			_remember_emoji(id)
+			_send_text(ChatEmoji.token(id)))
+		_quick_bar.add_child(chip)
+	for phrase: String in QUICK_PHRASES:
+		var chip := _quick_chip(phrase)
+		chip.pressed.connect(func() -> void: _send_text(phrase))
+		_quick_bar.add_child(chip)
+	_fit_quick_bar.call_deferred()
+
+func _quick_chip(text: String) -> Button:
+	var chip := MenuUI.button(text, "dark", 16)
+	chip.custom_minimum_size = Vector2(0, 48)
+	var normal := MenuUI.box(Color(0.1, 0.1, 0.11, 0.95), Color(0.3, 0.3, 0.33, 0.9), 1, 24)
+	normal.content_margin_left = 16
+	normal.content_margin_right = 16
+	var pressed := MenuUI.box(Color(0.28, 0.2, 0.04, 1.0), MenuUI.GOLD, 1, 24)
+	pressed.content_margin_left = 16
+	pressed.content_margin_right = 16
+	for state in ["normal", "hover"]:
+		chip.add_theme_stylebox_override(state, normal)
+	chip.add_theme_stylebox_override("pressed", pressed)
+	chip.add_theme_stylebox_override("hover_pressed", pressed)
+	chip.add_theme_color_override("font_color", Color(0.92, 0.92, 0.94, 1.0))
+	chip.pressed.connect(func() -> void: UIFx.tap(chip))
+	return chip
+
+## تراشه‌هایی که جا نمی‌شوند پنهان می‌شوند (گوشیِ باریک / تبلت 4:3)
+func _fit_quick_bar() -> void:
+	if _quick_bar == null:
+		return
+	var room := _quick_bar.size.x
+	var used := 0.0
+	for child in _quick_bar.get_children():
+		var c := child as Control
+		if c == null or c.is_queued_for_deletion():
+			continue
+		var w := c.get_combined_minimum_size().x + 8.0
+		c.visible = used + w <= room or used == 0.0
+		if c.visible:
+			used += w
+
+## نوار فقط وقتی دیده می‌شود که ورودی باز و خالی است و پنل ایموجی بسته (جای پیام‌ها را نخورد)
+func _refresh_quick_bar() -> void:
+	if _quick_bar == null:
+		return
+	_quick_bar.visible = _input_row.visible and not _emoji_panel.visible \
+		and _text_edit.text.strip_edges().is_empty()
+
+func _load_recent_emojis() -> void:
+	_recent_emojis.clear()
+	var cfg := ConfigFile.new()
+	if cfg.load(RECENT_EMOJI_PATH) == OK:
+		for id in cfg.get_value("recent", "ids", []):
+			if str(id) in ChatEmoji.list_ids():
+				_recent_emojis.append(str(id))
+	for id in ChatEmoji.list_ids():
+		if _recent_emojis.size() >= QUICK_EMOJIS:
+			break
+		if not id in _recent_emojis:
+			_recent_emojis.append(id)
+
+func _remember_emoji(id: String) -> void:
+	if _recent_emojis.size() > 0 and _recent_emojis[0] == id:
+		return
+	_recent_emojis.erase(id)
+	_recent_emojis.push_front(id)
+	if _recent_emojis.size() > 8:
+		_recent_emojis.resize(8)
+	var cfg := ConfigFile.new()
+	cfg.set_value("recent", "ids", _recent_emojis)
+	cfg.save(RECENT_EMOJI_PATH)
+	_fill_quick_bar()
+
+# --------------------------------------------------- «پیام‌های جدید» (C12)
+
+func _build_jump_pill() -> void:
+	_jump_pill = MenuUI.button("", "gold", 15)
+	_jump_pill.name = "JumpPill"
+	_jump_pill.visible = false
+	_jump_pill.z_index = 5
+	_jump_pill.custom_minimum_size = Vector2(0, 48)
+	var normal := MenuUI.box(Color(0.32, 0.22, 0.03, 0.97), MenuUI.GOLD, 1, 24)
+	normal.content_margin_left = 18
+	normal.content_margin_right = 18
+	normal.shadow_color = Color(0, 0, 0, 0.6)
+	normal.shadow_size = 8
+	for state in ["normal", "hover"]:
+		_jump_pill.add_theme_stylebox_override(state, normal)
+	add_child(_jump_pill)
+	_jump_pill.pressed.connect(func() -> void:
+		_new_below = 0
+		_stick_to_bottom = true
+		_update_jump_pill()
+		_scroll_to_bottom(true))
+	_messages_scroll.resized.connect(_place_jump_pill)
+
+func _update_jump_pill() -> void:
+	if _jump_pill == null:
+		return
+	var bar := _messages_scroll.get_v_scroll_bar()
+	var far := bar.max_value - bar.page - _messages_scroll.scroll_vertical > _messages_scroll.size.y
+	var show := _messages_scroll.visible and not _stick_to_bottom and (_new_below > 0 or far)
+	if show:
+		_jump_pill.text = ("↓  %s پیام جدید" % MenuUI.fa(_new_below)) if _new_below > 0 else "↓  آخرین پیام‌ها"
+		_jump_pill.reset_size()
+		_place_jump_pill()
+	if show and not _jump_pill.visible:
+		_jump_pill.visible = true
+		_jump_pill.modulate.a = 0.0
+		create_tween().tween_property(_jump_pill, "modulate:a", 1.0, 0.16)
+	elif not show:
+		_jump_pill.visible = false
+
+func _place_jump_pill() -> void:
+	if _jump_pill == null:
+		return
+	var r := _messages_scroll.get_global_rect()
+	var inv := get_global_transform().affine_inverse()
+	var local_pos: Vector2 = inv * (r.position + Vector2((r.size.x - _jump_pill.size.x) * 0.5, r.size.y - _jump_pill.size.y - 10.0))
+	_jump_pill.position = local_pos
+
+# --------------------------------------------------- کارت «شهر من» (E1 ارتباط)
+
+## ستون چپ قبلاً یک تصویرِ تزئینیِ خالی داشت؛ حالا شهرِ بازیکن (یا راهِ پیدا کردنش)
+func _build_city_box() -> void:
+	var root := _side_art.get_parent()
+	var slogan := root.get_node_or_null("Slogan") as CanvasItem
+	if slogan != null and _side_art.texture == null:
+		slogan.visible = false
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		margin.add_theme_constant_override(side, 12)
+	root.add_child(margin)
+	_city_box = VBoxContainer.new()
+	_city_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_city_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_city_box.add_theme_constant_override("separation", 8)
+	margin.add_child(_city_box)
+
+func _refresh_city_box() -> void:
+	if _city_box == null:
+		return
+	var in_city := _in_city()
+	var card: Dictionary = _overview.get("city", {}) if _overview.get("city", {}) is Dictionary else {}
+	var key := "%s|%s|%s" % [in_city, card.get("title", ""), card.get("member_count", 0)]
+	var online := 0
+	for person in _people():
+		if typeof(person) == TYPE_DICTIONARY and bool(person.get("is_city", false)) and bool(person.get("is_online", false)):
+			online += 1
+	key += "|%d" % online
+	if _city_box.get_meta(&"key", "") == key:
+		return
+	_city_box.set_meta(&"key", key)
+	for child in _city_box.get_children():
+		child.queue_free()
+
+	# نشانِ واقعیِ شهر در overview نیست — آیکن شهر طلایی، نه یک نشانِ ساختگی
+	var emblem := MenuUI.icon(ICON_CITY, 56, MenuUI.GOLD if in_city else Color(1, 1, 1, 0.4))
+	emblem.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_city_box.add_child(emblem)
+	var title := MenuUI.label(str(card.get("title", "")) if in_city else "هنوز شهر نداری", 18,
+		MenuUI.GOLD if in_city else MenuUI.TEXT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_city_box.add_child(title)
+	var sub := MenuUI.label("", 14, MenuUI.MUTED)
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if in_city:
+		sub.text = "%s عضو  •  %s هم‌شهریِ آنلاین" % [MenuUI.fa(int(card.get("member_count", 0))), MenuUI.fa(online)]
+	else:
+		sub.text = "هم‌تیمی، چت اختصاصی و رقابت شهرها"
+	_city_box.add_child(sub)
+	var go := MenuUI.button("صفحه‌ی شهر" if in_city else "پیدا کردن شهر", "dark", 16)
+	go.add_theme_color_override("font_color", MenuUI.GOLD)
+	go.pressed.connect(func() -> void:
+		UIFx.tap(go, func() -> void: get_tree().change_scene_to_file(CITY_SCENE_PATH)))
+	_city_box.add_child(go)

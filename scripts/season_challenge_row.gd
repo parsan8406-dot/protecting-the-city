@@ -82,19 +82,32 @@ func _apply(challenge: Dictionary) -> void:
 
 	# C9 نزدیکِ پایان: نوار و عدد طلایی (فضای ردیف برای جمله‌ی کامل کم است)
 	var near := not done and not claimed and PsychProgress.is_near(progress, target)
-	PsychProgress.emphasize_bar(_bar, near)
+	# جایزه‌ی آماده هم نوارِ طلایی می‌گیرد (طلایی = پاداش، V1)
+	PsychProgress.emphasize_bar(_bar, near or (done and not claimed))
 	if near:
 		_amount_label.add_theme_color_override("font_color", COLOR_GOLD)
 
 ## سه حالت: در حال انجام / آماده‌ی دریافت / گرفته‌شده
 func _apply_state(done: bool, claimed: bool) -> void:
 	_button.disabled = claimed
+	# V5 فقط «دریافت» طلایی است؛ «رفتن» تیره و فرعی؛ گرفته‌شده تیک و خاموش
 	if claimed:
-		_button.text = "گرفته شد"
+		_button.text = "✓ گرفته شد"
+		MenuUI.style_button(_button, "ghost")
 	elif done:
 		_button.text = "دریافت"
+		MenuUI.style_button(_button, "gold")
+		# همان طلاییِ پُرِ «دریافت»ِ ردیف‌های ماموریت (یک CTA در کل صفحه یک شکل دارد)
+		var sb := MenuUI.box(MenuUI.GOLD, Color(1.0, 0.93, 0.62), 1, 6)
+		sb.content_margin_left = 14
+		sb.content_margin_right = 14
+		for st in ["normal", "hover"]:
+			_button.add_theme_stylebox_override(st, sb)
+		for c in ["font_color", "font_hover_color", "font_pressed_color"]:
+			_button.add_theme_color_override(c, Color(0.2, 0.12, 0.0))
 	else:
 		_button.text = "رفتن"
+		MenuUI.style_button(_button, "dark")
 
 	if claimed:
 		_title_label.add_theme_color_override("font_color", COLOR_DIM)

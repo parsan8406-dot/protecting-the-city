@@ -5,29 +5,29 @@
 [ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
 
 [sub_resource type="StyleBoxFlat" id="SB_idle"]
-bg_color = Color(0.035, 0.063, 0.105, 0.9)
+bg_color = Color(0.07, 0.07, 0.08, 0.92)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.12, 0.2, 0.31, 1)
+border_color = Color(0.22, 0.22, 0.24, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="SB_selected"]
-bg_color = Color(0.04, 0.2, 0.42, 0.96)
+bg_color = Color(0.24, 0.17, 0.04, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.25, 0.64, 1, 1)
+border_color = Color(1, 0.8, 0.26, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0.16, 0.5, 1, 0.45)
+shadow_color = Color(1, 0.75, 0.2, 0.3)
 shadow_size = 8
 
 [sub_resource type="StyleBoxEmpty" id="SB_focus"]
@@ -88,7 +88,7 @@ theme_override_constants/separation = 0
 [node name="Title" type="Label" parent="Margin/Row/Text"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.97, 0.98, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 20
 text = "جهانی"
@@ -98,7 +98,7 @@ text_overrun_behavior = 3
 [node name="Subtitle" type="Label" parent="Margin/Row/Text"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.64, 0.71, 0.8, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
 text = "..."

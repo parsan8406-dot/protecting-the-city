@@ -35,6 +35,10 @@ const PAGE_SIZE := 30
 
 ## E1/E9 سهم من و تازه‌واردها
 const PsychSocialCity := preload("res://scripts/psych_social_city.gd")
+## E5/E9 فاصله تا شهرِ بالایی در رتبه‌بندی شهرها
+const PsychSocialRival := preload("res://scripts/psych_social_rival.gd")
+const CHAT_SCENE := "res://secense/chat.tscn"
+const ICON_SEARCH := preload("res://assets/chat/icons/search.svg")
 const ICON_XP := preload("res://assets/icons/missions/icon_xp.png")
 const ICON_COIN := preload("res://assets/ui/coin_icon.png")
 const ICON_CROWN := preload("res://assets/icons/missions/icon_crown.svg")
@@ -154,6 +158,17 @@ var _toast_tween: Tween = null
 var _nav_active_style: StyleBoxFlat = null
 var _nav_base_style: StyleBox = null
 
+## round 3: نوار سهمِ من، خطِ رقابت با شهرِ بالایی، دکمه‌ی آرامِ «ترک شهر»
+var _share_bar: ProgressBar = null
+var _race_label: Label = null
+var _race_bar: ProgressBar = null
+var _race_http: HTTPRequest = null
+var _race_key := ""
+var _leave_button: Button = null
+var _browse_action: Button = null
+var _browse_action_cb: Callable = Callable()
+var _just_joined := false
+
 # ------------------------------------------------------------------ آماده‌سازی
 
 func _ready() -> void:
@@ -190,6 +205,7 @@ func _ready() -> void:
 
 	UIScroll.attach(_browse_scroll)
 	UIScroll.attach(_member_scroll)
+	_build_r3_ui()
 
 	_build_column_header()
 	_build_rewards()
@@ -208,8 +224,10 @@ func _ready() -> void:
 	_apply_safe_area()
 
 	_show_mode(Mode.BROWSE)
-	_browse_empty.text = "در حال بارگذاری..."
-	_browse_empty.visible = true
+	# C12 اسکلتِ لیست به‌جای متنِ «در حال بارگذاری»
+	_browse_empty.visible = false
+	_browse_scroll.visible = true
+	_skeleton(_browse_list, 5, 68.0)
 	refresh()
 
 func _notification(what: int) -> void:
@@ -261,8 +279,8 @@ func _bind_nav(button: Button, action: Callable) -> void:
 
 func _set_active_nav(active: Button) -> void:
 	if _nav_active_style == null:
-		_nav_active_style = CityUI.box(Color(0.05, 0.2, 0.45, 0.92), Color(0.3, 0.65, 1.0), 2, 6)
-		_nav_active_style.shadow_color = Color(0.15, 0.5, 1.0, 0.45)
+		_nav_active_style = CityUI.box(Color(0.28, 0.2, 0.04, 0.95), CityUI.GOLD, 2, 6)
+		_nav_active_style.shadow_color = Color(1.0, 0.75, 0.2, 0.25)
 		_nav_active_style.shadow_size = 8
 		_nav_active_style.content_margin_left = 14
 		_nav_active_style.content_margin_right = 12
@@ -299,7 +317,7 @@ func _style_top_bar() -> void:
 	if profile:
 		profile.visible = false
 
-	var pill := CityUI.box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 8)
+	var pill := CityUI.box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 8)
 	pill.content_margin_left = 10
 	pill.content_margin_right = 6
 	pill.content_margin_top = 3
@@ -309,7 +327,7 @@ func _style_top_bar() -> void:
 		if p:
 			p.add_theme_stylebox_override("panel", pill)
 
-	var box := CityUI.box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 7)
+	var box := CityUI.box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 7)
 	for path in ["HBoxContainer/HBoxContainer3/MessagesButton",
 			"HBoxContainer/HBoxContainer3/FriendsButton",
 			"HBoxContainer/HBoxContainer3/SettingsButton"]:
@@ -440,6 +458,10 @@ func _show_error(message: String) -> void:
 		_browse_empty.text = message
 		_browse_empty.visible = _clans.is_empty()
 		_browse_scroll.visible = not _clans.is_empty()
+		if _clans.is_empty():
+			for child in _browse_list.get_children():
+				child.queue_free()
+			_set_browse_action("تلاش دوباره", refresh)
 	_show_toast(message)
 
 # ------------------------------------------------------------------ حالت‌ها
@@ -493,6 +515,29 @@ func _build_browse_list() -> void:
 		else "هنوز شهری ساخته نشده — اولین شهر را تو بساز!"
 	_browse_empty.visible = _clans.is_empty()
 	_browse_scroll.visible = not _clans.is_empty()
+	# E1/E10 حالت خالی یک قدمِ بعدی پیشنهاد می‌دهد
+	if searching:
+		_set_browse_action("پاک کردن جستجو", func() -> void:
+			_search_edit.text = ""
+			_search_now())
+	else:
+		_set_browse_action("ساخت شهر", _open_create)
+
+	# C2 یک پیشنهادِ هوشمند: شلوغ‌ترین شهری که همین حالا می‌توانم مستقیم عضوش شوم
+	var suggested := -1
+	var best := -1
+	if not searching:
+		for i in _clans.size():
+			var c = _clans[i]
+			if typeof(c) != TYPE_DICTIONARY or not bool(c.get("is_public", true)) or bool(c.get("is_full", false)):
+				continue
+			if int(c.get("min_level", 0)) > int(Global.level):
+				continue
+			if _pending_clan_ids.has(str(c.get("clan_id", ""))):
+				continue
+			if int(c.get("member_count", 0)) > best:
+				best = int(c.get("member_count", 0))
+				suggested = i
 
 	for i in _clans.size():
 		var item = _clans[i]
@@ -501,7 +546,7 @@ func _build_browse_list() -> void:
 		var row := CityRow.new()
 		_browse_list.add_child(row)
 		# جایگاه واقعی فقط وقتی جستجو نمی‌کنم معنا دارد (لیست بر اساس سطح مرتب است)
-		row.setup(item, i + 1, _pending_clan_ids.has(str(item.get("clan_id", ""))))
+		row.setup(item, i + 1, _pending_clan_ids.has(str(item.get("clan_id", ""))), i == suggested)
 		row.tapped.connect(_on_city_row_tapped)
 
 	if _has_more:
@@ -527,7 +572,9 @@ func _on_city_row_tapped(row: CityTapRow) -> void:
 	preview["members"] = []
 	_members_signature = ""
 	_apply_clan(preview, Mode.VIEW)
-	_member_empty.text = "در حال بارگذاری اعضا..."
+	_member_empty.visible = false
+	_member_scroll.visible = true
+	_skeleton(_member_list, 4, 54.0)
 	refresh()
 
 # ------------------------------------------------------------------ صفحه‌ی شهر
@@ -542,6 +589,9 @@ func _apply_clan(data: Dictionary, mode: Mode) -> void:
 	var capacity := int(data.get("max_members", 0))
 
 	_emblem.set_icon(str(data.get("icon_path", "")))
+	if _just_joined and mode == Mode.MINE:
+		_just_joined = false
+		_celebrate_join()
 	_name_label.text = clan_name
 	_tag_label.text = "[%s]" % tag if not tag.is_empty() else ""
 
@@ -565,6 +615,8 @@ func _apply_clan(data: Dictionary, mode: Mode) -> void:
 
 	_apply_banner(data, mode)
 	_build_info(data)
+	_leave_button.visible = mode == Mode.MINE
+	_fetch_race(world_rank)
 
 	var members: Array = data.get("members", []) if data.get("members", []) is Array else []
 	_members = members
@@ -590,23 +642,47 @@ func _apply_banner(data: Dictionary, mode: Mode) -> void:
 			_banner_title.text = "به شهر خوش اومدی!"
 			_banner_sub.text = "توی چتِ شهر سلام کن — هر کاپی که می‌گیری امتیازِ شهر رو بالا می‌بره."
 		else:
-			_banner_title.text = "شهر تو"
-			_banner_sub.text = "نقش تو: %s" % CityUI.role_label(role)
 			# E1/E10 ارتباط: سهم خودم از امتیاز شهر (امتیاز شهر = جمع کاپ اعضا، handlers_leaderboard.go)
 			# E9 مقایسه در گروهِ کوچک: جایگاهم بینِ همشهری‌ها، نه بینِ همه‌ی دنیا
 			if int(st.mine) > 0:
-				_banner_sub.text += "  •  سهم تو: %s کاپ (%s٪ امتیاز شهر)  •  نفرِ %s از %s" % [
-					CityUI.fa_grouped(int(st.mine)), CityUI.fa(int(st.pct)),
+				_banner_title.text = "سهم تو: %s کاپ  (%s٪)" % [CityUI.fa_grouped(int(st.mine)), CityUI.fa(int(st.pct))]
+				_banner_sub.text = "%s  •  نفرِ %s از %s در شهر" % [CityUI.role_label(role),
 					CityUI.fa(int(st.place)), CityUI.fa(int(st.count))]
+			else:
+				_banner_title.text = "شهر تو"
+				_banner_sub.text = "نقش تو: %s — با هر برد سهمت از امتیاز شهر بیشتر می‌شود" % CityUI.role_label(role)
 			if int(st.new_count) > 0:
 				_banner_sub.text += "  •  %s تازه‌وارد — خوش‌آمد بگو!" % CityUI.fa(int(st.new_count))
-		_set_action("ترک شهر", "danger", true)
+		# C9 نوارِ سهم: از عددِ واقعی پر می‌شود، با انیمیشنِ کوتاه
+		_share_bar.visible = int(st.mine) > 0
+		if _share_bar.visible:
+			_share_bar.max_value = 100.0
+			create_tween().tween_property(_share_bar, "value", float(maxi(int(st.pct), 2)), 0.5) \
+				.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		# V5 کار اصلیِ عضو: رفتن به چت شهر (طلایی). «ترک شهر» آرام در ستون کناری است.
+		_set_action("چت شهر", "primary", true)
 		return
-	_banner_sub.autowrap_mode = TextServer.AUTOWRAP_OFF
-	_banner_sub.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_share_bar.visible = false
+	_banner_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_banner_sub.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 
 	_banner_title.text = "به شهر ما بپیوندید!"
-	_banner_sub.text = "یک تیم، یک هدف؛ پیروزی در میدان نبرد."
+	# C8/C11 شرطِ ورود روشن و یک‌جا: نوع، سطح، جای خالی + E9 دوستانِ عضو
+	var parts: Array[String] = []
+	parts.append("ورود آزاد" if bool(data.get("is_public", true)) else "با تأیید رهبر")
+	var need := int(data.get("min_level", 0))
+	parts.append("سطح %s+" % CityUI.fa(need) if need > 0 else "بدون حداقل سطح")
+	var free := maxi(int(data.get("max_members", 0)) - int(data.get("member_count", 0)), 0)
+	parts.append("%s جای خالی" % CityUI.fa(free) if free > 0 else "ظرفیت پر")
+	var friends := 0
+	var members_any = data.get("members", [])
+	if members_any is Array:
+		for m in members_any:
+			if typeof(m) == TYPE_DICTIONARY and bool(m.get("is_friend", false)):
+				friends += 1
+	if friends > 0:
+		parts.append("%s دوستت اینجاست" % CityUI.fa(friends))
+	_banner_sub.text = "  •  ".join(parts)
 
 	var min_level := int(data.get("min_level", 0))
 	var my_level := int(data.get("my_level", Global.level))
@@ -634,7 +710,9 @@ func _on_action_pressed() -> void:
 	if _busy:
 		return
 	if _mode == Mode.MINE:
-		_confirm_leave()
+		# E1 ارتباط: از صفحه‌ی شهر مستقیم به چت شهر
+		Global.set("requested_chat_channel", "city")
+		get_tree().change_scene_to_file(CHAT_SCENE)
 	elif _mode == Mode.VIEW:
 		var clan_id := str(_clan.get("clan_id", ""))
 		if clan_id.is_empty():
@@ -644,6 +722,7 @@ func _on_action_pressed() -> void:
 				# شهر عمومی: همین الان عضو شدم → صفحه‌ی شهر خودم
 				if not bool(data.get("pending", false)):
 					_viewing_id = ""
+					_just_joined = true
 					# E11 لرزش فقط از مسیر تنظیمات (روی PC هم بی‌اثر)
 					LocalSettings.vibrate(40))
 
@@ -660,7 +739,7 @@ func _build_info(data: Dictionary) -> void:
 
 	_info_rows.add_child(_info_row(ICON_CROWN, "رهبر", leader if not leader.is_empty() else "—", CityUI.GOLD, false))
 	_info_rows.add_child(_info_row(ICON_FRIENDS, "معاونان", "%s نفر" % CityUI.fa(officers), CityUI.TEXT, false))
-	_info_rows.add_child(_info_row(ICON_SHIELD, "تگ", tag if not tag.is_empty() else "—", CityUI.BLUE, true))
+	_info_rows.add_child(_info_row(ICON_SHIELD, "تگ", tag if not tag.is_empty() else "—", CityUI.TEXT, true))
 	_info_rows.add_child(_info_row(ICON_STAR, "حداقل سطح",
 		"آزاد" if min_level <= 0 else "سطح %s" % CityUI.fa(min_level), CityUI.TEXT, false))
 	_info_rows.add_child(_info_row(ICON_LOCK, "نوع شهر",
@@ -706,7 +785,8 @@ func _build_member_list() -> void:
 	for child in _member_list.get_children():
 		child.queue_free()
 
-	_member_empty.text = "این شهر هنوز عضوی ندارد"
+	_member_empty.text = "اعضای این شهر هنوز نیامده‌اند" if _members.is_empty() and _mode == Mode.VIEW \
+		else "این شهر هنوز عضوی ندارد"
 	_member_empty.visible = _members.is_empty()
 	_member_scroll.visible = not _members.is_empty()
 
@@ -961,7 +1041,7 @@ func _build_requests() -> void:
 func _request_row(item: Dictionary) -> Control:
 	var request_id := str(item.get("request_id", ""))
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel", CityUI.box(Color(0.03, 0.06, 0.12, 0.8), Color(0.2, 0.3, 0.46, 0.5), 1, 8))
+	panel.add_theme_stylebox_override("panel", CityUI.box(Color(0.075, 0.075, 0.085, 0.85), Color(0.26, 0.26, 0.29, 0.6), 1, 8))
 	panel.mouse_filter = Control.MOUSE_FILTER_PASS
 
 	var margin := MarginContainer.new()
@@ -1027,7 +1107,7 @@ func _build_rewards() -> void:
 	for child in _reward_tiles.get_children():
 		child.queue_free()
 	# آیکن تجربه سفید و خطی است — به رنگ قاب درمی‌آید؛ سکه رنگ خودش را دارد
-	_reward_tiles.add_child(_reward_tile(ICON_XP, "تجربه", Color(0.55, 0.45, 1.0), Color(0.75, 0.68, 1.0)))
+	_reward_tiles.add_child(_reward_tile(ICON_XP, "تجربه", Color(0.72, 0.53, 0.14), Color(1.0, 0.86, 0.5)))
 	_reward_tiles.add_child(_reward_tile(ICON_COIN, "سکه", CityUI.GOLD, Color.WHITE))
 
 func _reward_tile(icon: Texture2D, caption: String, glow: Color, tint: Color) -> Control:
@@ -1035,7 +1115,7 @@ func _reward_tile(icon: Texture2D, caption: String, glow: Color, tint: Color) ->
 	tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tile.custom_minimum_size = Vector2(0, 76)
 	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var style := CityUI.box(Color(0.03, 0.07, 0.15, 0.95), Color(glow.r, glow.g, glow.b, 0.75), 1, 8)
+	var style := CityUI.box(Color(0.08, 0.07, 0.05, 0.95), Color(glow.r, glow.g, glow.b, 0.75), 1, 8)
 	style.shadow_color = Color(glow.r, glow.g, glow.b, 0.25)
 	style.shadow_size = 5
 	tile.add_theme_stylebox_override("panel", style)
@@ -1062,7 +1142,7 @@ func _build_benefits() -> void:
 		row.custom_minimum_size = Vector2(0, 28)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_theme_constant_override("separation", 8)
-		row.add_child(CityUI.icon(icons[entry[0]], 18, Color(0.62, 0.8, 1.0)))
+		row.add_child(CityUI.icon(icons[entry[0]], 18, CityUI.GOLD))
 		var label := CityUI.label(entry[1], 14, CityUI.TEXT)
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -1149,7 +1229,7 @@ func _show_toast(text: String) -> void:
 		_toast.add_theme_font_override("font", CityUI.FONT)
 		_toast.add_theme_font_size_override("font_size", 16)
 		_toast.add_theme_color_override("font_color", CityUI.TEXT)
-		var style := CityUI.box(Color(0.03, 0.08, 0.18, 0.95), CityUI.BLUE, 1, 8)
+		var style := CityUI.box(Color(0.07, 0.07, 0.08, 0.97), CityUI.GOLD, 1, 8)
 		style.content_margin_left = 18
 		style.content_margin_right = 18
 		style.content_margin_top = 8
@@ -1179,3 +1259,160 @@ func _play_intro(container: VBoxContainer) -> void:
 		var t := create_tween()
 		t.tween_interval(0.035 * i)
 		t.tween_property(row, "modulate:a", 1.0, 0.2).set_trans(Tween.TRANS_SINE)
+
+# ------------------------------------------------------------------ round 3
+
+## نودهای تازه‌ی این دور — کد، نه صحنه، تا city.tscn فقط رنگ عوض کند
+func _build_r3_ui() -> void:
+	# C9 نوارِ سهمِ من زیرِ متنِ بنر
+	_share_bar = MenuUI.progress_bar(MenuUI.GOLD, 8.0)
+	_share_bar.value = 0.0
+	_share_bar.visible = false
+	_banner_sub.get_parent().add_child(_share_bar)
+
+	# E5/E9 خطِ رقابتِ شهرها زیرِ آمارِ کارتِ بالا
+	var info := _name_label.get_parent().get_parent()
+	_race_label = CityUI.label("", 14, CityUI.MUTED)
+	_race_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_race_label.clip_text = true
+	_race_label.visible = false
+	info.add_child(_race_label)
+	_race_bar = MenuUI.progress_bar(MenuUI.GOLD, 6.0)
+	_race_bar.visible = false
+	info.add_child(_race_bar)
+	_race_http = HTTPRequest.new()
+	_race_http.timeout = 10.0
+	add_child(_race_http)
+	_race_http.request_completed.connect(_on_race_received)
+
+	# V5/C13 «ترک شهر» دیگر دکمه‌ی اصلیِ قرمزِ صفحه نیست؛ آرام، پایینِ اطلاعات شهر
+	_leave_button = CityUI.button("ترک شهر", "danger_quiet", 15)
+	_leave_button.visible = false
+	_leave_button.pressed.connect(func() -> void:
+		UIFx.tap(_leave_button)
+		if not _busy and _mode == Mode.MINE:
+			_confirm_leave())
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(0, 6)
+	_info_rows.get_parent().add_child(spacer)
+	_info_rows.get_parent().add_child(_leave_button)
+
+	# E1/E10 حالت خالیِ لیست شهرها: آیکن + متن + یک کارِ پیشنهادی
+	var body := _browse_empty.get_parent()
+	var box := VBoxContainer.new()
+	box.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_theme_constant_override("separation", 12)
+	body.add_child(box)
+	body.move_child(box, _browse_empty.get_index())
+	var icon := CityUI.icon(ICON_CLAN, 64, Color(1, 1, 1, 0.3))
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(icon)
+	_browse_empty.reparent(box)
+	_browse_empty.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_browse_action = CityUI.button("", "ghost", 16)
+	_browse_action.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_browse_action.custom_minimum_size = Vector2(200, CityUI.TOUCH_H)
+	_browse_action.add_theme_color_override("font_color", CityUI.GOLD)
+	_browse_action.visible = false
+	_browse_action.pressed.connect(func() -> void:
+		if _browse_action_cb.is_valid():
+			UIFx.tap(_browse_action, _browse_action_cb))
+	box.add_child(_browse_action)
+	box.visible = _browse_empty.visible
+	_browse_empty.visibility_changed.connect(func() -> void: box.visible = _browse_empty.visible)
+
+	# اعضا: آیکن بالای متنِ خالی
+	_member_empty.add_theme_color_override("font_color", CityUI.MUTED)
+
+func _set_browse_action(text: String, callback: Callable) -> void:
+	_browse_action_cb = callback
+	_browse_action.text = text
+	_browse_action.visible = not text.is_empty() and callback.is_valid()
+
+## C12 اسکلتِ تپنده (فقط تویینِ آلفا، ارزان) — با ساختنِ لیستِ واقعی آزاد می‌شود
+func _skeleton(list: VBoxContainer, rows: int, height: float) -> void:
+	for child in list.get_children():
+		child.queue_free()
+	for i in rows:
+		var p := Panel.new()
+		p.custom_minimum_size = Vector2(0, height)
+		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_theme_stylebox_override("panel", CityUI.box(Color(0.12, 0.12, 0.13, 1.0), Color(0, 0, 0, 0), 0, 8))
+		list.add_child(p)
+		p.modulate.a = 0.35
+		var t := p.create_tween().set_loops()
+		t.tween_interval(0.07 * i)
+		t.tween_property(p, "modulate:a", 0.75, 0.5).set_trans(Tween.TRANS_SINE)
+		t.tween_property(p, "modulate:a", 0.35, 0.5).set_trans(Tween.TRANS_SINE)
+
+## E17 جشنِ کوچکِ عضویت: نشانِ شهر یک بار طلایی می‌تپد (فقط بعد از عضویتِ واقعی)
+func _celebrate_join() -> void:
+	_emblem.pivot_offset = _emblem.size * 0.5
+	_emblem.scale = Vector2(0.6, 0.6)
+	var t := _emblem.create_tween().set_parallel(true)
+	t.tween_property(_emblem, "scale", Vector2.ONE, 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_emblem.modulate = Color(1.6, 1.4, 0.9)
+	t.tween_property(_emblem, "modulate", Color.WHITE, 0.7).set_trans(Tween.TRANS_SINE)
+
+## E5/E9/C9 «X کاپ تا رد شدن از شهرِ بالایی» — از همان جدول شهرهای سرور
+func _fetch_race(world_rank: int) -> void:
+	if world_rank <= 0:
+		_race_label.visible = false
+		_race_bar.visible = false
+		return
+	var key := "%s:%d" % [str(_clan.get("clan_id", "")), world_rank]
+	if key == _race_key:
+		return
+	var w := PsychSocialRival.window_request(world_rank, 1, 1)
+	if w.y <= 0:
+		return
+	_race_key = key
+	_race_http.cancel_request()
+	var url := "%s/leaderboard?scope=cities&page=%d&limit=%d" % [Global.SERVER_BASE, w.x, w.y]
+	var username := str(Global.my_username)
+	if not username.is_empty():
+		url += "&username=" + username.uri_encode()
+	if _race_http.request(url, Global.auth_headers()) != OK:
+		_race_key = ""
+
+func _on_race_received(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
+		_race_key = ""
+		return
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	if typeof(data) != TYPE_DICTIONARY or _city_page == null or not _city_page.visible:
+		return
+	var entries: Array = data.get("entries", []) if data.get("entries", []) is Array else []
+	var rank := int(_clan.get("world_rank", 0))
+	var here := PsychSocialRival.entry_at(entries, rank)
+	if here.is_empty() or str(here.get("clan_id", _clan.get("clan_id", ""))) != str(_clan.get("clan_id", "")):
+		_race_key = ""
+		return
+	var points := int(here.get("points", 0))
+	var above := PsychSocialRival.entry_at(entries, rank - 1)
+	var below := PsychSocialRival.entry_at(entries, rank + 1)
+	var text := "امتیاز شهر: %s کاپ" % CityUI.fa_grouped(points)
+	var color := CityUI.MUTED
+	var fill := 1.0
+	if above.is_empty():
+		# E6 پیامِ مثبت برای صدرنشین
+		text += "  •  صدرنشینِ شهرها"
+		if not below.is_empty():
+			text += " — %s کاپ جلوتر" % CityUI.fa_grouped(maxi(points - int(below.get("points", 0)), 0))
+		color = CityUI.GOLD
+	else:
+		var top := int(above.get("points", 0))
+		var gap := maxi(top - points + 1, 1)
+		text += "  •  %s کاپ تا رد شدن از «%s»" % [CityUI.fa_grouped(gap), CityUI.short(str(above.get("name", "")), 14)]
+		fill = clampf(float(points) / float(maxi(top, 1)), 0.03, 1.0)
+		# C9 نزدیکِ پایان برجسته‌تر
+		color = CityUI.GOLD if gap <= PsychSocialRival.NEAR_GAP * 3 else CityUI.TEXT
+	_race_label.text = text
+	_race_label.add_theme_color_override("font_color", color)
+	_race_label.visible = true
+	_race_bar.visible = true
+	_race_bar.max_value = 1.0
+	_race_bar.value = 0.0
+	create_tween().tween_property(_race_bar, "value", fill, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

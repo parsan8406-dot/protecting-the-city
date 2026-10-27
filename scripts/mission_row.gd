@@ -6,7 +6,7 @@ extends PanelContainer
 ## می‌شود (POST /missions/claim).
 ##
 ## دکمه سه حالت دارد:
-##   در حال انجام  → «رفتن» آبی، سیگنال go_requested (می‌رود سراغ حالت‌های بازی)
+##   در حال انجام  → «رفتن» تیره (فرعی)، سیگنال go_requested (می‌رود سراغ حالت‌های بازی)
 ##   آماده         → «دریافت» طلایی، سیگنال claim_requested
 ##   گرفته‌شده      → «گرفته شد» خاموش
 ##
@@ -110,7 +110,8 @@ func _apply(mission: Dictionary) -> void:
 
 	# C9/E7 نزدیکِ پایان: نوار طلایی و «فقط ۲ تا مونده!» جای توضیح
 	var near := not done and not claimed and PsychProgress.is_near(progress, target)
-	PsychProgress.emphasize_bar(_bar, near)
+	# جایزه‌ی آماده هم نوارِ طلایی می‌گیرد (طلایی = پاداش، V1)
+	PsychProgress.emphasize_bar(_bar, near or (done and not claimed))
 	if near:
 		_desc_label.text = PsychProgress.remaining_text(progress, target)
 		_desc_label.visible = true
@@ -118,26 +119,34 @@ func _apply(mission: Dictionary) -> void:
 		_amount_label.add_theme_color_override("font_color", COLOR_GOLD)
 
 ## سه حالت ردیف: در حال انجام / آماده‌ی دریافت / گرفته‌شده
+## V5: فقط «دریافت» طلایی و زنده است؛ «رفتن» تیره و آرام (فرعی)؛ گرفته‌شده
+## تیک می‌خورد و کم‌رنگ می‌شود. رنگ همیشه با شکل همراه است (V2: قاب/تیک).
 func _apply_state(done: bool, claimed: bool) -> void:
 	_done = done and not claimed
+	_stop_ready_pulse()
 
 	_action_button.disabled = claimed
 	if claimed:
-		_action_button.text = "گرفته شد"
+		_action_button.text = "✓ گرفته شد"
 		_set_button_style(_style_off, _style_off)
 	elif done:
 		_action_button.text = "دریافت"
 		_set_button_style(_style_claim, _style_claim_pressed)
 		# متن روی طلایی باید تیره باشد وگرنه خوانده نمی‌شود
-		_action_button.add_theme_color_override("font_color", Color(0.06, 0.08, 0.11, 1.0))
+		_action_button.add_theme_color_override("font_color", Color(0.2, 0.12, 0.0, 1.0))
+		_action_button.add_theme_color_override("font_pressed_color", Color(0.2, 0.12, 0.0, 1.0))
 	else:
 		_action_button.text = "رفتن"
 		_set_button_style(_style_go, _style_go_pressed)
-		_action_button.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+		_action_button.add_theme_color_override("font_color", COLOR_TEXT)
+		_action_button.add_theme_color_override("font_pressed_color", COLOR_TEXT)
 
 	_done_frame.visible = done and not claimed
 	if _done_frame.visible:
 		_done_frame.add_theme_stylebox_override("panel", _style_ready_frame)
+	(get_node("Margin/Row/IconSlot") as PanelContainer).add_theme_stylebox_override(
+		"panel", _style_icon_ready if _done else _style_icon)
+	add_theme_stylebox_override("panel", _style_row_ready if _done else _style_row)
 
 	if claimed:
 		_title_label.add_theme_color_override("font_color", COLOR_DIM)
@@ -151,36 +160,80 @@ func _apply_state(done: bool, claimed: bool) -> void:
 	modulate = Color(1, 1, 1, 1)
 	_icon.modulate = MissionArt.COLOR_READY if done else MissionArt.COLOR_ACTIVE
 	_title_label.add_theme_color_override("font_color", COLOR_GOLD if done else COLOR_TEXT)
-	_desc_label.add_theme_color_override("font_color", Color(0.42, 0.478, 0.557, 1.0))
+	_desc_label.add_theme_color_override("font_color", COLOR_MUTED)
 	_amount_label.add_theme_color_override("font_color", COLOR_GOLD if done else COLOR_MUTED)
+	if _done:
+		_start_ready_pulse()
+
+## V5/E2 جایزه‌ی آماده نفس می‌کشد: قاب طلایی کم‌وزیاد و دکمه کمی بزرگ‌تر
+## (فقط Tween، بدون شیدر — روی گوشی ضعیف هم سبک است)
+var _ready_pulse: Tween = null
+
+func _start_ready_pulse() -> void:
+	if not is_inside_tree():
+		return
+	_action_button.pivot_offset = _action_button.size * 0.5
+	_ready_pulse = create_tween().set_loops()
+	_ready_pulse.tween_property(_done_frame, "modulate:a", 0.45, 0.7).set_trans(Tween.TRANS_SINE)
+	_ready_pulse.parallel().tween_property(_action_button, "scale", Vector2(1.05, 1.05), 0.7) 		.set_trans(Tween.TRANS_SINE)
+	_ready_pulse.tween_property(_done_frame, "modulate:a", 1.0, 0.7).set_trans(Tween.TRANS_SINE)
+	_ready_pulse.parallel().tween_property(_action_button, "scale", Vector2.ONE, 0.7) 		.set_trans(Tween.TRANS_SINE)
+	if not _action_button.button_down.is_connected(_stop_ready_pulse):
+		_action_button.button_down.connect(_stop_ready_pulse, CONNECT_ONE_SHOT)
+
+func _stop_ready_pulse() -> void:
+	if _ready_pulse != null and _ready_pulse.is_valid():
+		_ready_pulse.kill()
+	_ready_pulse = null
+	_done_frame.modulate.a = 1.0
 
 func _set_button_style(normal: StyleBox, pressed: StyleBox) -> void:
 	_action_button.add_theme_stylebox_override("normal", normal)
-	_action_button.add_theme_stylebox_override("hover", pressed)
+	_action_button.add_theme_stylebox_override("hover", normal)
 	_action_button.add_theme_stylebox_override("pressed", pressed)
+	_action_button.add_theme_stylebox_override("hover_pressed", pressed)
 	_action_button.add_theme_stylebox_override("disabled", _style_off)
 
-## استایل‌های مشترک دکمه. فقط بار اول واقعاً چیزی می‌سازد.
+## استایل‌های مشترک (پالت MenuUI: سیاه/قرمز/طلایی). فقط بار اول چیزی می‌سازد.
+static var _style_row: StyleBoxFlat = null
+static var _style_row_ready: StyleBoxFlat = null
+static var _style_icon: StyleBoxFlat = null
+static var _style_icon_ready: StyleBoxFlat = null
+
 static func _build_styles() -> void:
 	if _style_go != null:
 		return
 
-	_style_go = _pill(Color(0.176, 0.553, 0.878, 1.0))
-	_style_go_pressed = _pill(Color(0.29, 0.667, 0.949, 1.0))
-	_style_claim = _pill(MissionArt.COLOR_GOLD)
-	_style_claim_pressed = _pill(Color(1.0, 0.855, 0.42, 1.0))
-	_style_off = _pill(Color(0.098, 0.137, 0.196, 1.0))
+	# «رفتن» فرعی است: تیره با حاشیه‌ی خاکستری (V5 — یک CTA طلایی در هر ردیف)
+	_style_go = _pill(Color(0.14, 0.14, 0.15, 1.0), Color(0.42, 0.42, 0.46, 0.9))
+	_style_go_pressed = _pill(Color(0.22, 0.22, 0.24, 1.0), Color(0.6, 0.6, 0.64, 1.0))
+	_style_claim = _pill(MenuUI.GOLD, Color(1.0, 0.93, 0.62, 1.0))
+	_style_claim.shadow_color = Color(1.0, 0.75, 0.2, 0.45)
+	_style_claim.shadow_size = 8
+	_style_claim_pressed = _pill(Color(1.0, 0.9, 0.5, 1.0), Color(1, 1, 1, 1))
+	_style_off = _pill(Color(0, 0, 0, 0), Color(0.3, 0.3, 0.32, 0.6))
 
 	_style_ready_frame = StyleBoxFlat.new()
 	_style_ready_frame.bg_color = Color(0, 0, 0, 0)
 	_style_ready_frame.set_border_width_all(2)
-	_style_ready_frame.border_color = MissionArt.COLOR_GOLD
-	_style_ready_frame.set_corner_radius_all(9)
+	_style_ready_frame.border_color = MenuUI.GOLD
+	_style_ready_frame.set_corner_radius_all(10)
+	_style_ready_frame.shadow_color = Color(1.0, 0.75, 0.2, 0.3)
+	_style_ready_frame.shadow_size = 10
 
-static func _pill(color: Color) -> StyleBoxFlat:
+	_style_row = MenuUI.box(MenuUI.CARD_BG, MenuUI.CARD_BORDER, 1, 8)
+	_style_row_ready = MenuUI.box(Color(0.13, 0.1, 0.04, 0.95), Color(0, 0, 0, 0), 0, 8)
+	_style_icon = MenuUI.box(Color(0.05, 0.05, 0.055, 1.0), Color(0.3, 0.3, 0.33, 1.0), 1, 8)
+	_style_icon.set_content_margin_all(7)
+	_style_icon_ready = MenuUI.box(Color(0.22, 0.15, 0.03, 1.0), MenuUI.GOLD, 2, 8)
+	_style_icon_ready.set_content_margin_all(6)
+
+static func _pill(color: Color, border: Color = Color(0, 0, 0, 0)) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = color
-	style.set_corner_radius_all(7)
+	style.border_color = border
+	style.set_border_width_all(1 if border.a > 0.0 else 0)
+	style.set_corner_radius_all(8)
 	style.content_margin_left = 12.0
 	style.content_margin_right = 12.0
 	style.content_margin_top = 8.0

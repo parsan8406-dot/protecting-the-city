@@ -121,7 +121,10 @@ func _initialize() -> void:
 		soldier.set_assist(-0.6)
 		_ok("negative assist sharpens", soldier.miss_chance < m0 and soldier.fire_cooldown < c0)
 		soldier.set_assist(0.0)
-		_ok("assist 0 restores the base", is_equal_approx(soldier.miss_chance, m0))
+		# پایه‌ی واقعی، نه m0: کارگردان ممکن است از اجراهای قبلی (psych_play.cfg)
+		# با کمکِ غیرصفر شروع کرده باشد و m0 همان مقدارِ کمک‌خورده باشد
+		_ok("assist 0 restores the base",
+			is_equal_approx(soldier.miss_chance, clampf(soldier._base_miss, 0.03, 0.6)))
 		var elite = null
 		var soldier_hp: int = soldier.max_health
 		_silence_all(world)

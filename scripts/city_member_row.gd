@@ -60,7 +60,7 @@ func setup(data: Dictionary) -> void:
 	avatar_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	avatar_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var frame_style := CityUI.box(Color(0.02, 0.03, 0.06, 1.0),
-		role_color if role != "member" else Color(0.3, 0.42, 0.6, 0.8), 2, 21)
+		role_color if role != "member" else Color(0.34, 0.34, 0.38, 0.8), 2, 21)
 	avatar_frame.add_theme_stylebox_override("panel", frame_style)
 	name_col.add_child(avatar_frame)
 

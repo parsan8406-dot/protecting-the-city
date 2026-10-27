@@ -9,6 +9,9 @@ extends RefCounted
 
 const PsychSocialMastery := preload("res://scripts/psych_social_mastery.gd")
 const PsychSocialGift := preload("res://scripts/psych_social_gift.gd")
+const PsychProfileInvite := preload("res://scripts/psych_profile_invite.gd")
+const UI := preload("res://scripts/psych_profile_ui.gd")
+const ICON_DUEL := preload("res://assets/ui/profile_menu/friend_icon_duel.svg")
 
 static func open(host: Node, player_id: String, on_message: Callable = Callable(),
 		on_gift: Callable = Callable()) -> void:
@@ -21,9 +24,8 @@ static func open(host: Node, player_id: String, on_message: Callable = Callable(
 	body.custom_minimum_size = Vector2(0, 260)
 	col.add_child(body)
 
-	var loading := MenuUI.label("در حال گرفتن پروفایل...", 18, MenuUI.MUTED)
-	loading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	loading.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# C12 اسکلت به‌جای متن خالی تا پروفایل برسد
+	var loading := UI.skeleton(3, 60)
 	body.add_child(loading)
 
 	var http := HTTPRequest.new()
@@ -33,13 +35,18 @@ static func open(host: Node, player_id: String, on_message: Callable = Callable(
 		if not is_instance_valid(body):
 			return
 		if result != HTTPRequest.RESULT_SUCCESS or code != 200:
-			loading.text = MenuUI.server_error(raw, code if result == HTTPRequest.RESULT_SUCCESS else 0, "پروفایل پیدا نشد")
+			loading.queue_free()
+			var err := MenuUI.label(MenuUI.server_error(raw, code if result == HTTPRequest.RESULT_SUCCESS else 0, "پروفایل پیدا نشد"), 17, MenuUI.MUTED)
+			err.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			err.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			body.add_child(err)
 			return
 		loading.queue_free()
 		_fill(body, MenuUI.parse_json(raw), sheet, on_message, on_gift))
 	var url := "%s/profile?player_id=%s" % [Global.SERVER_BASE, player_id.uri_encode()]
 	if http.request(url, Global.auth_headers()) != OK:
-		loading.text = "اتصال به سرور برقرار نشد"
+		loading.queue_free()
+		body.add_child(MenuUI.label("اتصال به سرور برقرار نشد", 17, MenuUI.MUTED))
 	sheet.open()
 
 static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalSheet, on_message: Callable,
@@ -71,15 +78,13 @@ static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalShee
 	tier_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	info.add_child(tier_line)
 
-	var avatar_box := PanelContainer.new()
-	avatar_box.custom_minimum_size = Vector2(84, 84)
-	avatar_box.add_theme_stylebox_override("panel", MenuUI.box(Color(0.13, 0.13, 0.14), MenuUI.GOLD_DEEP, 2, 6))
-	var avatar := TextureRect.new()
-	avatar.texture = MenuUI.avatar_texture(str(data.get("avatar_id", "")))
-	avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	avatar_box.add_child(avatar)
-	head.add_child(avatar_box)
+	# E1/E8 همان آواتار حلقه‌دار سربرگ پروفایل خودت — هویت هم‌شکل برای همه
+	var ring := UI.avatar_with_ring(96, 16)
+	(ring.avatar as TextureRect).texture = MenuUI.avatar_texture(str(data.get("avatar_id", "")))
+	ring.level.text = MenuUI.fa(int(data.get("level", 1)))
+	var need := maxf(1.0, float(data.get("max_xp", 100)))
+	(ring.ring as UI.LevelRing).animate_to(float(data.get("display_xp", 0)) / need)
+	head.add_child(ring.root)
 
 	# --- آمار ---
 	var stats: Dictionary = data.get("stats", {}) if data.get("stats") is Dictionary else {}
@@ -144,8 +149,32 @@ static func _fill(body: VBoxContainer, data: Dictionary, sheet: MenuUI.ModalShee
 			sheet.close()
 			on_gift.call())
 		actions.add_child(gift)
+	# E1/E10 دوستِ آنلاین: «دعوت به بازی» دکمه‌ی طلایی می‌شود و «پیام» آرام‌تر (V5)
+	var peer_id := str(data.get("player_id", ""))
+	var can_invite := online and on_message.is_valid() and not peer_id.is_empty() and peer_id != str(Global.player_id)
+	if can_invite:
+		var invite := MenuUI.button("دعوت به بازی", "gold")
+		invite.icon = ICON_DUEL
+		invite.expand_icon = true
+		invite.add_theme_constant_override("icon_max_width", 26)
+		invite.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var note := MenuUI.label("", 14, MenuUI.GOLD)
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		note.visible = false
+		invite.pressed.connect(func() -> void:
+			invite.disabled = true
+			PsychProfileInvite.send(sheet, peer_id, str(data.get("username", "")), func(ok: bool, message: String) -> void:
+				if not is_instance_valid(note):
+					return
+				invite.disabled = false
+				note.text = message
+				note.visible = true
+				if ok:
+					LocalSettings.vibrate(25)))
+		actions.add_child(invite)
+		body.add_child(note)
 	if on_message.is_valid():
-		var msg := MenuUI.button("پیام دادن", "gold")
+		var msg := MenuUI.button("پیام دادن", "dark" if can_invite else "gold")
 		msg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		msg.pressed.connect(func() -> void:
 			sheet.close()

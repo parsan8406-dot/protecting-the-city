@@ -24,7 +24,8 @@ extends VBoxContainer
 signal claim_requested(level: int, track: String)
 
 const COLOR_GOLD := MissionArt.COLOR_GOLD
-const COLOR_BLUE := MissionArt.COLOR_BLUE_SOFT
+## اکسنتِ مسیرِ رایگان — کرمِ روشن (طلایی مالِ مسیرِ طلایی و «آماده» است)
+const COLOR_BLUE := Color(0.96, 0.9, 0.78, 1.0)
 const COLOR_TEXT := MissionArt.COLOR_TEXT
 const COLOR_MUTED := MissionArt.COLOR_MUTED
 const COLOR_DIM := MissionArt.COLOR_DIM
@@ -80,14 +81,24 @@ func _ready() -> void:
 	_premium_lock_icon.texture = MissionArt.texture_for("lock")
 	_free_lock_icon.texture = MissionArt.texture_for("lock")
 
+	# E2/C9 کلِ خانه‌ی آماده لمس‌شدنی است (نه یک دکمه‌ی ریز ته‌اش). دکمه
+	# scroll_safe است تا کشیدنِ نردبان «دریافت» حساب نشود.
 	_free_button.pressed.connect(func() -> void:
-		UIFx.tap(_free_button)
+		UIFx.tap(_free_cell)
 		claim_requested.emit(level, "free"))
 	_premium_button.pressed.connect(func() -> void:
-		UIFx.tap(_premium_button)
+		UIFx.tap(_premium_cell)
 		claim_requested.emit(level, "premium"))
-	UIFx.bind_press_feedback(_free_button)
-	UIFx.bind_press_feedback(_premium_button)
+	for b: Button in [_free_button, _premium_button]:
+		var empty := StyleBoxEmpty.new()
+		var down := MenuUI.box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0), 0, 8)
+		for st in ["normal", "hover", "disabled", "focus"]:
+			b.add_theme_stylebox_override(st, empty)
+		b.add_theme_stylebox_override("pressed", down)
+		b.add_theme_stylebox_override("hover_pressed", down)
+	_free_cell.draw.connect(_draw_claim_tag.bind(_free_cell))
+	_premium_cell.draw.connect(_draw_claim_tag.bind(_premium_cell))
+	draw.connect(_draw_track)
 
 	if not _tier.is_empty():
 		_apply(_tier)
@@ -102,6 +113,8 @@ func setup(tier: Dictionary) -> void:
 
 func _apply(tier: Dictionary) -> void:
 	_level_label.text = MissionArt.fa_number(level)
+	_unlocked = bool(tier.get("unlocked", false))
+	queue_redraw()
 
 	var milestone := level % MILESTONE_EVERY == 0
 	_crown.visible = milestone
@@ -153,6 +166,12 @@ func _apply_cell(
 
 	var ready := state == "ready"
 	cell.add_theme_stylebox_override("panel", style_ready if ready else style_normal)
+	# حالتِ خانه برای نقاشیِ برچسب («دریافت» / تیک)
+	cell.set_meta("state", state)
+	cell.queue_redraw()
+	_set_glow(cell, ready)
+	# جای برچسبِ «دریافت»/تیک در پایینِ خانه — عنوان آن موقع کنار می‌رود
+	title.visible = not ready
 
 	# قفل روی خانه‌ای که هنوز باز نشده — چه به‌خاطر پله، چه به‌خاطر بتل‌پس
 	lock.visible = state == "locked" or state == "premium_locked"
@@ -182,7 +201,8 @@ func _apply_cell(
 			title.add_theme_color_override("font_color", COLOR_DIM)
 
 	# خانه‌ی گرفته‌شده عمداً کم‌رنگ است تا خانه‌ی آماده توی چشم باشد
-	cell.modulate = Color(1, 1, 1, 0.55) if state == "claimed" else Color(1, 1, 1, 1)
+	cell.self_modulate = Color(1, 1, 1, 0.55) if state == "claimed" else Color(1, 1, 1, 1)
+	(cell.get_node("Body") as CanvasItem).modulate = Color(1, 1, 1, 0.45) if state == "claimed" else Color.WHITE
 
 ## متن عدد جایزه: بزرگ‌ترین چیزی که این خانه می‌دهد
 func _amount_text(data: Dictionary) -> String:
@@ -195,12 +215,17 @@ func _amount_text(data: Dictionary) -> String:
 		return MissionArt.fa_number(cups)
 	return MissionArt.fa_grouped(coins)
 
-func _make_ready_style(base: StyleBox, accent: Color) -> StyleBox:
+## E2/V5 خانه‌ی آماده در هر دو مسیر طلایی و درخشان است (طلایی = جایزه)؛
+## شکلِ متمایزش برچسبِ «دریافت» پایینِ خانه است (V2: رنگ + شکل)
+func _make_ready_style(base: StyleBox, _accent: Color) -> StyleBox:
 	var flat := base.duplicate() as StyleBoxFlat
 	if flat == null:
 		return base
+	flat.bg_color = Color(0.2, 0.14, 0.03, 1.0)
 	flat.set_border_width_all(2)
-	flat.border_color = accent
+	flat.border_color = COLOR_GOLD
+	flat.shadow_color = Color(1.0, 0.72, 0.2, 0.45)
+	flat.shadow_size = 9
 	return flat
 
 func _make_level_on_style() -> StyleBox:
@@ -228,7 +253,7 @@ func set_next(on: bool) -> void:
 	if not on:
 		_apply(_tier)
 		return
-	_level_label.text = "%s · بعدی" % MissionArt.fa_number(level)
+	_level_label.text = "بعدی %s" % MissionArt.fa_number(level)
 	_level_label.add_theme_color_override("font_color", COLOR_GOLD)
 	_level_badge.add_theme_stylebox_override("panel", _style_level_on)
 	for pair in [[_free_cell, _free_icon, _free_amount, _free_lock, COLOR_BLUE],
@@ -252,3 +277,61 @@ func play_pop(delay: float) -> void:
 	var t := create_tween()
 	t.tween_interval(delay)
 	t.tween_property(self, "modulate:a", target_alpha, 0.25)
+
+
+# ---------------------------------------------------------- مسیر و برچسب‌ها
+
+## پله‌ی باز شده؟ (خطِ مسیر تا اینجا طلایی است)
+var _unlocked := false
+## نبضِ هاله‌ی خانه‌های آماده (یکی برای هر خانه)
+var _glows := {}
+
+## V3/C9 «مسیرِ» نردبان: خطی که از پشتِ نشانِ سطح‌ها رد می‌شود و تا پله‌ی
+## فعلی طلایی است — ستون‌های جدا یک مسیرِ پیوسته دیده می‌شوند.
+func _draw_track() -> void:
+	if not is_node_ready():
+		return
+	var sep := 8.0
+	if get_parent() is BoxContainer:
+		sep = float((get_parent() as BoxContainer).get_theme_constant("separation"))
+	var y := _level_badge.position.y + _level_badge.size.y * 0.5
+	var col := COLOR_GOLD if _unlocked else Color(0.3, 0.29, 0.3, 1.0)
+	draw_line(Vector2(-sep * 0.5 - 1.0, y), Vector2(size.x + sep * 0.5 + 1.0, y), col, 3.0)
+
+
+## برچسبِ پایینِ خانه: «دریافت» طلایی روی خانه‌ی آماده، تیکِ طلایی روی گرفته‌شده
+func _draw_claim_tag(cell: PanelContainer) -> void:
+	var state := str(cell.get_meta("state", ""))
+	var font: Font = MenuUI.FONT
+	if state == "ready":
+		var h := 24.0
+		var r := Rect2(Vector2(6, cell.size.y - h - 6), Vector2(cell.size.x - 12, h))
+		cell.draw_style_box(MenuUI.box(COLOR_GOLD, Color(1, 0.95, 0.7), 1, 6), r)
+		var fs := 14
+		var base := r.position.y + (r.size.y + font.get_ascent(fs) - font.get_descent(fs)) * 0.5
+		cell.draw_string(font, Vector2(r.position.x, base), "دریافت", HORIZONTAL_ALIGNMENT_CENTER,
+			r.size.x, fs, Color(0.2, 0.12, 0.0))
+	elif state == "claimed":
+		var c := Vector2(cell.size.x - 15, 15)
+		cell.draw_circle(c, 11.0, COLOR_GOLD)
+		cell.draw_polyline(PackedVector2Array([c + Vector2(-5, 0), c + Vector2(-1, 4), c + Vector2(5, -4)]),
+			Color(0.2, 0.12, 0.0), 2.5, true)
+
+
+## هاله‌ی خانه‌ی آماده آرام کم‌وزیاد می‌شود (بدون شیدر)
+func _set_glow(cell: PanelContainer, on: bool) -> void:
+	var old: Tween = _glows.get(cell, null)
+	if old != null and old.is_valid():
+		old.kill()
+	_glows.erase(cell)
+	var sb := cell.get_theme_stylebox("panel") as StyleBoxFlat
+	if not on or sb == null or not is_inside_tree():
+		return
+	var t := create_tween().set_loops()
+	t.tween_method(func(v: float) -> void:
+		sb.shadow_size = int(v)
+		cell.queue_redraw(), 5.0, 13.0, 0.75).set_trans(Tween.TRANS_SINE)
+	t.tween_method(func(v: float) -> void:
+		sb.shadow_size = int(v)
+		cell.queue_redraw(), 13.0, 5.0, 0.75).set_trans(Tween.TRANS_SINE)
+	_glows[cell] = t

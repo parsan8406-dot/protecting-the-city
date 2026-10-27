@@ -7,12 +7,12 @@
 [ext_resource type="Script" path="res://scripts/city_emblem.gd" id="5_emblem"]
 
 [sub_resource type="StyleBoxFlat" id="SB_avatar"]
-bg_color = Color(0.04, 0.07, 0.13, 1)
+bg_color = Color(0.06, 0.06, 0.07, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3, 0.45, 0.68, 0.9)
+border_color = Color(0.34, 0.34, 0.38, 0.9)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
@@ -20,7 +20,7 @@ corner_radius_bottom_left = 20
 corner_detail = 4
 
 [sub_resource type="StyleBoxFlat" id="SB_me_badge"]
-bg_color = Color(0.13, 0.52, 1, 1)
+bg_color = Color(0.72, 0.53, 0.14, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -66,7 +66,7 @@ stretch_mode = 5
 
 [node name="PosLabel" type="Label" parent="Margin/Row/PosCell"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 21
 text = "۰"
@@ -133,7 +133,7 @@ horizontal_alignment = 1
 [node name="NameLabel" type="Label" parent="Margin/Row/NameCol/NameRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "—"
@@ -142,7 +142,7 @@ clip_text = true
 
 [node name="SubLabel" type="Label" parent="Margin/Row/NameCol"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 13
 text = ""
@@ -163,7 +163,7 @@ script = ExtResource("5_emblem")
 [node name="CityLabel" type="Label" parent="Margin/Row/CityCell"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "—"
@@ -174,7 +174,7 @@ clip_text = true
 [node name="PointsLabel" type="Label" parent="Margin/Row"]
 custom_minimum_size = Vector2(78, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.94, 0.96, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 19
 text = "۰"
@@ -205,7 +205,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 15
 text = ""

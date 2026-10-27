@@ -66,6 +66,10 @@ void fragment() {
 	float k = smoothstep(0.18, 0.38, chroma);
 	t.rgb = mix(t.rgb, gold, k);
 	t.a = mix(t.a, max(t.a, 0.94), k);
+	// V5/V8: برقِ باریکی هر چند ثانیه یک بار از روی دکمه رد می‌شود
+	float sweep = mod(TIME, 4.2) / 1.1 - 0.25;
+	float band = 1.0 - smoothstep(0.0, 0.07, abs(UV.x + UV.y * 0.25 - sweep));
+	t.rgb += vec3(1.0, 0.92, 0.7) * band * 0.32 * k;
 	COLOR = t * v_mod;
 }
 """
@@ -84,7 +88,27 @@ void fragment() {
 	COLOR = t * v_mod;
 }
 """
+## V9: «تغییر» روی آرتِ دکمه‌ی نوعِ بازی خاکستریِ کم‌رنگ بود و غیرفعال به
+## نظر می‌رسید؛ متنِ خاکستریِ ثلثِ راست سفید می‌شود تا «لمس‌کردنی» دیده شود
+const TYPE_CHANGE_SHADER := """
+shader_type canvas_item;
+varying vec4 v_mod;
+void vertex() { v_mod = COLOR; }
+void fragment() {
+	vec4 t = texture(TEXTURE, UV);
+	float lum = dot(t.rgb, vec3(0.333));
+	float chroma = max(t.r, max(t.g, t.b)) - min(t.r, min(t.g, t.b));
+	float k = step(0.72, UV.x) * smoothstep(0.32, 0.5, lum) * (1.0 - smoothstep(0.08, 0.16, chroma));
+	t.rgb = mix(t.rgb, vec3(0.97, 0.95, 0.9), k);
+	COLOR = t * v_mod;
+}
+"""
 const CTA_PULSE_TIME := 1.1
+## V8: ورودِ پلکانی و پس‌زمینه‌ی زنده (psych_lobby_intro.gd)
+const INTRO := preload("res://scripts/psych_lobby_intro.gd")
+## اگر اسکین تا این مدت نرسید (سرورِ کند)، همان آرتِ صحنه نشان داده می‌شود
+const CHARACTER_FALLBACK_SEC := 3.0
+var _character_shown := false
 var _cta_halo: Panel = null
 
 # --- E7/E16: «هدفِ بعدی» زیرِ ستونِ چپ (psych_menu_next_goal.gd) ---
@@ -144,6 +168,22 @@ func _ready():
 	if not SafeArea.changed.is_connected(_apply_safe_area):
 		SafeArea.changed.connect(_apply_safe_area)
 	_apply_safe_area()
+	_play_intro()
+
+
+## V8: پس‌زمینه‌ی زنده از همان اول؛ ورودِ پلکانی بعد از اولین فریمِ چیدمان،
+## تا جای نهاییِ هر بخش (بعد از ناحیه‌ی امن) معلوم باشد
+func _play_intro() -> void:
+	INTRO.living_background(self, get_node_or_null("Background") as Control)
+	# V8: آرتِ پیش‌فرضِ صحنه یک سیلوئتِ سفید است و تا رسیدنِ اسکینِ واقعی
+	# «خراب» به نظر می‌رسید؛ تا آن موقع پنهان، بعد آرام ظاهر می‌شود
+	var stage := get_node_or_null("Node2D") as CanvasItem
+	if stage != null and not _character_shown:
+		stage.modulate.a = 0.0
+		get_tree().create_timer(CHARACTER_FALLBACK_SEC).timeout.connect(_reveal_character)
+	await get_tree().process_frame
+	if is_inside_tree():
+		INTRO.play(self)
 
 ## شش دکمه‌ی اصلی: انیمیشنِ فشردن (UIFx) و بعد کارِ خودشان.
 ## قبلاً سیگنال‌ها در خودِ صحنه وصل بودند و هیچ بازخوردِ لمسی نداشتند؛
@@ -191,6 +231,9 @@ func _style_primary_cta() -> void:
 	var play := get_node_or_null("VBoxContainer/PlayButton") as CanvasItem
 	if play != null:
 		play.material = _shader_material(DEMOTE_RED_SHADER)
+	var type_btn := get_node_or_null("TypeButton") as CanvasItem
+	if type_btn != null:
+		type_btn.material = _shader_material(TYPE_CHANGE_SHADER)
 
 
 ## هاله دقیقاً دورِ خودِ آرت (stretch_mode = keep aspect centered)، نه کلِ دکمه
@@ -255,6 +298,15 @@ func update_ui(data: Dictionary):
 	elif data.has("character"):
 		load_character_by_id(str(data["character"]))
 
+## شخصیت یک بار و نرم ظاهر می‌شود (اسکینِ واقعی یا بعد از مهلت)
+func _reveal_character() -> void:
+	if _character_shown or not is_inside_tree():
+		return
+	_character_shown = true
+	var stage := get_node_or_null("Node2D") as CanvasItem
+	if stage != null:
+		stage.create_tween().tween_property(stage, "modulate:a", 1.0, 0.35) 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
 ## لود تصویر جدید روی شبکه وکتوری Polygon2D
 func load_character_by_id(char_id: String) -> void:
 	if not character_node:
@@ -273,6 +325,7 @@ func load_character_by_id(char_id: String) -> void:
 	if loaded_texture:
 		# جایگزین کردن تصویر روی همان شبکه وکتوری و انیمیشن
 		character_node.texture = loaded_texture
+		_reveal_character()
 		print("✅ تصویر کاراکتر با موفقیت در Polygon2D بارگذاری شد: ", char_id)
 	else:
 		print("❌ تصویر کاراکتر یافت نشد: ", CHARACTERS_FOLDER_PATH + char_id)
@@ -293,8 +346,15 @@ func _open_chat() -> void:
 func _refresh_chat_badge(count: int) -> void:
 	if chat_badge == null:
 		return
+	var had := chat_badge.visible
 	chat_badge.visible = count > 0
-	chat_badge_count.text = "99+" if count > 99 else str(count)
+	# همان قاعده‌ی نشانِ پیام‌های نوارِ بالا: عددِ واقعی، بیش از ۹ یعنی «9+»
+	chat_badge_count.text = "9+" if count > 9 else str(count)
+	# E16: نشانِ تازه یک تپش کوچک می‌زند تا دیده شود (فقط وقتی ظاهر می‌شود)
+	if count > 0 and not had:
+		chat_badge.pivot_offset = chat_badge.size * 0.5
+		chat_badge.scale = Vector2(0.4, 0.4)
+		chat_badge.create_tween().tween_property(chat_badge, "scale", Vector2.ONE, 0.32) 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 ## دکمه‌ی «عملیات ضربت / ۴ در ۴» بالای دکمه‌ی شروع — هم نوعِ بازی را نشان
 ## می‌دهد و هم در را به منوی انتخابِ حالت باز می‌کند.

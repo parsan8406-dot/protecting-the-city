@@ -9,7 +9,7 @@ extends TextureRect
 const SHADER := preload("res://shaders/circle_avatar.gdshader")
 
 ## رنگ‌های حلقه
-const RING_DEFAULT := Color(0.42, 0.52, 0.66, 1.0)
+const RING_DEFAULT := Color(0.42, 0.42, 0.46, 1.0)
 const RING_BLUE := Color(0.24, 0.62, 1.0, 1.0)
 const RING_GOLD := Color(1.0, 0.76, 0.24, 1.0)
 const RING_GREEN := Color(0.2, 0.82, 0.38, 1.0)

@@ -14,6 +14,12 @@ extends PanelContainer
 ##   ۴) هر ماموریتِ در حال انجام
 ## هیچ‌کدام نبود (یا آموزش در جریان است) → پنهان.
 ##
+## E16 محرّکِ برگشت: اولین باری که در یک روزِ تازه لابی باز می‌شود و
+## ماموریت‌های امروز هنوز دست نخورده‌اند، به‌جای (۲) تا (۴) یک بار خبرِ مثبتِ
+## «ماموریت‌های امروز رسید» می‌آید — فقط واقعیت (ریستِ روزانه)، بدونِ تایمرِ فشار.
+## C9: زیرِ کادر یک نوارِ باریکِ طلایی پیشرفتِ همان هدف را نشان می‌دهد (از
+## راست پر می‌شود)؛ برای مودِ قفل یعنی کاپِ فعلی نسبت به کاپِ لازم.
+##
 ## داده‌ها همان دو درخواستِ سبکی است که بقیه‌ی منو هم می‌زند؛ هیچ عددی این‌جا
 ## ساخته نمی‌شود.
 
@@ -27,6 +33,9 @@ const GOLD := Color(0.96, 0.79, 0.32)
 const TEXT := Color(0.95, 0.95, 0.96)
 const MUTED := Color(0.70, 0.70, 0.74)
 const TAP_SLOP := 14.0
+## «روزِ تازه» یک بار در روز (روی همین دستگاه و حساب)
+const PREFS_PATH := "user://psych_menu.cfg"
+const BAR_H := 3.0
 ## پشتِ هم رفرش نکن (player_data_updated چند بار پشتِ هم می‌آید)
 const MIN_REFRESH_MS := 1500
 
@@ -44,6 +53,10 @@ var _last_refresh := -100000
 var _touch_down := false
 var _touch_start := Vector2.ZERO
 var _shown_once := false
+## پیشرفتِ هدفِ نمایش‌داده‌شده ۰..۱ — منفی یعنی نوار نکش
+var _progress := -1.0
+var _shown_bar := 0.0
+var _fresh_day_used := false
 
 
 func _ready() -> void:
@@ -88,13 +101,16 @@ func _build() -> void:
 	add_child(row)
 
 	# فلشِ «برو» سمتِ چپ (رو به محتوا در راست‌به‌چپ)
-	var chevron := Label.new()
-	chevron.text = "‹"
-	chevron.add_theme_font_override("font", FONT_NUM)
-	chevron.add_theme_font_size_override("font_size", 30)
-	chevron.add_theme_color_override("font_color", Color(GOLD, 0.8))
+	# V9: فلشِ کشیده‌شده — گلیفِ «‹» در Lalezar شبیهِ پرانتز دیده می‌شد
+	var chevron := Control.new()
+	chevron.custom_minimum_size = Vector2(14, 24)
 	chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chevron.draw.connect(func() -> void:
+		var c := chevron.size * 0.5
+		chevron.draw_polyline(PackedVector2Array([
+			c + Vector2(4, -8), c + Vector2(-4, 0), c + Vector2(4, 8)]),
+			Color(GOLD, 0.85), 3.0, true))
 	row.add_child(chevron)
 
 	var col := VBoxContainer.new()
@@ -207,6 +223,19 @@ func _pick() -> void:
 			_art(CHEST_ART, MissionArt.texture_for(str(first.get("icon", "")))), MISSIONS_SCENE, true)
 		return
 
+	# E16) روزِ تازه، ماموریت‌های دست‌نخورده — یک بار در روز
+	if _fresh_day_used or _is_fresh_day():
+		var total_xp := 0
+		for item in _missions:
+			if typeof(item) == TYPE_DICTIONARY:
+				total_xp += int((item as Dictionary).get("xp", 0))
+		var sub_fresh := "%s ماموریتِ تازه" % MissionArt.fa_number(_missions.size())
+		if total_xp > 0:
+			sub_fresh += " — تا %sxp جایزه" % MissionArt.fa_grouped(total_xp)
+		_show("ماموریت‌های امروز رسید!", sub_fresh,
+			_art(CHEST_ART, null), MISSIONS_SCENE, false)
+		return
+
 	# ۲) ماموریتِ نزدیک به پایان (C9)
 	if not best.is_empty() and best_ratio >= 0.5:
 		_show_mission(best)
@@ -223,7 +252,8 @@ func _pick() -> void:
 			sub = "حدودِ %s برد — هر برد +%s کاپ" % [MissionArt.fa_number(wins), MissionArt.fa_number(per_win)]
 		var emblem := ModeArt.emblem(str(gate.get("mode_id", "")))
 		_show("%s کاپ تا باز شدنِ «%s»" % [MissionArt.fa_grouped(need), str(gate.get("name", ""))],
-			sub, emblem if emblem != null else _art(PADLOCK_ART, null), MODES_SCENE, false)
+			sub, emblem if emblem != null else _art(PADLOCK_ART, null), MODES_SCENE, false,
+			float(_trophies) / float(maxi(int(gate.get("min_trophies", 1)), 1)))
 		return
 
 	# ۴) هر ماموریتِ در حال انجام
@@ -241,7 +271,8 @@ func _show_mission(m: Dictionary) -> void:
 	if xp > 0:
 		sub += " — جایزه %sxp" % MissionArt.fa_number(xp)
 	_show(str(m.get("title", "ماموریتِ روزانه")), sub,
-		MissionArt.texture_for(str(m.get("icon", ""))), MISSIONS_SCENE, false)
+		MissionArt.texture_for(str(m.get("icon", ""))), MISSIONS_SCENE, false,
+		float(int(m.get("progress", 0))) / float(target))
 
 
 ## مودِ قفلی که کمترین کاپِ اضافه را لازم دارد («به زودی»ها حساب نیستند)
@@ -281,6 +312,29 @@ func _art(path: String, fallback: Texture2D) -> Texture2D:
 	return fallback
 
 
+## اولین لابیِ امروز و هیچ ماموریتی هنوز شروع نشده؟ (همان لحظه «دیده شد»
+## ثبت می‌شود؛ تا آخرِ همین صفحه همان خبر می‌ماند و بارِ بعد دیگر نمی‌آید)
+func _is_fresh_day() -> bool:
+	if _missions.is_empty():
+		return false
+	for item in _missions:
+		if typeof(item) != TYPE_DICTIONARY:
+			return false
+		var m: Dictionary = item
+		if int(m.get("progress", 0)) > 0 or bool(m.get("done", false)) or bool(m.get("claimed", false)):
+			return false
+	var today := Time.get_date_string_from_system()
+	var key := str(Global.my_username)
+	var cfg := ConfigFile.new()
+	cfg.load(PREFS_PATH)
+	if str(cfg.get_value("lobby_fresh_day", key, "")) == today:
+		return false
+	cfg.set_value("lobby_fresh_day", key, today)
+	cfg.save(PREFS_PATH)
+	_fresh_day_used = true
+	return true
+
+
 func _tutorial_running() -> bool:
 	var tut := get_node_or_null("/root/Tutorial")
 	return tut != null and tut.has_method("is_running") and tut.is_running()
@@ -288,7 +342,10 @@ func _tutorial_running() -> bool:
 
 # ============================ نمایش ============================
 
-func _show(title: String, sub: String, icon: Texture2D, target: String, reward_ready: bool) -> void:
+func _show(title: String, sub: String, icon: Texture2D, target: String, reward_ready: bool,
+		progress: float = -1.0) -> void:
+	_set_progress(progress)
+	var was_ready := _style.get_border_width(SIDE_TOP) == 2
 	_title.text = title
 	_sub.text = sub
 	_sub.visible = sub != ""
@@ -305,6 +362,41 @@ func _show(title: String, sub: String, icon: Texture2D, target: String, reward_r
 			_shown_once = true
 			modulate.a = 0.0
 			create_tween().tween_property(self, "modulate:a", 1.0, 0.3)
+	# E2/V7: جایزه‌ی تازه آماده شد → یک درخششِ گرمِ کوتاه، یک بار (نه پالسِ دائمی، V5)
+	if reward_ready and not was_ready:
+		var tw := create_tween()
+		tw.tween_interval(0.3)
+		tw.tween_property(self, "self_modulate", Color(1.35, 1.2, 0.85), 0.16)
+		tw.tween_property(self, "self_modulate", Color.WHITE, 0.45).set_trans(Tween.TRANS_SINE)
+
+
+## نوارِ پیشرفتِ پایینِ کادر: نرم تا مقدارِ تازه می‌رود
+func _set_progress(p: float) -> void:
+	_progress = p
+	if p < 0.0:
+		_shown_bar = 0.0
+		queue_redraw()
+		return
+	var target := clampf(p, 0.0, 1.0)
+	var tw := create_tween()
+	tw.tween_method(func(v: float) -> void:
+		_shown_bar = v
+		queue_redraw(), _shown_bar, target, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+
+func _draw() -> void:
+	if _progress < 0.0 or _style == null:
+		return
+	var x0 := _style.content_margin_left + 2.0
+	var x1 := size.x - _style.content_margin_right - 2.0
+	var y := size.y - BAR_H - 2.0
+	if x1 <= x0:
+		return
+	draw_rect(Rect2(x0, y, x1 - x0, BAR_H), Color(1, 1, 1, 0.10))
+	# راست‌به‌چپ: از لبه‌ی راست پر می‌شود
+	var w := (x1 - x0) * _shown_bar
+	if w > 0.5:
+		draw_rect(Rect2(x1 - w, y, w, BAR_H), Color(GOLD, 0.95))
 
 
 func _hide() -> void:

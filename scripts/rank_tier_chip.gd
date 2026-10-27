@@ -2,7 +2,7 @@ extends PanelContainer
 ## یک ستون از «درجه‌های رنک» (صفحه‌ی رنک): برنز → نقره → طلا → پلاتین → الماس → لجندری
 ##
 ## هر ستون: نشان رنک + اسم + بازه‌ی کاپ «(۱ - ۱۰۰۰)» با آیکن کاپِ هم‌رنگ رنک +
-## یک جمله‌ی کوتاه. رنک فعلی بازیکن قاب آبی درخشان می‌گیرد.
+## یک جمله‌ی کوتاه. رنک فعلی بازیکن قاب طلاییِ درخشان می‌گیرد.
 ##
 ## استفاده (اول add_child، بعد setup):
 ##   var chip := preload("res://secense/rank_tier_chip.tscn").instantiate()
@@ -11,8 +11,8 @@ extends PanelContainer
 ##
 ## tier_dictionary: {id, name, min, max, sub} — max صفر یعنی سقف ندارد.
 
-const COLOR_TEXT := Color(0.94, 0.96, 1.0, 1.0)
-const COLOR_GOLD := Color(0.97, 0.78, 0.3, 1.0)
+const COLOR_TEXT := MenuUI.TEXT
+const COLOR_GOLD := MenuUI.GOLD
 
 ## رنگ آیکن کاپ کنار بازه‌ی هر رنک
 const CUP_TINT := {
@@ -40,7 +40,7 @@ var _mark: TextureRect = null
 ## state (اختیاری، از صفحه‌ی رنک):
 ##   ""        فقط ستون (رفتارِ قدیمی)
 ##   "passed"  رنکی که از آن رد شده — عادی
-##   "current" رنکِ فعلی — قاب آبی + سپرِ طلایی
+##   "current" رنکِ فعلی — قاب طلایی + سپرِ طلایی
 ##   "next"    رنکِ بعدی — C9 «فقط X کاپ مونده!» به‌جای جمله‌ی زیرش
 ##   "locked"  دورتر — E12 تیزر: نشانِ کم‌رنگ با قفل، ولی اسم و بازه پیداست
 ## left: کاپِ باقی‌مانده تا رنکِ بعدی (فقط برای "next")
@@ -71,6 +71,24 @@ func setup(tier: Dictionary, is_current: bool, state: String = "", left: int = 0
 			_badge.modulate = Color(0.42, 0.42, 0.48, 0.75)
 			mark_path = PSYCH + "tease_padlock.png"
 	_set_mark(mark_path, state == "locked")
+	# E12 قفل: اسم و بازه کم‌رنگ‌تر، ولی خوانا (تیزر، نه پنهان)
+	_name_label.modulate = Color(1, 1, 1, 0.6) if state == "locked" else Color.WHITE
+	_range_label.modulate = _name_label.modulate
+	_set_frame_pulse(is_current)
+
+## V4 رنکِ فعلی: قابِ طلایی آرام نفس می‌کشد تا چشم اول آن‌جا بنشیند
+var _frame_pulse: Tween = null
+
+func _set_frame_pulse(on: bool) -> void:
+	if _frame_pulse != null and _frame_pulse.is_valid():
+		_frame_pulse.kill()
+	_frame_pulse = null
+	_current_frame.modulate = Color.WHITE
+	if not on or not is_inside_tree():
+		return
+	_frame_pulse = create_tween().set_loops()
+	_frame_pulse.tween_property(_current_frame, "modulate", Color(1.25, 1.15, 0.9), 0.9).set_trans(Tween.TRANS_SINE)
+	_frame_pulse.tween_property(_current_frame, "modulate", Color(1, 1, 1, 0.8), 0.9).set_trans(Tween.TRANS_SINE)
 
 func _set_mark(path: String, centered: bool) -> void:
 	if path == "" or not ResourceLoader.exists(path):

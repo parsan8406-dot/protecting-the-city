@@ -13,6 +13,9 @@ extends Node
 ##   season            تبِ فصل مستقیم
 ##   achievements      پنجره‌ی دستاوردها (یکی تازه باز شده)
 ##   reward            RewardPopup با سه کارت
+##   claim_fly         ماموریت‌ها + RewardPopup؛ بستن ← پروازِ سکه به نوارِ بالا و
+##                     شمارشِ عدد (عکس وسطِ پرواز: _fly، بعد از شمارش: _claim_fly)
+##   missions_loading  حالتِ «در حال بارگذاری» / missions_error حالتِ خطا با «تلاش دوباره»
 ##
 ## با --live (فقط صفحه‌های missions_*) دیتا از سرورِ محلی می‌آید نه ساختگی.
 ## در آخر هر کنترلی که از صفحه بیرون زده یا رویِ نوارِ بالا افتاده چاپ می‌شود.
@@ -49,8 +52,13 @@ func _start() -> void:
 	match _page:
 		"dump":
 			_dump()
-		"missions_daily", "missions_switch":
+		"missions_daily", "missions_switch", "claim_fly":
 			_open_missions("daily")
+		"missions_loading", "missions_error":
+			Global.requested_missions_tab = "daily"
+			_screen = load(MISSIONS_SCENE).instantiate()
+			add_child(_screen)
+			_screen.call("_set_list_state", "loading" if _page == "missions_loading" else "error")
 		"season":
 			_open_missions("season")
 		"achievements":
@@ -77,6 +85,35 @@ func _process(_delta: float) -> void:
 		return
 	# Global هم دیتای سرور را می‌گیرد و صفحه با آن تازه می‌شود؛ دیتای ساختگی
 	# بعد از آن دوباره نشانده می‌شود
+	if _page == "claim_fly":
+		if _frames == 30:
+			RewardPopup.show_rewards([{"icon": "coin", "amount": 1200}, {"icon": "gem", "amount": 15}], "ماموریت انجام شد")
+		elif _frames == 34:
+			Global.coins = int(Global.coins) + 1200
+			Global.gems = int(Global.gems) + 15
+			Global.player_data_updated.emit()
+		elif _frames == 70:
+			var p = RewardPopup._active
+			if p != null:
+				p._opened_at = -10.0
+				p._close()
+		elif _frames == 88:
+			_save("fly")
+		elif _frames == 130:
+			print("SHOT coins label=%s" % (_screen.get("_coins_label") as Label).text)
+			_report()
+			_save(_page)
+			get_tree().quit(0)
+		return
+	if _page.begins_with("missions_") and _page != "missions_daily" and _page != "missions_switch":
+		# Global ممکن است دیتای سرور را برساند؛ حالت دوباره نشانده می‌شود
+		if _frames == 30:
+			_screen.call("_set_list_state", "loading" if _page == "missions_loading" else "error")
+		if _frames == 40:
+			_report()
+			_save(_page)
+			get_tree().quit(0)
+		return
 	if _frames == 25 and _screen != null and not _live and _page != "achievements":
 		_screen.call("_apply_missions", _fake_missions())
 		_screen.call("_apply_season", _fake_season())

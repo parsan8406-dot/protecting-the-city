@@ -68,6 +68,7 @@ func mark_read() -> void:
 	if is_node_ready():
 		_unread_dot.visible = false
 		_title_label.add_theme_color_override("font_color", Color(0.82, 0.82, 0.85, 1.0))
+		_apply_emphasis(has_unclaimed_reward())
 
 func _on_tapped(_row: TapRow, target: Control) -> void:
 	if target == _action_button:
@@ -117,6 +118,7 @@ func _apply(data: Dictionary) -> void:
 	_type_icon.modulate = MessageRow.type_color(message_type)
 
 	var pending := has_unclaimed_reward()
+	_apply_emphasis(pending)
 	match message_type:
 		TYPE_FRIEND_REQUEST:
 			_action_button.text = "پذیرفتن"
@@ -134,3 +136,24 @@ func _apply(data: Dictionary) -> void:
 
 func _refresh_selection() -> void:
 	_selected_frame.visible = _selected
+
+## V1/V3 تأکید: جایزه‌ی گرفته‌نشده زمینه‌ی طلایی کم‌رنگ و نوار طلایی سمت راست؛
+## نخوانده کمی روشن‌تر؛ خوانده‌شده آرام و بی‌رنگ (کارهای مانده از دور دیده شوند)
+func _apply_emphasis(pending: bool) -> void:
+	var st := StyleBoxFlat.new()
+	st.border_width_bottom = 1
+	st.border_color = Color(0.35, 0.35, 0.38, 0.35)
+	st.set_corner_radius_all(4)
+	if pending:
+		st.bg_color = Color(1.0, 0.8, 0.26, 0.07)
+		st.border_width_right = 4
+		st.border_color = Color(1.0, 0.8, 0.26, 0.85)
+	elif not is_read:
+		st.bg_color = Color(1, 1, 1, 0.04)
+		st.border_width_right = 4
+		st.border_color = Color(0.96, 0.96, 0.97, 0.5)
+	else:
+		st.bg_color = Color(1, 1, 1, 0)
+	add_theme_stylebox_override("normal", st)
+	add_theme_stylebox_override("hover", st)
+	_preview_label.modulate = Color(1, 1, 1, 1.0 if (pending or not is_read) else 0.7)

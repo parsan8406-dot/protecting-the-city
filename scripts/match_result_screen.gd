@@ -27,9 +27,10 @@ class_name MatchResultScreen
 ## واقعیِ صفحه بزرگ/کوچک می‌شود (مثل GameHUD). عرض آزاد است و محتوا وسط
 ## می‌نشیند، پس از ۴:۳ تا ۲۱:۹ درست دیده می‌شود؛ ناچ هم کنار گذاشته می‌شود.
 ##
-## ردیفِ «بینش‌ها» زیرِ جوایز (docs/game-psychology.md):
-##   بهترین لحظه   E4  کیل/استریک/بدون مرگ/برد پیاپی + «رکورد جدید»
-##                     (آمار: psych_results_match_stats.gd از طریقِ Network)
+## سلسله‌مراتبِ صفحه (دورِ ۳، V4): نتیجه ← بهترین لحظه ← جوایز ← پیشرفت ← اقدامِ بعدی
+##   بهترین لحظه   E4  قرصِ طلایی زیرِ عنوان: کیل/استریک/بدون مرگ/برد پیاپی +
+##                     «رکورد جدید» (آمار: psych_results_match_stats.gd)
+## ردیفِ «پیشرفت» زیرِ جوایز (docs/game-psychology.md):
 ##   رنک           E5/E6/C9  «فقط X کاپ تا طلا» / «یه برد تا ارتقا» / ارتقا + کنفتی
 ##   نزدیک‌ترین هدف E7/C8  ماموریتِ روزانه یا چالشِ فصلِ ناتمام از سرور
 ## و دو دکمه: «دوباره بازی» (طلایی، اصلی — V5/E5) و «لابی» (فرعی).
@@ -57,7 +58,10 @@ const PSYCH := "res://assets/ui/psych/"
 const PsychProgress := preload("res://scripts/psych_results_progress.gd")
 const CONFETTI := preload("res://scripts/psych_results_confetti.gd")
 const INSIGHT_H := 80.0
-const CHIP_W := 286.0
+const CHIP_W := 340.0
+## ارتفاعِ ردیفِ زیرِ عنوان (جمله‌ی نتیجه یا قرصِ «بهترین لحظه») — از اول
+## رزرو می‌شود تا رسیدنِ قرص صفحه را جابه‌جا نکند
+const MOMENT_H := 50.0
 
 const DESIGN_H := 720.0
 const EMBLEM := Vector2(640, 300)
@@ -139,6 +143,9 @@ var _insights: HBoxContainer = null
 var _chip_moment: Dictionary = {}
 var _chip_rank: Dictionary = {}
 var _chip_goal: Dictionary = {}
+var _subtitle_row: HBoxContainer = null
+## جمله‌ی سفیدِ «تیم شما پیروز شد!» — وقتی قرصِ بهترین لحظه آمد کنار می‌رود
+var _subtitle_plain: Label = null
 ## آمارِ همین مسابقه + رکوردها (PsychResultsMatchStats.commit)
 var _stats: Dictionary = {}
 var _goal_http: HTTPRequest = null
@@ -267,7 +274,7 @@ func _build() -> void:
 	column.add_child(_build_insights())
 
 	# V5 فقط یک دکمه‌ی اصلی: آنلاین «دوباره بازی» طلایی است و «لابی»
-	# کوچک و سرمه‌ای کنارش (E5/E13: شروعِ دوباره‌ی فوری، حتی بعد از باخت)
+	# کوچک و تیره کنارش (E5/E13: شروعِ دوباره‌ی فوری، حتی بعد از باخت)
 	if _can_replay():
 		var row := HBoxContainer.new()
 		row.name = "Buttons"
@@ -404,9 +411,12 @@ func _build_emblem() -> Control:
 
 func _build_subtitle() -> Control:
 	var row := HBoxContainer.new()
+	row.layout_direction = Control.LAYOUT_DIRECTION_LTR
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 18)
+	row.custom_minimum_size = Vector2(0, MOMENT_H)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_subtitle_row = row
 	# در «عملیات انتقام» نتیجه یک عدد است، نه فقط برد و باخت
 	if score_text != "":
 		row.add_child(_num_label(score_text, 30, GOLD))
@@ -421,7 +431,8 @@ func _build_subtitle() -> Control:
 		# E5 نزدیک‌برد: باختِ نزدیک «تقریباً بردی» است، نه «باختی»
 		row.add_child(_num_label(near, 26, GOLD))
 	else:
-		row.add_child(_text_label(text, 26, TEXT if outcome == Outcome.LOSE else CREAM))
+		_subtitle_plain = _text_label(text, 26, TEXT if outcome == Outcome.LOSE else CREAM)
+		row.add_child(_subtitle_plain)
 	return row
 
 
@@ -605,10 +616,20 @@ func _build_trophy_panel() -> Control:
 	_pill.add_child(prow)
 	v.add_child(_pill)
 
+	# E4 «دست‌خالی نیستی»: سکه‌ی طلایی کنارِ «+N سکه · +M تجربه»
+	var cons := HBoxContainer.new()
+	cons.layout_direction = Control.LAYOUT_DIRECTION_LTR
+	cons.alignment = BoxContainer.ALIGNMENT_CENTER
+	cons.add_theme_constant_override("separation", 8)
+	cons.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_consolation_label = _num_label("", 22, GOLD)  # عدد دارد → Lalezar
 	_consolation_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_consolation_label.modulate.a = 0.0
-	v.add_child(_consolation_label)
+	cons.add_child(_consolation_label)
+	var coin := _icon_rect(_tex(COIN_ICON), 28)
+	cons.add_child(coin)
+	cons.modulate.a = 0.0
+	_consolation_label.set_meta("row", cons)
+	v.add_child(cons)
 	return panel
 
 
@@ -624,11 +645,54 @@ func _build_insights() -> Control:
 	_insights.add_theme_constant_override("separation", 12)
 	_insights.custom_minimum_size = Vector2(0, INSIGHT_H)
 	_insights.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# چپ‌به‌راست ساخته می‌شوند؛ ترتیبِ خواندن (راست‌به‌چپ): لحظه ← رنک ← هدف
+	# چپ‌به‌راست ساخته می‌شوند؛ ترتیبِ خواندن (راست‌به‌چپ): رنک ← هدف
 	_chip_goal = _make_chip("Goal")
 	_chip_rank = _make_chip("Rank")
-	_chip_moment = _make_chip("Moment")
+	# V4/E4 «بهترین لحظه» بالاتر از جوایز، درست زیرِ عنوان
+	_chip_moment = _make_moment_pill()
 	return _insights
+
+
+## قرصِ «بهترین لحظه»: آیکن + عنوانِ طلایی + متن در یک خط، زیرِ عنوانِ صفحه.
+## همان کلیدهای _make_chip را دارد تا _show_chip رویش کار کند.
+func _make_moment_pill() -> Dictionary:
+	var panel := PanelContainer.new()
+	panel.name = "ChipMoment"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.04, 0.03, 0.88)
+	sb.set_border_width_all(2)
+	sb.border_color = Color(GOLD_EDGE, 0.55)
+	sb.set_corner_radius_all(24)
+	sb.content_margin_left = 22.0
+	sb.content_margin_right = 10.0
+	sb.content_margin_top = 2.0
+	sb.content_margin_bottom = 2.0
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.visible = false
+	var row := HBoxContainer.new()
+	row.layout_direction = Control.LAYOUT_DIRECTION_LTR
+	row.add_theme_constant_override("separation", 10)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(row)
+	var value := _num_label("", 22, CREAM)
+	value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(value)
+	var dot := _num_label("•", 18, GOLD_EDGE)
+	row.add_child(dot)
+	var title := _num_label("", 22, GOLD)
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(title)
+	var icon := _icon_rect(null, 42)
+	row.add_child(icon)
+	var bar := Control.new()
+	bar.visible = false
+	var count := _num_label("", 17, GOLD)
+	count.visible = false
+	_subtitle_row.add_child(panel)
+	return {"panel": panel, "sb": sb, "icon": icon, "title": title, "value": value, "bar": bar,
+		"count": count, "pill": true}
 
 
 ## یک کارت: آیکن، عنوانِ کوچک، متنِ اصلی و نوارِ باریک. تا پر نشده پنهان است.
@@ -699,7 +763,7 @@ func _make_chip(id: String) -> Dictionary:
 
 	_insights.add_child(panel)
 	return {"panel": panel, "sb": sb, "icon": icon, "title": title, "value": value, "bar": bar,
-		"count": count}
+		"count": count, "pill": false}
 
 
 ## کارت را پر می‌کند و با پرشِ کوچک نشان می‌دهد.
@@ -732,7 +796,13 @@ func _show_chip(chip: Dictionary, tex: Texture2D, title: String, value: String,
 	panel.visible = true
 	if first:
 		panel.modulate.a = 0.0
-	panel.pivot_offset = Vector2(CHIP_W, INSIGHT_H) * 0.5
+	var pill := bool(chip.get("pill", false))
+	if pill:
+		(chip["title"] as Label).add_theme_color_override("font_color", GOLD)
+		# جمله‌ی کلی کنار می‌رود تا خودِ لحظه دیده شود (جمله‌ی نزدیک‌برد می‌ماند — E5)
+		if first and _subtitle_plain != null and is_instance_valid(_subtitle_plain):
+			_subtitle_plain.visible = false
+	panel.pivot_offset = panel.get_combined_minimum_size() * 0.5 if pill else Vector2(CHIP_W, INSIGHT_H) * 0.5
 	var t := panel.create_tween()
 	if first:
 		panel.scale = Vector2(0.85, 0.85)
@@ -928,7 +998,7 @@ func _fill_goal() -> void:
 	if tex == null:
 		tex = _psych_tex("chest_closed", COIN_ICON)
 	_show_chip(_chip_goal, tex, title, str(goal.get("title", "")), near,
-		0.0, PsychProgress.visual_ratio(progress, target), "%d/%d" % [progress, target])
+		0.0, PsychProgress.visual_ratio(progress, target), "%s/%s" % [_fa(progress), _fa(target)])
 
 
 ## E17: کنفتیِ طلاییِ کوتاه بالای نشان (ارتقای رنک یا سطح) — فقط یک بار
@@ -1495,7 +1565,7 @@ func _animate_trophies() -> void:
 		_set_consolation(0.0, coins, xp)
 		var ct := _consolation_label.create_tween()
 		ct.tween_interval(0.9)
-		ct.tween_property(_consolation_label, "modulate:a", 1.0, 0.3)
+		ct.tween_property(_consolation_label.get_meta("row") as Control, "modulate:a", 1.0, 0.3)
 		ct.tween_method(_set_consolation.bind(coins, xp), 0.0, 1.0, 0.8) \
 			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		ct.tween_callback(func() -> void: UIFx.tap(_consolation_label))
@@ -1717,10 +1787,11 @@ func _draw_button_plate(c: Control, b: Button, navy: bool) -> void:
 	var bot: Color
 	var edge: Color
 	if navy:
-		top = Color(0.14, 0.2, 0.34)
-		mid = Color(0.08, 0.11, 0.2)
-		bot = Color(0.04, 0.06, 0.12)
-		edge = ICE
+		# فرعی: فلزِ تیره با لبه‌ی خاکستری (پالتِ تم؛ قبلاً سرمه‌ای/یخی)
+		top = Color(0.2, 0.2, 0.21)
+		mid = Color(0.11, 0.11, 0.12)
+		bot = Color(0.05, 0.05, 0.055)
+		edge = Color(0.55, 0.55, 0.58)
 	else:
 		top = Color(1.0, 0.9, 0.5)
 		mid = Color(0.95, 0.72, 0.26)
@@ -1738,7 +1809,7 @@ func _draw_button_plate(c: Control, b: Button, navy: bool) -> void:
 	_outline(c, pts, edge, 3.0)
 	var inner := Geometry2D.offset_polygon(pts, -6.0)
 	if not inner.is_empty():
-		_outline(c, inner[0], Color(ICE, 0.35) if navy else Color(1, 0.97, 0.8, 0.55), 1.5)
+		_outline(c, inner[0], Color(1, 1, 1, 0.14) if navy else Color(1, 0.97, 0.8, 0.55), 1.5)
 	_draw_shine_band(c, pts)
 
 
@@ -1749,7 +1820,7 @@ func _draw_home(c: Control) -> void:
 		Vector2(w * 0.5, h * 0.04), Vector2(w, h * 0.5), Vector2(w * 0.86, h * 0.5),
 		Vector2(w * 0.86, h * 0.96), Vector2(w * 0.14, h * 0.96), Vector2(w * 0.14, h * 0.5),
 		Vector2(0, h * 0.5)]), Color.WHITE)
-	c.draw_rect(Rect2(w * 0.41, h * 0.6, w * 0.18, h * 0.36), Color(0.08, 0.11, 0.2))
+	c.draw_rect(Rect2(w * 0.41, h * 0.6, w * 0.18, h * 0.36), Color(0.11, 0.11, 0.12))
 
 
 func _draw_shine(c: Control, _hex: bool) -> void:

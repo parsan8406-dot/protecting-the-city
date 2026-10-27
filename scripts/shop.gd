@@ -78,6 +78,10 @@ extends Control
 @onready var code_button: TextureButton = $SectionMenu/GemandcoinTab/Control2/VBoxContainer/HBoxContainer/CodeButton
 
 const GIFT_CODE_DIALOG_SCENE := preload("res://secense/gift_code_dialog.tscn")
+## round 3: پالتِ رده (V2)، پنجره‌های پیش‌نمایش/کم‌داری/شانس (C11/C13/E3)، وضعیت‌ها (C12)
+const Rarity := preload("res://scripts/psych_shop_rarity.gd")
+const Sheet := preload("res://scripts/psych_shop_sheet.gd")
+const States := preload("res://scripts/psych_shop_states.gd")
 
 # صحنه‌ها
 @export var shop_card_scene: PackedScene = preload("res://secense/shop_card.tscn")
@@ -101,6 +105,7 @@ const BORDER_COLOR_COMMON: Color = Color("888888")
 var SHOP_URL := Global.SERVER_BASE + "/get_shop"
 var BUY_URL := Global.SERVER_BASE + "/buy_item"
 var LUCKY_URL := Global.SERVER_BASE + "/lucky_box"
+var EQUIP_URL := Global.SERVER_BASE + "/equip_item"
 
 const SECTION_CHARACTERS := "characters"
 const SECTION_WEAPONS := "weapons"
@@ -120,6 +125,9 @@ const WEAPONS_FOLDER_PATH := "res://assets/items/"
 const CURRENCY_ASSETS_FOLDER_PATH := "res://assets/"
 const CURRENCY_ART_FOLDER_PATH := "res://assets/ui/Arz/"
 
+## دکمه‌ی خانه: بزرگ‌تر از ۴۸dp (TOUCH_H=50) ولی کم‌جاتر از ۸۰ قبلی
+const HOME_SIZE := 68.0
+
 const CURRENCY_BTN_HOVER_SCALE := Vector2(1.07, 1.07)
 const CURRENCY_BTN_NORMAL_SCALE := Vector2(1.0, 1.0)
 const CURRENCY_BTN_DOWN_SCALE := Vector2(0.90, 0.90)
@@ -136,6 +144,8 @@ var selected_weapon_data: Dictionary = {}
 
 var _buy_in_flight: bool = false
 var _pending_buy_item: Dictionary = {}
+## دکمه‌ای که خرید از آن شروع شد (برای «−۶٬۰۰۰» شناور)
+var _pending_source: Control = null
 
 # --- C13 پیشگیری از خطا: تأییدِ خرج کردنِ قلب (ارزِ ویژه) ---
 ## خریدِ قلبی از این مبلغ به بالا یک پنجره‌ی تأیید دارد؛ بسته‌های کوچکِ سکه نه
@@ -162,12 +172,18 @@ func _ready() -> void:
 
 	add_child(shop_http_request)
 	add_child(buy_http_request)
+	# اینترنتِ موبایل: درخواستِ گیرکرده بعد از چند ثانیه خطا می‌دهد تا «دوباره» دیده شود
+	shop_http_request.timeout = 12.0
+	buy_http_request.timeout = 20.0
 
 	if not buy_http_request.request_completed.is_connected(_on_buy_response):
 		buy_http_request.request_completed.connect(_on_buy_response)
 
 	if not Global.inventory_updated.is_connected(_refresh_ownership_ui):
 		Global.inventory_updated.connect(_refresh_ownership_ui)
+	# C11: «X کم داری» با هر تغییرِ سکه/قلب تازه می‌شود
+	if not Global.player_data_updated.is_connected(_refresh_ownership_ui):
+		Global.player_data_updated.connect(_refresh_ownership_ui)
 
 	if not Global.open_shop_tab_requested.is_connected(_on_shop_tab_requested):
 		Global.open_shop_tab_requested.connect(_on_shop_tab_requested)
@@ -206,6 +222,9 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_safe_area)
 	_apply_safe_area()
 
+	_setup_detail_panels()
+	_setup_hero()
+	_show_loading()
 	fetch_shop_data()
 	_setup_tab_buttons()
 
@@ -243,18 +262,21 @@ func _apply_safe_area() -> void:
 		tabs_row.offset_left = 14.0 + ins.x
 		tabs_row.offset_right = -(14.0 + ins.z)
 
+	# دکمه‌ی خانه گوشه‌ی پایین-راست (مثلِ بقیه‌ی صفحه‌ها) ریلِ خودش را دارد —
+	# قبلاً روی لبه‌ی دکمه‌ی خرید/بسته‌ی قلبِ ستونِ راست می‌افتاد و لمس را می‌دزدید (C3/C13)
 	var section := $SectionMenu as Control
 	if section:
 		section.offset_left = 23.0 + ins.x
-		section.offset_right = -(25.0 + ins.z)
+		section.offset_right = -(HOME_SIZE + 12.0 + ins.z)
 		section.offset_bottom = -(34.0 + ins.w)
 
 	var home := $HomeButton as Control
 	if home:
-		home.offset_left = -(80.0 + ins.z)
-		home.offset_right = -ins.z
-		home.offset_top = -(80.0 + ins.w)
-		home.offset_bottom = -ins.w
+		home.custom_minimum_size = Vector2(HOME_SIZE, HOME_SIZE)
+		home.offset_left = -(HOME_SIZE + 4.0 + ins.z)
+		home.offset_right = -(4.0 + ins.z)
+		home.offset_top = -(HOME_SIZE + 4.0 + ins.w)
+		home.offset_bottom = -(4.0 + ins.w)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -309,6 +331,8 @@ func _make_grid_responsive(grid: Node, card_width: float) -> void:
 	if not scroll:
 		return
 
+	# ستون‌ها وسطِ ستونِ چپ — نه چسبیده به یک لبه با جای خالیِ بزرگ کنارش (V3)
+	g.size_flags_horizontal = Control.SIZE_SHRINK_CENTER | Control.SIZE_EXPAND
 	var apply := func() -> void:
 		var gap: float = float(g.get_theme_constant("h_separation"))
 		var usable: float = scroll.size.x - 14.0
@@ -372,7 +396,10 @@ func switch_tab(target_index: int, _animate: bool = true) -> void:
 
 		if i == target_index:
 			if tab:
+				var was_hidden := not tab.visible
 				tab.visible = true
+				if was_hidden and _animate:
+					_stagger_tab(i)
 			if btn:
 				var tween_color := create_tween().set_parallel(true)
 				tween_color.tween_property(btn, "self_modulate", ACTIVE_COLOR, 0.15)
@@ -414,14 +441,17 @@ func fetch_shop_data() -> void:
 	var err := shop_http_request.request(SHOP_URL, Global.auth_headers())
 	if err != OK:
 		print("❌ خطا در ارسال درخواست HTTP فروشگاه:", err)
+		_show_shop_error()
 
 
 func _on_shop_data_received(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
+		_show_shop_error()
 		return
 
 	var json := JSON.new()
 	if json.parse(body.get_string_from_utf8()) != OK:
+		_show_shop_error()
 		return
 
 	var raw_data = _normalize_data(json.data)
@@ -435,7 +465,10 @@ func _on_shop_data_received(result: int, response_code: int, _headers: PackedStr
 		if raw_data.has("suggest_up") and typeof(raw_data["suggest_up"]) == TYPE_DICTIONARY:
 			_setup_suggest_up(raw_data["suggest_up"])
 
+	States.clear_notice($SectionMenu as Control)
 	render_shop_sections(items_list)
+	_apply_empty_states(items_list)
+	_stagger_tab(current_tab_index)
 
 
 func render_shop_sections(items: Array) -> void:
@@ -450,7 +483,7 @@ func render_shop_sections(items: Array) -> void:
 	var first_weapon: Dictionary = {}
 	var suggest_up_filled := false
 
-	for item in items:
+	for item in _owned_last(items):
 		var section: String = str(item.get("section", ""))
 
 		if section == SECTION_CHARACTERS and first_character.is_empty():
@@ -464,6 +497,13 @@ func render_shop_sections(items: Array) -> void:
 
 		_render_single_item(item)
 
+	# V5: اگر سرور «خیلی ویژه» نفرستاد، قهرمان خالی نماند — اولین ویترینِ نخریده
+	if not suggest_up_filled:
+		for item in items:
+			if typeof(item) == TYPE_DICTIONARY and not _get_featured_section(item).is_empty() 					and _item_state(item) in ["buy", "short"]:
+				_setup_suggest_up(item)
+				break
+
 	_render_currency_sections(items)
 
 	if not first_character.is_empty():
@@ -471,6 +511,10 @@ func render_shop_sections(items: Array) -> void:
 
 	if not first_weapon.is_empty():
 		update_weapon_card_show(first_weapon)
+
+	_fit_featured_cards.call_deferred(weekly_container)
+	_fit_featured_cards.call_deferred(special_container)
+	_refresh_ownership_ui()
 
 
 ## E3: «X روز تا اتمام» فقط وقتی دیده می‌شود که سرور واقعاً پایانِ ویترین را
@@ -510,6 +554,7 @@ func _apply_weekly_deadline(items: Array) -> void:
 
 
 func _setup_suggest_up(item: Dictionary) -> void:
+	_set_hero_content_visible(true)
 	if suggest_name_label:
 		suggest_name_label.text = str(item.get("name", "پیشنهاد ویژه"))
 
@@ -542,10 +587,11 @@ func _setup_suggest_up(item: Dictionary) -> void:
 		suggest_buy_button.set_meta("item_data", item)
 		suggest_buy_button.focus_mode = Control.FOCUS_NONE
 		if not suggest_buy_button.has_meta("offer_connected"):
-			suggest_buy_button.pressed.connect(_on_gem_offer_pressed.bind(suggest_buy_button))
+			suggest_buy_button.pressed.connect(_on_hero_pressed)
 			UIFx.bind_press_feedback(suggest_buy_button)
 			suggest_buy_button.set_meta("offer_connected", true)
 
+	_style_hero(item)
 	_refresh_suggest_up_ownership()
 
 
@@ -562,8 +608,13 @@ func _refresh_suggest_up_ownership() -> void:
 		return
 
 	var owned: bool = Global.owns_item(str(item.get("item_id", "")).strip_edges(), category)
-	suggest_buy_button.disabled = owned
-	suggest_buy_button.modulate = Color(0.78, 0.78, 0.78, 1.0) if owned else Color.WHITE
+	# E8: آیتمِ خریده‌شده هنوز دیده می‌شود ولی روشن می‌گوید «مالِ توست»؛ لمس → پیش‌نمایش
+	suggest_buy_button.modulate = Color(0.85, 0.85, 0.85, 1.0) if owned else Color.WHITE
+	if owned and suggest_last_amount:
+		suggest_last_amount.text = "✓ مالِ توست"
+		if suggest_first_amount:
+			suggest_first_amount.visible = false
+	_set_hero_pulse(not owned)
 
 
 func _get_featured_section(item: Dictionary) -> String:
@@ -649,12 +700,16 @@ func setup_card_data(card: Node, item: Dictionary) -> void:
 	_apply_card_ownership(card)
 
 	if card.has_signal("buy_requested"):
-		if not card.buy_requested.is_connected(_on_card_buy_requested):
-			card.buy_requested.connect(_on_card_buy_requested)
+		if not card.buy_requested.is_connected(_open_item_preview):
+			card.buy_requested.connect(_open_item_preview)
 
 	if card.has_signal("card_clicked"):
 		var section: String = str(item.get("section", ""))
-		if section == SECTION_WEAPONS:
+		if section != SECTION_WEAPONS and section != SECTION_CHARACTERS:
+			# ویترین (هفتگی/خیلی ویژه): پیش‌نمایش + تأیید در یک پنجره (C11/C13)
+			if not card.card_clicked.is_connected(_open_item_preview):
+				card.card_clicked.connect(_open_item_preview)
+		elif section == SECTION_WEAPONS:
 			if not card.card_clicked.is_connected(update_weapon_card_show):
 				card.card_clicked.connect(update_weapon_card_show)
 		else:
@@ -709,23 +764,9 @@ func _get_character_texture(item: Dictionary) -> Texture2D:
 # ==========================================================
 
 func _apply_rarity_style(rarity_str: String, bg_rect: TextureRect, ref_rect: ReferenceRect, rarity_icon: TextureRect) -> void:
-	var rarity: String = rarity_str.to_lower()
-	var bg_color: Color = BG_COLOR_COMMON
-	var bright_color: Color = BORDER_COLOR_COMMON
-
-	match rarity:
-		"rare":
-			bg_color = BG_COLOR_RARE
-			bright_color = BORDER_COLOR_RARE
-		"epic":
-			bg_color = BG_COLOR_EPIC
-			bright_color = BORDER_COLOR_EPIC
-		"legend", "legendary":
-			bg_color = BG_COLOR_LEGEND
-			bright_color = BORDER_COLOR_LEGEND
-		_:
-			bg_color = BG_COLOR_COMMON
-			bright_color = BORDER_COLOR_COMMON
+	# V2: همان پالتِ کارت‌ها (psych_shop_rarity)
+	var bg_color: Color = Rarity.deep(rarity_str)
+	var bright_color: Color = Rarity.color(rarity_str)
 
 	if ref_rect:
 		ref_rect.border_color = bright_color
@@ -784,7 +825,7 @@ func display_selected_character(item: Dictionary) -> void:
 	var cost_type: String = str(item.get("cost_type", item.get("currency", "coins"))).to_lower()
 
 	if cs_buy_price_label:
-		cs_buy_price_label.text = str(price)
+		cs_buy_price_label.text = MissionArt.fa_grouped(price)
 
 	if cs_buy_type_icon:
 		if cost_type in ["gems", "gem"]:
@@ -825,7 +866,10 @@ func display_selected_character(item: Dictionary) -> void:
 	_update_stat_row(cs_stat_regen, regen, max_stat_value, ref.get("health_regen", -1))
 	_set_compare_caption(cs_stat_movement, "character", char_id)
 
-	_set_buy_button_owned(cs_buy_button, Global.owns_item(char_id, "character"))
+	_set_panel_badge(cs_rarity_icon, rarity)
+	_set_detail_state(cs_buy_button, item)
+	_highlight_selected(character_container, char_id)
+	_pop_detail(cs_character_image)
 
 
 func _update_stat_row(container: HBoxContainer, value: int, _max_value: int, ref_value = -1) -> void:
@@ -855,7 +899,7 @@ func update_weapon_card_show(data: Dictionary) -> void:
 	var cost_type: String = str(data.get("cost_type", data.get("currency", "coins"))).to_lower()
 
 	if ws_buy_price_label:
-		ws_buy_price_label.text = str(price)
+		ws_buy_price_label.text = MissionArt.fa_grouped(price)
 
 	if ws_buy_type_icon:
 		if cost_type in ["gems", "gem"]:
@@ -885,7 +929,10 @@ func update_weapon_card_show(data: Dictionary) -> void:
 	_update_weapon_stat_bar(ws_stat_control, float(stats.get("control", data.get("control", 0))), STAT_SCALE, float(ref.get("control", -1)))
 	_set_compare_caption(ws_stat_power, "weapon", weapon_id)
 
-	_set_buy_button_owned(ws_buy_button, Global.owns_item(weapon_id, "weapon"))
+	_set_panel_badge(ws_rarity_icon, rarity)
+	_set_detail_state(ws_buy_button, data)
+	_highlight_selected(weapon_container, weapon_id)
+	_pop_detail(ws_weapon_image)
 
 
 ## ref_value < 0 یعنی مقایسه‌ای در کار نیست (همین آیتم تجهیز است، یا آمارش نیامده)
@@ -895,7 +942,8 @@ func _update_weapon_stat_bar(container: HBoxContainer, value: float, max_value: 
 
 	var value_label: Label = container.get_node_or_null("ValueLabel")
 	if value_label:
-		value_label.text = str(int(value))
+		value_label.text = MissionArt.fa_number(int(value))
+		value_label.add_theme_font_override("font", MenuUI.FONT_NUM)
 
 	# اختلاف با آیتمِ فعلی: سبز بهتر، قرمز ضعیف‌تر (همیشه با علامتِ + / − هم)
 	var delta_label := container.get_node_or_null("DeltaLabel") as Label
@@ -912,16 +960,39 @@ func _update_weapon_stat_bar(container: HBoxContainer, value: float, max_value: 
 	var delta := int(round(value - ref_value))
 	delta_label.visible = ref_value >= 0.0 and delta != 0
 	if delta_label.visible:
-		delta_label.text = ("+%d" % delta) if delta > 0 else ("−%d" % -delta)
+		delta_label.text = ("+" + MissionArt.fa_number(delta)) if delta > 0 else ("−" + MissionArt.fa_number(-delta))
 		delta_label.add_theme_color_override("font_color", COL_BETTER if delta > 0 else COL_WORSE)
 
 	var bg_rect: ColorRect = container.get_node_or_null("ColorRect")
 	if bg_rect:
 		var fill_rect: ColorRect = bg_rect.get_node_or_null("ColorRect")
+		var ratio: float = clamp(value / max_value, 0.0, 1.0) if max_value > 0 else 0.0
 		if fill_rect:
-			var ratio: float = clamp(value / max_value, 0.0, 1.0) if max_value > 0 else 0.0
-			fill_rect.anchor_right = ratio
+			# V7: نوار نرم به مقدارِ تازه می‌رسد (نه پرش)
 			fill_rect.offset_right = 0.0
+			var old_tw = fill_rect.get_meta("_fill_tw") if fill_rect.has_meta("_fill_tw") else null
+			if old_tw is Tween and (old_tw as Tween).is_valid():
+				(old_tw as Tween).kill()
+			var tw := fill_rect.create_tween()
+			tw.tween_property(fill_rect, "anchor_right", ratio, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+			fill_rect.set_meta("_fill_tw", tw)
+		# C11: فاصله‌ی تو تا آیتمِ فعلی — سبز یعنی بهتر، قرمزِ کم‌رنگ یعنی ضعیف‌تر
+		var seg := bg_rect.get_node_or_null("DeltaSeg") as ColorRect
+		if seg == null:
+			seg = ColorRect.new()
+			seg.name = "DeltaSeg"
+			seg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			seg.anchor_top = 0.25
+			seg.anchor_bottom = 0.75
+			bg_rect.add_child(seg)
+		var rr: float = clamp(ref_value / max_value, 0.0, 1.0) if max_value > 0 and ref_value >= 0.0 else -1.0
+		seg.visible = rr >= 0.0 and absf(rr - ratio) > 0.005
+		if seg.visible:
+			seg.anchor_left = minf(rr, ratio)
+			seg.anchor_right = maxf(rr, ratio)
+			seg.offset_left = 0.0
+			seg.offset_right = 0.0
+			seg.color = Color(COL_BETTER, 0.85) if ratio > rr else Color(COL_WORSE, 0.45)
 		# خطِ طلاییِ مقدارِ آیتمِ فعلی روی همان نوار
 		var mark := bg_rect.get_node_or_null("RefMark") as ColorRect
 		if mark == null:
@@ -1115,6 +1186,7 @@ func _setup_lucky_box() -> void:
 		lucky_button.button_up.connect(UIFx.press_scale.bind(lucky_panel, false))
 
 	_show_lucky_price(_lucky_price)
+	_place_lucky_overlays.call_deferred()
 
 	_lucky_info_request = HTTPRequest.new()
 	add_child(_lucky_info_request)
@@ -1182,45 +1254,99 @@ func _lucky_odds_body(odds: Dictionary) -> String:
 	return "\n".join(lines)
 
 
-## نوارِ کوچکِ «شانس: حماسی ٪۲۵ · کمیاب ٪۷۵» روی کادرِ بسته — همیشه پیدا
+## E3 شفاف و جذاب: نوارِ رنگیِ احتمال‌ها + «◆◆ حماسی ٪۲۵» به رنگِ هر رده،
+## همیشه روی کادرِ بسته پیداست (نه پشتِ یک لمسِ اضافه)
+var _lucky_odds_box: PanelContainer = null
+
+
 func _refresh_lucky_odds() -> void:
 	if lucky_panel == null:
 		return
-	if _lucky_odds_label == null:
-		var pill := PanelContainer.new()
-		pill.name = "OddsPill"
-		pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = Color(0, 0, 0, 0.82)
-		sb.set_corner_radius_all(8)
-		sb.set_border_width_all(1)
-		sb.border_color = Color(1.0, 0.8, 0.26, 0.6)
-		sb.content_margin_left = 8.0
-		sb.content_margin_right = 8.0
-		sb.content_margin_top = 1.0
-		sb.content_margin_bottom = 1.0
-		pill.add_theme_stylebox_override("panel", sb)
-		pill.anchor_left = 0.06
-		pill.anchor_right = 0.94
-		pill.anchor_top = 0.66
-		pill.anchor_bottom = 0.66
-		pill.grow_vertical = Control.GROW_DIRECTION_BOTH
-		# Lalezar: ارقامِ فارسیِ هم‌تراز (V10)
-		_lucky_odds_label = MenuUI.label("", 17, MenuUI.TEXT, true)
-		_lucky_odds_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		pill.add_child(_lucky_odds_label)
-		lucky_panel.add_child(pill)
-		# دکمه‌ی کلِ کادر روی همه بماند تا لمس همچنان به آن برسد
-		if lucky_button:
-			lucky_panel.move_child(lucky_button, -1)
+	if _lucky_odds_box != null and is_instance_valid(_lucky_odds_box):
+		_lucky_odds_box.queue_free()
+	_lucky_odds_box = null
 	var odds := _lucky_odds()
-	var line := _odds_line(odds)
-	if line == "" and not _lucky_pool.is_empty():
-		line = "همه‌ی جایزه‌ها را داری"
-	elif line != "":
-		line = "شانس: " + line
-	_lucky_odds_label.text = line
-	_lucky_odds_label.get_parent().visible = line != ""
+	if odds.is_empty() and _lucky_pool.is_empty():
+		return
+	var pill := PanelContainer.new()
+	pill.name = "OddsPill"
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := MenuUI.box(Color(0, 0, 0, 0.84), Color(1.0, 0.8, 0.26, 0.55), 1, 10)
+	sb.content_margin_left = 10.0
+	sb.content_margin_right = 10.0
+	sb.content_margin_top = 4.0
+	sb.content_margin_bottom = 4.0
+	pill.add_theme_stylebox_override("panel", sb)
+	pill.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 3)
+	pill.add_child(col)
+	if odds.is_empty():
+		col.add_child(MenuUI.label("✓ همه‌ی جایزه‌ها را داری", 15, MenuUI.GREEN))
+	else:
+		var bar := Sheet.odds_bar(odds)
+		bar.custom_minimum_size.y = 7
+		col.add_child(bar)
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_theme_constant_override("separation", 14)
+		for r in ["common", "rare", "epic", "legend"]:
+			if not odds.has(r):
+				continue
+			var cell := HBoxContainer.new()
+			cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			cell.add_theme_constant_override("separation", 4)
+			cell.add_child(MenuUI.label("٪" + MissionArt.fa_number(int(round(float(odds[r]["p"]) * 100.0))), 16, Rarity.color(r), true))
+			cell.add_child(MenuUI.label(LUCKY_RARITY_NAMES.get(r, r), 14, Rarity.color(r).lightened(0.2)))
+			cell.add_child(Rarity.pips(r, 7.0))
+			row.add_child(cell)
+		col.add_child(row)
+	lucky_panel.add_child(pill)
+	_lucky_odds_box = pill
+	_place_lucky_overlays()
+	# دکمه‌ی کلِ کادر روی همه بماند تا لمس همچنان به آن برسد
+	if lucky_button:
+		lucky_panel.move_child(lucky_button, -1)
+
+
+## آرتِ بسته با «keep aspect» وسطِ کادر کشیده می‌شود؛ روی 4:3 کادر بلندتر از آرت است و
+## برچسبِ قیمت و نوارِ شانس (که به کادر لنگر بودند) زیرِ آرت می‌افتادند. حالا به
+## مستطیلِ واقعیِ آرت بسته‌اند.
+func _lucky_art_rect() -> Rect2:
+	var bg := lucky_panel.get_node_or_null("Bg") as TextureRect if lucky_panel else null
+	var full := Rect2(Vector2.ZERO, lucky_panel.size) if lucky_panel else Rect2()
+	if bg == null or bg.texture == null or full.size.x <= 0.0:
+		return full
+	var ts := bg.texture.get_size()
+	var k := minf(full.size.x / ts.x, full.size.y / ts.y)
+	var sz := ts * k
+	return Rect2((full.size - sz) * 0.5, sz)
+
+
+func _place_lucky_overlays() -> void:
+	if lucky_panel == null:
+		return
+	if not lucky_panel.has_meta("overlay_fit"):
+		lucky_panel.set_meta("overlay_fit", true)
+		lucky_panel.resized.connect(_place_lucky_overlays)
+	var art := _lucky_art_rect()
+	if _lucky_odds_box and is_instance_valid(_lucky_odds_box):
+		for k in ["anchor_left", "anchor_right", "anchor_top", "anchor_bottom"]:
+			_lucky_odds_box.set(k, 0.0)
+		_lucky_odds_box.offset_left = art.position.x + art.size.x * 0.06
+		_lucky_odds_box.offset_right = art.position.x + art.size.x * 0.94
+		var cy := art.position.y + art.size.y * 0.64
+		_lucky_odds_box.offset_top = cy - 18.0
+		_lucky_odds_box.offset_bottom = cy + 18.0
+	if lucky_price_label:
+		for k in ["anchor_left", "anchor_right", "anchor_top", "anchor_bottom"]:
+			lucky_price_label.set(k, 0.0)
+		lucky_price_label.offset_left = art.position.x + art.size.x * 0.1
+		lucky_price_label.offset_right = art.position.x + art.size.x * 0.48
+		lucky_price_label.offset_top = art.position.y + art.size.y * 0.805
+		lucky_price_label.offset_bottom = art.position.y + art.size.y * 0.945
 
 
 func _show_lucky_price(price: int) -> void:
@@ -1254,8 +1380,7 @@ func _on_lucky_box_pressed() -> void:
 		return
 
 	if Global.gems < _lucky_price:
-		_show_toast("قلب کافی نداری", false)
-		Global.request_shop_tab(3)
+		_open_short_sheet(_lucky_price - Global.gems, "gems", "بسته‌ی شانسی")
 		return
 
 	# E3 + C13: صندوقِ شانسی — قبل از خرج کردن، احتمالِ دقیقِ هر رده دیده می‌شود
@@ -1266,12 +1391,10 @@ func _on_lucky_box_pressed() -> void:
 		_show_toast("همه‌ی جایزه‌های این بسته را داری", true)
 		return
 	_confirm_open = true
-	MenuUI.confirm(self, "بسته‌ی شانسی", _lucky_odds_body(odds),
-		"باز کن — %s قلب" % MissionArt.fa_grouped(_lucky_price),
-		func(ok: bool) -> void:
-			_confirm_open = false
-			if ok:
-				_open_lucky_box_now())
+	Sheet.odds_sheet(self, odds, _lucky_price, Global.gems, func(action: String) -> void:
+		_confirm_open = false
+		if action == "open":
+			_open_lucky_box_now())
 
 
 func _open_lucky_box_now() -> void:
@@ -1319,27 +1442,22 @@ func _on_lucky_box_opened(result: int, code: int, _headers: PackedStringArray, b
 	if prize_name.is_empty():
 		prize_name = str(prize["item_id"])
 
-	LocalSettings.vibrate(35)
-
-	RewardPopup.show_rewards([{
-		"texture": _get_character_texture(prize),
-		"amount": 0,
-		"label": prize_name,
-		"tint": _rarity_border_color(str(payload.get("rarity", ""))),
-	}], "بسته‌ی شانسی")
-
-	_refresh_ownership_ui()
+	# E2/V7 انتظار: بسته کوتاه می‌لرزد، بعد جایزه رو می‌شود
+	var reveal := func() -> void:
+		LocalSettings.vibrate(35)
+		RewardPopup.show_rewards([{
+			"texture": _get_character_texture(prize),
+			"icon": "char_skin" if prize["category"] == "character" else "weapon_skin",
+			"amount": 0,
+			"label": "%s · %s" % [prize_name, Rarity.name_fa(str(payload.get("rarity", "")))],
+			"tint": _rarity_border_color(str(payload.get("rarity", ""))),
+		}], "بسته‌ی شانسی")
+		_refresh_ownership_ui()
+	_shake_lucky_box(reveal)
 
 
 func _rarity_border_color(rarity: String) -> Color:
-	match rarity.to_lower():
-		"epic":
-			return BORDER_COLOR_EPIC
-		"legend", "legendary":
-			return BORDER_COLOR_LEGEND
-		"rare":
-			return BORDER_COLOR_RARE
-	return BORDER_COLOR_COMMON
+	return Rarity.color(rarity)
 
 
 func _on_gem_offer_pressed(row: BaseButton) -> void:
@@ -1914,18 +2032,29 @@ func _kill_meta_tween(node: Node, meta_key: String) -> void:
 # ==========================================================
 
 func _on_card_show_buy_pressed() -> void:
-	if not selected_character_data.is_empty():
-		_on_card_buy_requested(selected_character_data)
+	_on_detail_action(selected_character_data, cs_buy_button)
 
 
 func _on_weapon_buy_pressed() -> void:
-	if not selected_weapon_data.is_empty():
-		_on_card_buy_requested(selected_weapon_data)
+	_on_detail_action(selected_weapon_data, ws_buy_button)
+
+
+## دکمه‌ی پنلِ جزئیات: خرید، یا اگر مالِ توست «تجهیز کن» (E1 خودمختاری / E8 مالکیت)
+func _on_detail_action(item: Dictionary, btn: Control) -> void:
+	if item.is_empty():
+		return
+	_pending_source = btn
+	if _item_state(item) == "owned":
+		_equip_item(item)
+		return
+	_on_card_buy_requested(item)
 
 
 func clear_container(container: Node) -> void:
 	if container:
 		for child in container.get_children():
+			# همان لحظه از چیدمان بیرون — وگرنه تا آخرِ فریم جا می‌گیرد و ردیف را پهن می‌کند
+			container.remove_child(child)
 			child.queue_free()
 
 
@@ -2047,13 +2176,16 @@ func _on_card_buy_requested(item_data: Dictionary) -> void:
 		_start_store_purchase(item_data)
 		return
 
-	if cost_type == "gems":
-		if Global.gems < price:
-			_show_toast("قلب کافی نداری", false)
-			return
-	else:
-		if Global.coins < price:
-			_show_toast("سکه کافی نداری", false)
+	# C13: «X کم داری» با راهِ بعدی، نه فقط یک پیامِ خطا
+	var have := Global.gems if cost_type == "gems" else Global.coins
+	if have < price:
+		_open_short_sheet(price - have, cost_type, str(item_data.get("name", "")).strip_edges())
+		return
+
+	# کاراکتر/اسلحه: پیش‌نمایش با آمار، قیمت و مانده = همان تأییدِ خرید
+	if category == "character" or category == "weapon":
+		if (cost_type == "gems" and price >= GEM_CONFIRM_MIN) or (cost_type != "gems" and price >= COIN_CONFIRM_MIN):
+			_open_item_preview(item_data)
 			return
 
 	# C13: خرج کردنِ قلب (ارزِ ویژه) قبلش یک بار تأیید می‌خواهد؛ قیمت، مانده‌ی
@@ -2123,6 +2255,12 @@ func _on_buy_response(result: int, response_code: int, _headers: PackedStringArr
 		_show_toast(str(payload.get("error", "خرید انجام نشد")), false)
 		return
 
+	# V7: خرج دیده می‌شود (−۶٬۰۰۰ از روی دکمه)؛ TopBar هم خودش پایین می‌شمارد
+	var spent_unit := _item_cost_type(bought_item)
+	States.spend_float(self, _buy_source(bought_item), _item_price(bought_item),
+		Sheet.unit_icon(spent_unit) if spent_unit != "toman" else null)
+	LocalSettings.vibrate(30)
+
 	if payload.is_empty():
 		Global.refresh_player_data()
 	else:
@@ -2152,11 +2290,16 @@ func _show_purchase_reward(item: Dictionary) -> void:
 		if amount <= 0:
 			reward["label"] = item_name
 	else:
+		# E17: آیتمِ تازه با قابِ رنگِ رده‌اش و جشنِ کوتاه (کنفتیِ RewardPopup برای آیتمِ ظاهری)
 		reward = {
 			"texture": _get_character_texture(item),
+			"icon": "char_skin" if category == "character" else "weapon_skin",
+			"tint": Rarity.color(Rarity.of(item)),
 			"amount": 0,
 			"label": item_name if not item_name.is_empty() else "آیتم جدید",
 		}
+		RewardPopup.show_rewards([reward], "مالِ تو شد!")
+		return
 
 	RewardPopup.show_rewards([reward], "خرید موفق")
 
@@ -2355,7 +2498,7 @@ func _on_gift_code_redeemed(data: Dictionary) -> void:
 # وضعیت مالکیت
 # ==========================================================
 
-func _set_buy_button_owned(btn: Button, owned: bool) -> void:
+func _set_buy_button_owned(btn: Button, owned: bool, equipped: bool = false) -> void:
 	if not btn:
 		return
 
@@ -2373,24 +2516,21 @@ func _set_buy_button_owned(btn: Button, owned: bool) -> void:
 	if badge == null and owned:
 		badge = Label.new()
 		badge.name = "OwnedLabel"
-		badge.text = "خریداری شده"
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		badge.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		badge.add_theme_color_override("font_color", Color("ffd257"))
-
-		var owned_font := load("res://fonts/Lalezar-Regular.ttf")
-		if owned_font:
-			badge.add_theme_font_override("font", owned_font)
-
-		badge.add_theme_font_size_override("font_size", 22)
+		badge.add_theme_font_override("font", MenuUI.FONT)
+		badge.add_theme_font_size_override("font_size", 17)
 		btn.add_child(badge)
 
 	if badge:
 		badge.visible = owned
+		# E8: «در دستِ توست» (طلایی) با «مالِ توست» (سبز) فرق دارد — هر دو با ✓
+		badge.text = "✓ در دستِ توست" if equipped else "✓ مالِ توست"
+		badge.add_theme_color_override("font_color", MenuUI.GOLD if equipped else MenuUI.GREEN)
 
-	btn.modulate = Color(0.78, 0.78, 0.78, 1.0) if owned else Color.WHITE
+	btn.modulate = Color(0.9, 0.9, 0.9, 1.0) if owned else Color.WHITE
 
 
 func _apply_card_ownership(card: Node) -> void:
@@ -2408,9 +2548,13 @@ func _apply_card_ownership(card: Node) -> void:
 	var item_id: String = str(item.get("item_id", item.get("id", ""))).strip_edges()
 	var owned: bool = Global.owns_item(item_id, category)
 
+	if card.has_method("set_affordable") and not owned:
+		var ct := _item_cost_type(item)
+		card.call("set_affordable", ct == "toman" or (Global.gems if ct == "gems" else Global.coins) >= _item_price(item))
+
 	var btn: Button = card.find_child("BuyButton", true, false) as Button
 	if btn:
-		_set_buy_button_owned(btn, owned)
+		_set_buy_button_owned(btn, owned, Global.is_equipped(item_id, category))
 		return
 
 	var price_bar: Control = card.find_child("PriceBar", true, false) as Control
@@ -2428,7 +2572,7 @@ func _set_price_bar_owned(price_bar: Control, owned: bool) -> void:
 	if badge == null and owned:
 		badge = Label.new()
 		badge.name = "OwnedLabel"
-		badge.text = "خریداری شده"
+		badge.text = "✓ مالِ توست"
 		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -2453,12 +2597,12 @@ func _refresh_ownership_ui() -> void:
 				_apply_card_ownership(card)
 
 	if not selected_character_data.is_empty():
-		var char_id: String = str(selected_character_data.get("item_id", "")).strip_edges()
-		_set_buy_button_owned(cs_buy_button, Global.owns_item(char_id, "character"))
+		_set_detail_state(cs_buy_button, selected_character_data)
+		_set_compare_caption(cs_stat_movement, "character", str(selected_character_data.get("item_id", "")).strip_edges())
 
 	if not selected_weapon_data.is_empty():
-		var weapon_id: String = str(selected_weapon_data.get("item_id", "")).strip_edges()
-		_set_buy_button_owned(ws_buy_button, Global.owns_item(weapon_id, "weapon"))
+		_set_detail_state(ws_buy_button, selected_weapon_data)
+		_set_compare_caption(ws_stat_power, "weapon", str(selected_weapon_data.get("item_id", "")).strip_edges())
 
 	_refresh_suggest_up_ownership()
 
@@ -2570,6 +2714,522 @@ func _normalize_data(data):
 		return str(data).strip_edges()
 
 	return data
+
+
+# ==========================================================
+# round 3 — وضعیت‌ها، پنلِ جزئیات، پیش‌نمایش، تجهیز
+# ==========================================================
+
+const CHAR_STAT_KEYS := [["move_speed", "سرعت حرکت"], ["aim_accuracy", "دقت تیراندازی"],
+	["hand_speed", "سرعت دست"], ["throw_range", "برد پرتاب"], ["health", "جان"], ["health_regen", "بازیابی جان"]]
+const WEAPON_STAT_KEYS := [["power", "قدرت"], ["accuracy", "دقت"], ["range", "برد"],
+	["fire_rate", "سرعت"], ["control", "کنترل"]]
+
+var _equip_http: HTTPRequest = null
+var _equip_pending: Dictionary = {}
+var _hero_pulse: Tween = null
+
+
+func _cs_panel() -> Control:
+	return get_node_or_null("SectionMenu/CharactersTab/CardShow") as Control
+
+
+func _ws_panel() -> Control:
+	return get_node_or_null("SectionMenu/WeaponsTab/Control2") as Control
+
+
+func _setup_detail_panels() -> void:
+	for btn in [cs_buy_button, ws_buy_button]:
+		if btn:
+			btn.focus_mode = Control.FOCUS_NONE
+			UIFx.bind_press_feedback(btn)
+
+
+## C12: تا رسیدنِ کاتالوگ، کارت‌های اسکلتیِ چشمک‌زن — نه صفحه‌ی یخ‌زده یا پنلِ ساختگی
+func _show_loading() -> void:
+	for c in [weekly_container, special_container, character_container, weapon_container]:
+		clear_container(c)
+	States.skeleton(weekly_container, 4, CARD_DEFAULT_MIN_SIZE)
+	States.skeleton(special_container, 4, CARD_DEFAULT_MIN_SIZE)
+	States.skeleton(character_container, 6, CHARACTER_CARD_MIN_SIZE)
+	States.skeleton(weapon_container, 4, WEAPON_CARD_MIN_SIZE)
+	for panel in [_cs_panel(), _ws_panel()]:
+		if panel:
+			panel.visible = false
+	_set_hero_content_visible(false)
+	for path in ["SectionMenu/SpecialTab/SuggestSec/Label", "SectionMenu/SpecialTab/SuggestSec/Label2"]:
+		var l := get_node_or_null(path) as Control
+		if l:
+			l.visible = false
+
+
+## محتوای قابِ قهرمان تا رسیدنِ آیتمِ واقعی پنهان است (نه «ak-47 ویژه»ی ساختگیِ صحنه)
+func _set_hero_content_visible(on: bool) -> void:
+	for n in ["ItemImg", "VBoxContainer", "BuyButton", "PercentBg", "HeroGlow"]:
+		var c := get_node_or_null("SectionMenu/SpecialTab/SuggestUp/" + n) as Control
+		if c:
+			c.visible = on
+
+
+## شبکه قطع/کند: پیامِ روشن + «دوباره» (CLAUDE.md شبکه‌ی موبایل)
+func _show_shop_error() -> void:
+	for c in [weekly_container, special_container, character_container, weapon_container]:
+		clear_container(c)
+	States.notice($SectionMenu as Control, "فروشگاه باز نشد",
+		"اتصال به سرور برقرار نشد. اینترنتت رو چک کن و دوباره امتحان کن.",
+		"دوباره امتحان کن", _retry_fetch)
+
+
+func _retry_fetch() -> void:
+	States.clear_notice($SectionMenu as Control)
+	_show_loading()
+	fetch_shop_data()
+	if _lucky_pool.is_empty() and _lucky_info_request \
+			and _lucky_info_request.get_http_client_status() == HTTPClient.STATUS_DISCONNECTED:
+		_lucky_info_request.request(LUCKY_URL, Global.auth_headers())
+
+
+## E1/E10: خالی هم طراحی‌شده است — یک جمله‌ی دوستانه و یک کارِ پیشنهادی
+func _apply_empty_states(items: Array) -> void:
+	if items.is_empty():
+		States.notice($SectionMenu as Control, "ویترین در حالِ چیدن است",
+			"آیتم‌های تازه به‌زودی می‌رسن. تا اون موقع یه مسابقه بزن و سکه جمع کن!",
+			"برگشت به منو", _on_home_button_pressed, "res://assets/ui/psych/chest_closed.png")
+		return
+	var has_char := false
+	var has_weapon := false
+	for it in items:
+		var sec := str(it.get("section", ""))
+		has_char = has_char or sec == SECTION_CHARACTERS
+		has_weapon = has_weapon or sec == SECTION_WEAPONS
+	var go_special := func() -> void: switch_tab(0, true)
+	if characters_tab:
+		if has_char:
+			States.clear_notice(characters_tab)
+		else:
+			States.notice(characters_tab, "کاراکترِ تازه‌ای نیست",
+				"کاراکترهای جدید به‌زودی می‌رسن. پیشنهادهای ویژه رو ببین.", "پیشنهادهای ویژه", go_special,
+				"res://assets/ui/psych/social_squad.png")
+	if weapons_tab:
+		if has_weapon:
+			States.clear_notice(weapons_tab)
+		else:
+			States.notice(weapons_tab, "اسلحه‌ی تازه‌ای نیست",
+				"اسلحه‌های جدید به‌زودی می‌رسن. پیشنهادهای ویژه رو ببین.", "پیشنهادهای ویژه", go_special)
+
+
+func _stagger_tab(index: int) -> void:
+	match index:
+		0:
+			States.stagger_in(weekly_container)
+			States.stagger_in(special_container)
+		1:
+			States.stagger_in(character_container, 9)
+		2:
+			States.stagger_in(weapon_container, 6)
+
+
+## C14: آیتم‌هایی که بازیکن دارد آخرِ لیست؛ چیزهای تازه اول دیده شوند (ترتیبِ سرور حفظ می‌شود)
+func _owned_last(items: Array) -> Array:
+	var fresh: Array = []
+	var owned: Array = []
+	for it in items:
+		if typeof(it) != TYPE_DICTIONARY:
+			continue
+		var cat := _resolve_purchase_category(it)
+		var sec := str(it.get("section", ""))
+		if (sec == SECTION_CHARACTERS or sec == SECTION_WEAPONS) \
+				and Global.owns_item(str(it.get("item_id", "")).strip_edges(), cat):
+			owned.append(it)
+		else:
+			fresh.append(it)
+	return fresh + owned
+
+
+## کارت‌های ویترین کلِ ردیف را پر می‌کنند (روی 20:9 پهن‌تر، روی 4:3 بلندتر) — نه ۱۲۰×۱۲۰ ثابت
+func _fit_featured_cards(container: HBoxContainer) -> void:
+	if container == null or not is_instance_valid(container):
+		return
+	if not container.has_meta("fit_connected"):
+		container.set_meta("fit_connected", true)
+		container.resized.connect(func() -> void: _fit_featured_cards.call_deferred(container))
+	var cards: Array = []
+	for c in container.get_children():
+		if c is Control and not c.is_queued_for_deletion() and not c.has_meta("skeleton"):
+			cards.append(c)
+	if cards.is_empty() or container.get_parent_area_size().x <= 0.0:
+		return
+	var sep := float(container.get_theme_constant("separation"))
+	# عرض/ارتفاعِ «سهمِ» کانتینر از روی anchorها — نه size که با بچه‌های بزرگ کش می‌آید
+	var area := container.get_parent_area_size()
+	var avail_w := area.x * (container.anchor_right - container.anchor_left) + container.offset_right - container.offset_left
+	var avail_h := area.y * (container.anchor_bottom - container.anchor_top) + container.offset_bottom - container.offset_top
+	var room := floorf((avail_w - sep * (cards.size() - 1)) / cards.size())
+	var h := floorf(avail_h)
+	var w := minf(room, h * 1.3)
+	h = minf(h, floorf(w * 1.25))
+	for c in cards:
+		(c as Control).custom_minimum_size = Vector2(w, h)
+
+
+# ---------------------------------------------------------- قهرمانِ ویترین (V5/V8)
+
+func _setup_hero() -> void:
+	var up := get_node_or_null("SectionMenu/SpecialTab/SuggestUp") as Control
+	if up == null:
+		return
+	if suggest_item_img and up.get_node_or_null("HeroGlow") == null:
+		var glow := TextureRect.new()
+		glow.name = "HeroGlow"
+		glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		glow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		for k in ["anchor_left", "anchor_top", "anchor_right", "anchor_bottom"]:
+			glow.set(k, suggest_item_img.get(k))
+		up.add_child(glow)
+		up.move_child(glow, suggest_item_img.get_index())
+	# لمسِ هر جای قابِ قهرمان = پیش‌نمایش (هدفِ لمسیِ بزرگ — C3)
+	up.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventScreenTouch and not event.pressed:
+			_on_hero_pressed())
+
+
+func _style_hero(item: Dictionary) -> void:
+	var rarity := Rarity.of(item)
+	var up := get_node_or_null("SectionMenu/SpecialTab/SuggestUp") as Control
+	if up == null:
+		return
+	var glow := up.get_node_or_null("HeroGlow") as TextureRect
+	if glow:
+		glow.texture = Rarity.glow(rarity, 0.6)
+	var box := suggest_name_label.get_parent() if suggest_name_label else null
+	if box:
+		var old := box.get_node_or_null("HeroBadge")
+		if old:
+			box.remove_child(old)
+			old.queue_free()
+		var badge := Rarity.badge(rarity, 14)
+		badge.name = "HeroBadge"
+		badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		box.add_child(badge)
+	# آیتمِ قهرمان آرام نفس می‌کشد (V4: حرکتِ کم در دیدِ پیرامونی = کانونِ صفحه)
+	if suggest_item_img and not suggest_item_img.has_meta("breath"):
+		suggest_item_img.set_meta("breath", true)
+		var tw := suggest_item_img.create_tween().set_loops()
+		tw.tween_callback(func() -> void: suggest_item_img.pivot_offset = suggest_item_img.size * Vector2(0.5, 0.9))
+		tw.tween_property(suggest_item_img, "scale", Vector2(1.035, 1.035), 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(suggest_item_img, "scale", Vector2.ONE, 1.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+## V5: تنها دکمه‌ی تپنده‌ی تبِ ویژه — نبضِ ملایم هر چند ثانیه (نه تایمرِ فشار)
+func _set_hero_pulse(on: bool) -> void:
+	if _hero_pulse and _hero_pulse.is_valid():
+		_hero_pulse.kill()
+	_hero_pulse = null
+	if suggest_buy_button == null:
+		return
+	suggest_buy_button.scale = Vector2.ONE
+	if not on:
+		return
+	_hero_pulse = suggest_buy_button.create_tween().set_loops()
+	_hero_pulse.tween_interval(2.2)
+	_hero_pulse.tween_callback(func() -> void: suggest_buy_button.pivot_offset = suggest_buy_button.size * 0.5)
+	_hero_pulse.tween_property(suggest_buy_button, "scale", Vector2(1.06, 1.06), 0.22).set_trans(Tween.TRANS_SINE)
+	_hero_pulse.tween_property(suggest_buy_button, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_SINE)
+
+
+func _on_hero_pressed() -> void:
+	if suggest_buy_button == null:
+		return
+	var item: Dictionary = suggest_buy_button.get_meta("item_data", {})
+	_pending_source = suggest_buy_button
+	_open_item_preview(item)
+
+
+# ---------------------------------------------------------- پنلِ جزئیات
+
+## "buy" | "short" | "owned" | "equipped"
+func _item_state(item: Dictionary) -> String:
+	var cat := _resolve_purchase_category(item)
+	var id := str(item.get("item_id", item.get("id", ""))).strip_edges()
+	if cat == "character" or cat == "weapon":
+		if Global.is_equipped(id, cat):
+			return "equipped"
+		if Global.owns_item(id, cat):
+			return "owned"
+	var ct := _item_cost_type(item)
+	if ct == "toman":
+		return "buy"
+	var have := Global.gems if ct == "gems" else Global.coins
+	return "buy" if have >= _item_price(item) else "short"
+
+
+## دکمه‌ی پنل: خرید (طلایی)، کم داری (تیره + روبانِ «X کم داری»)، تجهیز کن (طلایی)،
+## در دستِ توست (غیرفعال) — V5 فقط یک دکمه‌ی طلایی در صفحه، E8 مالکیتِ روشن
+func _set_detail_state(btn: Button, item: Dictionary) -> void:
+	if btn == null or item.is_empty():
+		return
+	var state := _item_state(item)
+	var price_row := btn.get_node_or_null("HBoxContainer") as Control
+	if price_row:
+		price_row.visible = state == "buy" or state == "short"
+	var badge := btn.get_node_or_null("OwnedLabel") as Label
+	if badge == null:
+		badge = MenuUI.label("", 24, MenuUI.GOLD)
+		badge.name = "OwnedLabel"
+		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		badge.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		btn.add_child(badge)
+	badge.visible = state == "owned" or state == "equipped"
+	badge.text = "تجهیز کن" if state == "owned" else "✓ در دستِ توست"
+	btn.disabled = state == "equipped"
+	btn.modulate = Color.WHITE
+	var kind := "gold" if state == "buy" or state == "owned" else "dark"
+	var colors: Array = MenuUI.BUTTON_KINDS[kind]
+	var normal := MenuUI.box(colors[0], colors[1], 3, 10)
+	var pressed := MenuUI.box((colors[0] as Color).lightened(0.18), (colors[1] as Color).lightened(0.2), 3, 10)
+	var disabled := MenuUI.box(Color(0.1, 0.09, 0.05, 0.95), Color(MenuUI.GOLD_DEEP, 0.6), 2, 10)
+	for st in ["normal", "hover"]:
+		btn.add_theme_stylebox_override(st, normal)
+	btn.add_theme_stylebox_override("pressed", pressed)
+	btn.add_theme_stylebox_override("hover_pressed", pressed)
+	btn.add_theme_stylebox_override("disabled", disabled)
+	badge.add_theme_color_override("font_color", colors[2] if state == "owned" else MenuUI.GOLD)
+	var price_label := btn.find_child("AmountLabel", true, false) as Label
+	if price_label == null:
+		price_label = btn.find_child("Label", true, false) as Label
+	if price_label and price_label != badge:
+		price_label.add_theme_font_override("font", MenuUI.FONT_NUM)
+		price_label.add_theme_color_override("font_color", colors[2] if state == "buy" else MenuUI.MUTED)
+	# روبانِ «X کم داری» روی لبه‌ی بالای دکمه — بی‌قرمزی، فقط عدد و راهِ بعدی
+	var rib := btn.get_node_or_null("NeedRibbon") as PanelContainer
+	if rib == null:
+		rib = PanelContainer.new()
+		rib.name = "NeedRibbon"
+		rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var sb := MenuUI.box(Color(0.04, 0.04, 0.05, 0.95), Color(MenuUI.GOLD, 0.7), 1, 9)
+		sb.content_margin_left = 10
+		sb.content_margin_right = 10
+		rib.add_theme_stylebox_override("panel", sb)
+		rib.add_child(MenuUI.label("", 14, MenuUI.TEXT))
+		rib.anchor_left = 0.5
+		rib.anchor_right = 0.5
+		rib.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		rib.grow_vertical = Control.GROW_DIRECTION_BOTH
+		btn.add_child(rib)
+	rib.visible = state == "short"
+	if rib.visible:
+		var ct := _item_cost_type(item)
+		var have := Global.gems if ct == "gems" else Global.coins
+		(rib.get_child(0) as Label).text = "%s %s کم داری — بزن تا راهش رو ببینی" % [
+			MissionArt.fa_grouped(_item_price(item) - have), Sheet.unit_name(ct)]
+		rib.reset_size()
+
+
+## V2 روی پنل: کپسولِ رده کنارِ آیکنِ لوزی
+func _set_panel_badge(icon_rect: TextureRect, rarity: String) -> void:
+	if icon_rect == null:
+		return
+	var host := icon_rect.get_parent()
+	var old := host.get_node_or_null("PanelRarityBadge")
+	if old:
+		host.remove_child(old)
+		old.queue_free()
+	var badge := Rarity.badge(rarity, 16)
+	badge.name = "PanelRarityBadge"
+	host.add_child(badge)
+	var place := func() -> void:
+		if not is_instance_valid(badge):
+			return
+		badge.reset_size()
+		badge.position = icon_rect.position + Vector2(icon_rect.size.x + 8.0, (icon_rect.size.y - badge.size.y) * 0.5)
+	place.call_deferred()
+
+
+func _highlight_selected(container: Node, item_id: String) -> void:
+	if container == null:
+		return
+	for c in container.get_children():
+		if c.has_method("set_selected"):
+			var it: Dictionary = c.get_meta("shop_item", {})
+			c.call("set_selected", str(it.get("item_id", "")).strip_edges() == item_id)
+
+
+## V7 عکسِ پنل با انتخابِ کارتِ تازه کوتاه «می‌پرد»
+func _pop_detail(img: Control) -> void:
+	var panel := img.get_parent() as Control if img else null
+	if panel:
+		panel.visible = true
+	if img == null or not img.is_inside_tree():
+		return
+	img.pivot_offset = img.size * Vector2(0.5, 0.8)
+	img.scale = Vector2(0.93, 0.93)
+	img.modulate.a = 0.4
+	var tw := img.create_tween().set_parallel(true)
+	tw.tween_property(img, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(img, "modulate:a", 1.0, 0.16)
+
+
+# ---------------------------------------------------------- پیش‌نمایش / کم‌داری
+
+func _item_stat_dict(item: Dictionary) -> Dictionary:
+	var raw = item.get("stats", {})
+	if typeof(raw) == TYPE_STRING:
+		raw = JSON.parse_string(raw)
+	return raw if typeof(raw) == TYPE_DICTIONARY else {}
+
+
+## [[عنوان، مقدار، مقدارِ آیتمِ فعلی (-1 = بی‌مقایسه)], ...] — فقط آمارهایی که واقعاً آمده‌اند
+func _sheet_stats(item: Dictionary, cat: String) -> Array:
+	var stats := _item_stat_dict(item)
+	var ref := _equipped_stats(cat, str(item.get("item_id", "")).strip_edges())
+	var rows: Array = []
+	for pair in (WEAPON_STAT_KEYS if cat == "weapon" else CHAR_STAT_KEYS):
+		var k: String = pair[0]
+		var v = stats.get(k, item.get(k, null))
+		if v == null and k == "fire_rate":
+			v = stats.get("speed", null)
+		if v == null:
+			continue
+		var r = ref.get(k, ref.get("speed", -1) if k == "fire_rate" else -1)
+		rows.append([pair[1], float(v), float(r)])
+	return rows
+
+
+## C11 + C13: پیش‌نمایشِ کامل (عکس، رده، آمار در برابرِ فعلیِ تو، قیمت و مانده)
+## که خودش تأییدِ خرید هم هست
+func _open_item_preview(item: Dictionary) -> void:
+	if item.is_empty() or _confirm_open or _buy_in_flight:
+		return
+	var cat := _resolve_purchase_category(item)
+	var ct := _item_cost_type(item)
+	if (cat != "character" and cat != "weapon") or ct == "toman":
+		_on_card_buy_requested(item)
+		return
+	_confirm_open = true
+	var price := _item_price(item)
+	var orig := int(item.get("original_price", price))
+	var info := {
+		"name": str(item.get("name", "")).strip_edges(),
+		"texture": _get_character_texture(item),
+		"rarity": Rarity.of(item),
+		"price": price,
+		"old_price": orig if orig > price else 0,
+		"unit": ct,
+		"balance": Global.gems if ct == "gems" else Global.coins,
+		"state": _item_state(item),
+		"stats": _sheet_stats(item, cat),
+		"compare_name": _equipped_name(cat),
+		"kind": "کاراکتر" if cat == "character" else "اسلحه",
+	}
+	Sheet.item_sheet(self, info, _on_preview_answer.bind(item))
+
+
+func _on_preview_answer(action: String, item: Dictionary) -> void:
+	_confirm_open = false
+	match action:
+		"buy":
+			_buy_from_preview(item)
+		"equip":
+			_equip_item(item)
+		"go_currency":
+			switch_tab(3, true)
+
+
+func _buy_from_preview(item: Dictionary) -> void:
+	if Global.my_username.is_empty():
+		_show_toast("هنوز وارد حساب نشدی", false)
+		return
+	var cat := _resolve_purchase_category(item)
+	var id := str(item.get("item_id", item.get("id", ""))).strip_edges()
+	if id.is_empty() or Global.owns_item(id, cat):
+		return
+	var ct := _item_cost_type(item)
+	var have := Global.gems if ct == "gems" else Global.coins
+	if have < _item_price(item):
+		_open_short_sheet(_item_price(item) - have, ct, str(item.get("name", "")))
+		return
+	_send_buy(item, id, cat)
+
+
+func _open_short_sheet(need: int, unit: String, item_name: String) -> void:
+	if _confirm_open:
+		return
+	_confirm_open = true
+	LocalSettings.vibrate(15)
+	Sheet.short_sheet(self, need, "gems" if unit == "gems" else "coins", item_name.strip_edges(),
+		func(action: String) -> void:
+			_confirm_open = false
+			if action == "go_currency":
+				switch_tab(3, true))
+
+
+## «−۶٬۰۰۰» از روی دکمه‌ای که خرید از آن شروع شد (یا دکمه‌ی پنلِ همان دسته)
+func _buy_source(item: Dictionary) -> Control:
+	if _pending_source and is_instance_valid(_pending_source) and _pending_source.is_visible_in_tree():
+		return _pending_source
+	var cat := _resolve_purchase_category(item)
+	var btn: Control = cs_buy_button if cat == "character" else ws_buy_button
+	return btn if btn and btn.is_visible_in_tree() else null
+
+
+## E2 انتظار پیش از رو شدن: لرزشِ کوتاهِ بسته
+func _shake_lucky_box(then: Callable) -> void:
+	if lucky_panel == null or not lucky_panel.is_visible_in_tree():
+		then.call()
+		return
+	LocalSettings.vibrate(20)
+	lucky_panel.pivot_offset = lucky_panel.size * 0.5
+	var tw := lucky_panel.create_tween()
+	for i in 5:
+		tw.tween_property(lucky_panel, "rotation", 0.03 * (1.0 if i % 2 == 0 else -1.0), 0.06)
+	tw.tween_property(lucky_panel, "rotation", 0.0, 0.06)
+	tw.tween_callback(then)
+
+
+# ---------------------------------------------------------- تجهیز
+
+## E1/E8: آیتمِ خریده‌شده همین‌جا «تجهیز» می‌شود — بدونِ رفتن به صفحه‌ی دیگر
+func _equip_item(item: Dictionary) -> void:
+	var cat := _resolve_purchase_category(item)
+	var id := str(item.get("item_id", item.get("id", ""))).strip_edges()
+	if id.is_empty() or not Global.owns_item(id, cat) or Global.is_equipped(id, cat):
+		return
+	if Global.my_username.is_empty():
+		_show_toast("هنوز وارد حساب نشدی", false)
+		return
+	if _equip_http == null:
+		_equip_http = HTTPRequest.new()
+		_equip_http.timeout = 15.0
+		add_child(_equip_http)
+		_equip_http.request_completed.connect(_on_equip_response)
+	if _equip_http.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
+		return
+	_equip_pending = {"id": id, "cat": cat}
+	var err := _equip_http.request(EQUIP_URL, Global.json_headers(), HTTPClient.METHOD_POST,
+		JSON.stringify({"username": Global.my_username, "item_id": id, "category": cat}))
+	if err != OK:
+		_equip_pending = {}
+		_show_toast("ارتباط با سرور برقرار نشد", false)
+
+
+func _on_equip_response(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	var pend := _equip_pending
+	_equip_pending = {}
+	if result != HTTPRequest.RESULT_SUCCESS:
+		_show_toast("ارتباط با سرور برقرار نشد", false)
+		return
+	var payload := MenuUI.parse_json(body)
+	if code != 200:
+		_show_toast(str(payload.get("error", "انتخاب انجام نشد")), false)
+		return
+	# سرورهای قدیمی بدنه‌ی خالی می‌فرستند؛ از روی همین درخواست پر می‌شود
+	var key := "equipped_" + str(pend.get("cat", ""))
+	if str(payload.get(key, "")).strip_edges().is_empty():
+		payload[key] = str(pend.get("id", ""))
+	Global.apply_equip_response(payload)
+	LocalSettings.vibrate(25)
+	_show_toast("✓ تجهیز شد — مسابقه‌ی بعد با همین", true)
 
 
 func _on_home_button_pressed() -> void:

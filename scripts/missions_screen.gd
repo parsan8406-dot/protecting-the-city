@@ -28,6 +28,7 @@ const BONUS_NODE_SCENE := preload("res://secense/mission_bonus_node.tscn")
 const TIER_CARD_SCENE := preload("res://secense/season_tier_card.tscn")
 const CHALLENGE_ROW_SCENE := preload("res://secense/season_challenge_row.tscn")
 const PsychProgress := preload("res://scripts/psych_results_progress.gd")
+const ProgFx := preload("res://scripts/psych_prog_fx.gd")
 
 ## فونت عددها. قوطی‌های جایزه‌ی کارت کناری در کد ساخته می‌شوند و تم صحنه را
 ## به ارث نمی‌برند، پس فونت را صریح می‌دهیم تا با بقیه‌ی عددهای صفحه یکی باشد.
@@ -64,6 +65,8 @@ const COLOR_MUTED := MissionArt.COLOR_MUTED
 @onready var _mail_badge_count: Label = $Header/Margin/Row/MailSlot/Badge/Count
 @onready var _friends_button: TextureButton = $Header/Margin/Row/FriendsButton
 @onready var _settings_button: TextureButton = $Header/Margin/Row/SettingsButton
+@onready var _coin_pill: Control = $Header/Margin/Row/CoinPill
+@onready var _gem_pill: Control = $Header/Margin/Row/GemPill
 
 # --- ساید بار ---
 @onready var _daily_icon: TextureRect = $Body/Sidebar/DailySlot/Icon
@@ -204,6 +207,8 @@ func _ready() -> void:
 	UIFx.bind_press_feedback(_bonus_claim_button)
 
 	_wire_season_page()
+	_apply_theme_art()
+	_register_counters()
 
 	# اسکرول‌بار پیش‌فرض پهن است و همیشه دیده می‌شود؛ این سه‌تا نوار باریکِ
 	# آبی می‌گیرند که فقط موقع اسکرول کردن ظاهر می‌شود
@@ -244,6 +249,10 @@ func _wire_season_page() -> void:
 
 	_buy_button.pressed.connect(_on_buy_pass_pressed)
 	UIFx.bind_press_feedback(_buy_button)
+	# V5 کانونِ این صفحه خانه‌های آماده‌ی نردبان است؛ خرید فرعی و آرام می‌ماند
+	# (طلاییِ تیره با حاشیه، نه طلاییِ پُر) — بدون فشارِ خرید
+	MenuUI.style_button(_buy_button, "gold")
+	MenuUI.style_button(_promo_button, "dark")
 
 	# کارت تبلیغ فعلاً بازیکن را می‌برد سراغ خرید بتل‌پس — همان چیزی که
 	# متن کارت وعده‌اش را می‌دهد
@@ -268,10 +277,53 @@ func _wire_header() -> void:
 	UIFx.bind_press(_friends_button, _go_to_profile_menu.bind("friends"))
 	UIFx.bind_press(_settings_button, _go_to_profile_menu.bind("settings"))
 
-## موجودی نوار بالا — از Global خوانده می‌شود و Global هم فقط از سرور پر می‌شود
+## موجودی نوار بالا — از Global خوانده می‌شود و Global هم فقط از سرور پر می‌شود.
+## E17/V10: وقتی صفحه‌ی جایزه باز است عدد صبر می‌کند تا سکه‌ها پرواز کنند و
+## به شمارنده برسند؛ بعد از عددِ قبلی تا تازه می‌شمارد.
+var _shown_coins := -1
+var _shown_gems := -1
+
 func _apply_wallet() -> void:
-	_coins_label.text = MissionArt.fa_grouped(int(Global.coins))
-	_gems_label.text = MissionArt.fa_grouped(int(Global.gems))
+	var popup = RewardPopup._active
+	if popup != null and is_instance_valid(popup) and _shown_coins >= 0:
+		if not popup.closed.is_connected(_on_reward_closed):
+			popup.closed.connect(_on_reward_closed)
+		return
+	_count_wallet()
+
+## اگر پروازی نبود (مثلاً جایزه فقط تجربه بود) بعد از بسته شدن بشمار
+func _on_reward_closed() -> void:
+	get_tree().create_timer(0.75).timeout.connect(_count_wallet)
+
+func _count_wallet() -> void:
+	if not is_inside_tree():
+		return
+	var coins := int(Global.coins)
+	var gems := int(Global.gems)
+	if _shown_coins < 0:
+		_coins_label.text = MissionArt.fa_grouped(coins)
+		_gems_label.text = MissionArt.fa_grouped(gems)
+	else:
+		ProgFx.count_label(_coins_label, _shown_coins, coins)
+		ProgFx.count_label(_gems_label, _shown_gems, gems)
+	_shown_coins = coins
+	_shown_gems = gems
+
+## شمارنده‌های سکه/جم مقصدِ پروازِ RewardPopup هستند
+func _register_counters() -> void:
+	_coin_pill.add_to_group(ProgFx.COIN_TARGET)
+	_gem_pill.add_to_group(ProgFx.GEM_TARGET)
+	_coin_pill.set_meta("psych_on_receive", _count_wallet)
+	_gem_pill.set_meta("psych_on_receive", _count_wallet)
+
+## آرت‌های قدیمیِ صفحه سرمه‌ای‌اند؛ به خاکستریِ گرم برده می‌شوند تا صفحه با
+## پالتِ سیاه/قرمز/طلاییِ بقیه‌ی منوها یکی شود (V2/V3 — یک زبانِ بصری)
+func _apply_theme_art() -> void:
+	ProgFx.desaturate(get_node("BackgroundArt") as CanvasItem, Color(0.95, 0.82, 0.8))
+	ProgFx.desaturate(_season_banner_art, Color(0.95, 0.8, 0.78))
+	ProgFx.desaturate(_season_hero, Color(1.0, 0.86, 0.84), 0.7)
+	(get_node("BackgroundTint") as ColorRect).color = Color(0.03, 0.02, 0.02, 0.5)
+	(get_node("BackgroundBase") as ColorRect).color = Color(0.035, 0.03, 0.03, 1.0)
 
 func _on_unread_updated(count: int) -> void:
 	_mail_badge.visible = count > 0
@@ -366,6 +418,9 @@ func refresh_missions() -> void:
 		push_warning("خطا در درخواست ماموریت‌های روزانه")
 		return
 	_missions_busy = true
+	# C12 تا جواب برسد صفحه یخ‌زده نیست: ردیف‌های «در حال بارگذاری»
+	if _missions_list.get_child_count() == 0:
+		_set_list_state("loading")
 
 func _on_missions_received(
 	result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray
@@ -374,9 +429,11 @@ func _on_missions_received(
 
 	var data := _parse(result, response_code, body)
 	if data.is_empty():
-		_missions_empty.text = "ماموریت ها در دسترس نیستند."
-		_missions_empty.visible = true
-		_missions_scroll.visible = false
+		# اینترنت موبایل ناپایدار است: پیامِ روشن + «تلاش دوباره» (نه صفحه‌ی خالی)
+		if _missions_list.get_child_count() == 0:
+			_set_list_state("error")
+		else:
+			_show_toast("اتصال ضعیف است — لیست به‌روز نشد")
 		return
 
 	_apply_missions(data)
@@ -424,8 +481,30 @@ func _apply_missions(data: Dictionary) -> void:
 		row.play_pop(0.04 * float(index))
 		index += 1
 
-	_missions_empty.visible = index == 0
-	_missions_scroll.visible = index > 0
+	_missions_empty.visible = false
+	_set_list_state("" if index > 0 else "empty")
+
+## حالتِ لیستِ ماموریت‌ها: "" (لیست) / loading / error / empty
+var _list_state_node: Control = null
+
+func _set_list_state(state: String) -> void:
+	if _list_state_node != null and is_instance_valid(_list_state_node):
+		_list_state_node.queue_free()
+	_list_state_node = null
+	_missions_empty.visible = false
+	_missions_scroll.visible = state == ""
+	var host := _missions_scroll.get_parent() as Control
+	match state:
+		"loading":
+			_list_state_node = ProgFx.skeleton(host, 4, 76.0)
+		"error":
+			_list_state_node = ProgFx.message_state(host, MissionArt.texture_for("clock"),
+				"ماموریت‌ها نرسیدند — اینترنت را بررسی کن", "تلاش دوباره", refresh_missions)
+		"empty":
+			# E1/E10 حالتِ خالی هم یک قدمِ بعدی دارد
+			_list_state_node = ProgFx.message_state(host, MissionArt.texture_for("star"),
+				"ماموریت‌های امروز تمام شد! تا ماموریت‌های فردا، یک دست بازی کن.",
+				"بازی کن", _on_mission_go_requested.bind(""), "gold")
 
 ## «رفتن» روی ماموریتِ ناتمام — فقط ناوبری است، هیچ چیزی گرفته نمی‌شود
 func _on_mission_go_requested(_mission_id: String) -> void:
@@ -463,10 +542,10 @@ func _on_mission_claim_received(
 
 	# پاسخِ claim خودش لیست تازه را دارد، پس درخواست دوم لازم نیست
 	_apply_missions(data)
-	_sync_wallet(data)
-
+	# اول صفحه‌ی جایزه، بعد موجودی — تا شمارنده منتظرِ پروازِ سکه بماند (E17)
 	RewardPopup.show_rewards(
 		RewardPopup.items_from_reward(data.get("reward", {})), "ماموریت انجام شد")
+	_sync_wallet(data)
 
 	# تجربه‌ی ماموریت به بتل‌پس هم اضافه شده، پس آن را هم تازه می‌کنیم
 	refresh_season()
@@ -500,7 +579,7 @@ func _track_line(filled: bool) -> Control:
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var line := ColorRect.new()
-	line.color = MissionArt.COLOR_GOLD if filled else Color(0.15, 0.2, 0.27, 1.0)
+	line.color = MissionArt.COLOR_GOLD if filled else Color(0.24, 0.23, 0.24, 1.0)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# وسطِ ارتفاع صندوق (۴۴ پیکسل) بنشیند، نه وسط کل گره
 	line.set_anchors_preset(Control.PRESET_TOP_WIDE)
@@ -531,7 +610,7 @@ func _apply_bonus_card(tiers: Array) -> void:
 
 	if int(final_tier.get("gems", 0)) > 0:
 		_bonus_rewards.add_child(
-			_reward_chip("gem", int(final_tier["gems"]), Color(0.353, 0.784, 0.98, 1.0)))
+			_reward_chip("gem", int(final_tier["gems"]), Color(0.95, 0.36, 0.47, 1.0)))
 	if int(final_tier.get("coins", 0)) > 0:
 		_bonus_rewards.add_child(
 			_reward_chip("coin", int(final_tier["coins"]), MissionArt.COLOR_GOLD))
@@ -547,7 +626,7 @@ func _reward_chip(icon_id: String, value: int, color: Color) -> Control:
 	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.031, 0.063, 0.106, 0.95)
+	style.bg_color = Color(0.06, 0.055, 0.055, 0.95)
 	style.set_border_width_all(1)
 	style.border_color = Color(color.r, color.g, color.b, 0.45)
 	style.set_corner_radius_all(7)
@@ -629,12 +708,12 @@ func _on_bonus_claim_received(
 		return
 
 	_apply_missions(data)
-	_sync_wallet(data)
 
 	# عکس همان صندوقی که باز شد بالای صفحه‌ی جایزه می‌نشیند
 	var reward: Dictionary = data.get("reward", {})
 	var chest := MissionArt.texture_for(str(reward.get("chest", "chest_common")))
 	RewardPopup.show_rewards(RewardPopup.items_from_reward(reward), "صندوق باز شد", chest)
+	_sync_wallet(data)
 
 # ------------------------------------------------------------------- پاداش فصل
 
@@ -656,8 +735,24 @@ func _on_season_received(
 
 	var data := _parse(result, response_code, body)
 	if data.is_empty():
+		if _ladder.get_child_count() == 0:
+			_set_ladder_error(true)
 		return
+	_set_ladder_error(false)
 	_apply_season(data)
+
+var _ladder_error: Control = null
+
+## نردبان نیامد: پیام + «تلاش دوباره» جای نردبانِ خالی
+func _set_ladder_error(on: bool) -> void:
+	if _ladder_error != null and is_instance_valid(_ladder_error):
+		_ladder_error.queue_free()
+	_ladder_error = null
+	_ladder_scroll.visible = not on
+	if on:
+		_ladder_error = ProgFx.message_state(_ladder_scroll.get_parent() as Control,
+			MissionArt.texture_for("clock"), "پاداش‌های فصل نرسیدند — اینترنت را بررسی کن",
+			"تلاش دوباره", refresh_season)
 
 func _apply_season(data: Dictionary) -> void:
 	_pass_level_label.text = "سطح %s" % MissionArt.fa_number(int(data.get("level", 1)))
@@ -934,8 +1029,6 @@ func _on_season_claim_received(
 		return
 
 	_apply_season(data)
-	# پاسخ‌های فصل «level» را برای پله‌ی بتل‌پس دارند، نه سطح بازیکن
-	_sync_wallet(data, true)
 
 	match action:
 		"buy":
@@ -951,6 +1044,9 @@ func _on_season_claim_received(
 				Global.apply_skin_response(data)
 			RewardPopup.show_rewards(
 				RewardPopup.items_from_reward(data.get("reward", {})), "پاداش فصل")
+	# پاسخ‌های فصل «level» را برای پله‌ی بتل‌پس دارند، نه سطح بازیکن.
+	# بعد از باز شدنِ صفحه‌ی جایزه، تا شمارنده منتظرِ پروازِ سکه بماند (E17)
+	_sync_wallet(data, true)
 
 # ------------------------------------------------------------------- کمکی‌ها
 

@@ -70,3 +70,39 @@ static func summary(category: String, item_id: String) -> String:
 		return ""
 	var noun := "این اسلحه" if category == "weapon" else "این کاراکتر"
 	return "با %s: %s" % [noun, " · ".join(parts)]
+
+
+## E8 + E14: درجه‌ی «تسلط» از روی کیل‌های همین آیتم — فقط تأییدِ مهارت است،
+## هیچ پاداشی به آن وصل نیست. C9: همیشه فاصله تا درجه‌ی بعد گفته می‌شود.
+const MASTERY_TIERS := [
+	{"at": 0, "name": "تازه‌کار"},
+	{"at": 10, "name": "آشنا"},
+	{"at": 50, "name": "کارکشته"},
+	{"at": 150, "name": "حرفه‌ای"},
+	{"at": 400, "name": "استاد"},
+	{"at": 1000, "name": "افسانه"},
+]
+
+
+## {tier, name, kills, matches, floor, next_at (-1 = آخرین درجه), next_name, ratio}
+static func mastery(category: String, item_id: String) -> Dictionary:
+	var s := get_stats(category, item_id)
+	var kills := int(s["kills"])
+	var tier := 0
+	for i in MASTERY_TIERS.size():
+		if kills >= int(MASTERY_TIERS[i]["at"]):
+			tier = i
+	var floor_at := int(MASTERY_TIERS[tier]["at"])
+	var last := tier >= MASTERY_TIERS.size() - 1
+	var next_at := -1 if last else int(MASTERY_TIERS[tier + 1]["at"])
+	var ratio := 1.0 if last else clampf(float(kills - floor_at) / float(maxi(1, next_at - floor_at)), 0.0, 1.0)
+	return {
+		"tier": tier,
+		"name": str(MASTERY_TIERS[tier]["name"]),
+		"kills": kills,
+		"matches": int(s["matches"]),
+		"floor": floor_at,
+		"next_at": next_at,
+		"next_name": "" if last else str(MASTERY_TIERS[tier + 1]["name"]),
+		"ratio": ratio,
+	}

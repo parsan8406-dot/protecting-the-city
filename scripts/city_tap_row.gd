@@ -60,12 +60,12 @@ func _on_gui_input(event: InputEvent) -> void:
 func apply_row_style(highlight: bool) -> void:
 	var normal: StyleBoxFlat
 	if highlight:
-		normal = CityUI.box(Color(0.16, 0.12, 0.03, 0.55), Color(0.97, 0.78, 0.3, 0.55), 1, 8)
+		normal = CityUI.box(Color(0.18, 0.13, 0.03, 0.6), Color(1.0, 0.8, 0.26, 0.6), 1, 8)
 	else:
-		normal = CityUI.box(Color(0.03, 0.06, 0.12, 0.7), Color(0.2, 0.3, 0.46, 0.45), 1, 8)
+		normal = CityUI.box(Color(0.075, 0.075, 0.085, 0.85), Color(0.24, 0.24, 0.27, 0.6), 1, 8)
 	var pressed := normal.duplicate() as StyleBoxFlat
 	pressed.bg_color = normal.bg_color.lightened(0.12)
-	pressed.border_color = CityUI.BLUE
+	pressed.border_color = CityUI.GOLD
 	for state in ["normal", "hover", "disabled"]:
 		add_theme_stylebox_override(state, normal)
 	add_theme_stylebox_override("pressed", pressed)

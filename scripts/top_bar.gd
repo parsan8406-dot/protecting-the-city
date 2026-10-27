@@ -15,6 +15,13 @@ const TOUCH := preload("res://scripts/psych_menu_touch.gd")
 ## آخرین عددهای نشان‌داده‌شده — برای پالسِ «عوض شد» (V10)
 var _shown_coins := -1
 var _shown_gems := -1
+## V10/E4: آخرین عددی که *هر* نوارِ بالا نشان داد. نوارِ بالا با هر صحنه از
+## نو ساخته می‌شود؛ بدونِ این، جایزه‌ای که در صفحه‌ی نتیجه گرفته شده در
+## لابی بی‌صدا عوض می‌شد. حالا صحنه‌ی بعد از همان عددِ قبلی شمارش می‌کند.
+static var _last_coins := -1
+static var _last_gems := -1
+const COUNT_TIME := 0.7
+const FLOAT_DROP := 18.0
 
 @onready var name_text: Label = $HBoxContainer/Profile/VBoxContainer/NameLabel
 @onready var level_text: Label = $HBoxContainer/Profile/LevelLabel
@@ -94,17 +101,19 @@ func _on_player_data_updated() -> void:
 		xp_text.text = "%s / %s" % [
 			MissionArt.fa_grouped(Global.display_xp), MissionArt.fa_grouped(Global.max_xp)
 		]
-	if coins_text:
-		coins_text.text = MissionArt.fa_grouped(Global.coins)
-	if gems_text:
-		gems_text.text = MissionArt.fa_grouped(Global.gems)
-	# V10: عددِ تازه یک پالسِ کوچک می‌زند تا تغییر (جایزه/خرید) دیده شود
-	if _shown_coins >= 0 and Global.coins != _shown_coins:
-		_pulse(coins_text, Global.coins > _shown_coins)
-	if _shown_gems >= 0 and Global.gems != _shown_gems:
-		_pulse(gems_text, Global.gems > _shown_gems)
+	# اولین نمایشِ این نمونه: از عددی شروع کن که نوارِ قبلی نشان داده بود
+	if _shown_coins < 0 and _last_coins >= 0:
+		_shown_coins = _last_coins
+	if _shown_gems < 0 and _last_gems >= 0:
+		_shown_gems = _last_gems
+	# V10: عددِ تازه پالس می‌زند و تا مقدارِ جدید می‌شمارد؛ افزایش یک «+N»
+	# طلاییِ کوچک هم بالا می‌فرستد تا جایزه حس شود (E4/E17)
+	_show_amount(coins_text, _shown_coins, Global.coins)
+	_show_amount(gems_text, _shown_gems, Global.gems)
 	_shown_coins = Global.coins
 	_shown_gems = Global.gems
+	_last_coins = Global.coins
+	_last_gems = Global.gems
 
 	_apply_xp_bar()
 	_apply_avatar(str(Global.avatar_id))
@@ -191,3 +200,63 @@ func _pulse(label: Label, gained: bool) -> void:
 		tw.tween_property(label, "modulate", Color(1.25, 1.1, 0.6), 0.09)
 	tw.chain().tween_property(label, "scale", Vector2.ONE, 0.26) 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.tween_property(label, "modulate", Color.WHITE, 0.3)
+
+
+## عدد را نشان می‌دهد؛ اگر قبلاً عددِ دیگری دیده شده بود شمارش + پالس
+func _show_amount(label: Label, from: int, to: int) -> void:
+	if label == null:
+		return
+	if from < 0 or from == to or not label.is_inside_tree():
+		_kill_count(label)
+		label.text = MissionArt.fa_grouped(to)
+		return
+	_pulse(label, to > from)
+	if to > from:
+		_float_gain(label, to - from)
+	_kill_count(label)
+	# پهنای نهایی از اول رزرو می‌شود تا وسطِ شمارش ردیف نلرزد
+	var font := label.get_theme_font("font")
+	var fs := label.get_theme_font_size("font_size")
+	if font != null:
+		var w := font.get_string_size(MissionArt.fa_grouped(maxi(to, from)), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		label.custom_minimum_size.x = maxf(label.custom_minimum_size.x, ceilf(w) + 4.0)
+	var tw := label.create_tween()
+	tw.tween_method(func(v: float) -> void: label.text = MissionArt.fa_grouped(int(round(v))),
+		float(from), float(to), COUNT_TIME).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	label.set_meta("_count_tw", tw)
+
+
+func _kill_count(label: Label) -> void:
+	if label.has_meta("_count_tw"):
+		var old = label.get_meta("_count_tw")
+		if old is Tween and (old as Tween).is_valid():
+			(old as Tween).kill()
+		label.remove_meta("_count_tw")
+
+
+## «+۱۲۰» طلایی درست زیرِ کپسولِ سکه/جم که کمی پایین می‌لغزد و محو می‌شود.
+## کنارِ کپسول نمی‌گذاریمش: سکه و جم کنارِ هم‌اند و «+» جم روی کپسولِ سکه
+## می‌افتاد (صفحه‌ی رنک).
+func _float_gain(label: Label, amount: int) -> void:
+	var tag := Label.new()
+	tag.text = "+" + MissionArt.fa_grouped(amount)
+	tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tag.add_theme_font_override("font", MenuUI.FONT_NUM)
+	tag.add_theme_font_size_override("font_size", 20)
+	tag.add_theme_color_override("font_color", MenuUI.GOLD)
+	tag.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.85))
+	tag.add_theme_constant_override("outline_size", 5)
+	tag.z_index = 5
+	add_child(tag)
+	tag.reset_size()
+	var pill := label.get_parent().get_parent() as Control   # Row → Coins/Gems
+	var r := (pill if pill != null else label).get_global_rect()
+	var to_local := get_global_transform_with_canvas().affine_inverse()
+	var anchor := to_local * Vector2(r.position.x + r.size.x * 0.5, r.end.y)
+	tag.position = anchor - Vector2(tag.size.x * 0.5, 2.0)
+	tag.modulate.a = 0.0
+	var tw := tag.create_tween().set_parallel(true)
+	tw.tween_property(tag, "modulate:a", 1.0, 0.12)
+	tw.tween_property(tag, "position:y", tag.position.y + FLOAT_DROP, 0.9) 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.chain().tween_property(tag, "modulate:a", 0.0, 0.35)
+	tw.chain().tween_callback(tag.queue_free)

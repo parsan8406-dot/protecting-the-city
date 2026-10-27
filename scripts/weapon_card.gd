@@ -3,6 +3,8 @@ extends Control
 signal card_clicked(item_data: Dictionary)
 signal buy_requested(item_data: Dictionary)
 
+const Rarity := preload("res://scripts/psych_shop_rarity.gd")
+
 # ارجاع به نودهای اصلی کارت
 @onready var bg_texture: TextureRect = $TextureRect
 @onready var reference_rect: ReferenceRect = $ReferenceRect
@@ -26,6 +28,10 @@ const COLOR_EPIC_BORDER := Color("e066ff")
 const COLOR_LEGEND_BORDER := Color("ff9900")
 
 var item_data: Dictionary = {}
+var _border_color := Color.WHITE
+var _selected := false
+var _pips: Control = null
+var _touch_down := false
 var click_tween: Tween
 var scroll_fade_tween: Tween
 
@@ -53,10 +59,13 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_configure_child_mouse_filters()
 	
+	# C13: نوارِ قیمت فقط برچسب است؛ لمسِ کارت انتخاب می‌کند و خرید از پنلِ کنار
+	# است — وگرنه کشیدنِ انگشت روی لیست از روی دکمه خرید می‌زد و اسکرول گیر می‌کرد
 	if buy_button:
-		buy_button.pivot_offset = buy_button.size / 2.0
-		if not buy_button.pressed.is_connected(_on_buy_button_pressed):
-			buy_button.pressed.connect(_on_buy_button_pressed)
+		buy_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		buy_button.focus_mode = Control.FOCUS_NONE
+		for c in buy_button.find_children("*", "Control", true, false):
+			(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	# ۳. اتصال سیگنال ورودی
 	if not gui_input.is_connected(_on_gui_input):
@@ -85,10 +94,15 @@ func setup_card(data: Dictionary) -> void:
 		name_label.text = str(data.get("name", "نامشخص"))
 
 	# ۲. قیمت
-	var price: int = int(data.get("original_price", data.get("price", data.get("cost", 0))))
+	# V10: قیمتِ واقعیِ پرداختی با ارقامِ فارسیِ هم‌تراز
+	var price: int = int(data.get("final_price", data.get("original_price", data.get("price", data.get("cost", 0)))))
 	var price_node := _get_amount_label()
 	if price_node:
-		price_node.text = str(price)
+		price_node.text = MissionArt.fa_grouped(price)
+		price_node.add_theme_font_override("font", MenuUI.FONT_NUM)
+	if name_label:
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_label.clip_text = true
 
 	# ۳. تنظیم نوع ارز (سکه / الماس)
 	var currency: String = str(data.get("currency", data.get("cost_type", "coins"))).to_lower().strip_edges()
@@ -103,8 +117,7 @@ func setup_card(data: Dictionary) -> void:
 	_load_weapon_texture(data)
 
 	# ۵. اعمال استایل نایابی (Rarity)
-	var rarity: String = str(data.get("rarity", data.get("rarety", "rare"))).to_lower()
-	_apply_rarity_style(rarity)
+	_apply_rarity_style(Rarity.of(data))
 
 
 func _get_amount_label() -> Label:
@@ -140,74 +153,77 @@ func _load_weapon_texture(data: Dictionary) -> void:
 		weapon_image.texture = load(final_path)
 
 
+## V2: پالتِ مشترکِ رده + لوزی‌ها کنارِ آیکن (شکل، نه فقط رنگ)
 func _apply_rarity_style(rarity: String) -> void:
-	var border_color: Color = COLOR_RARE_BORDER
-
-	match rarity:
-		"epic":
-			border_color = COLOR_EPIC_BORDER
-		"legend", "legendary":
-			border_color = COLOR_LEGEND_BORDER
-		"rare", _:
-			border_color = COLOR_RARE_BORDER
-
-	# رنگ کادر و آیکون نایابی
+	_border_color = Rarity.color(rarity)
 	if reference_rect:
-		reference_rect.border_color = border_color
+		reference_rect.border_color = MenuUI.GOLD if _selected else _border_color
+		reference_rect.border_width = 4.0 if _selected else 2.0
 	if rarity_icon:
-		rarity_icon.modulate = border_color
-	# تغییر گرادینت پس‌زمینه با رنگ نایابی
-	if bg_texture and bg_texture.texture is GradientTexture2D:
-		var grad_tex := bg_texture.texture.duplicate() as GradientTexture2D
-		if grad_tex.gradient:
-			grad_tex.gradient = grad_tex.gradient.duplicate()
-			grad_tex.gradient.set_color(1, border_color * 0.35)
-		bg_texture.texture = grad_tex
+		rarity_icon.modulate = _border_color
+		if _pips == null:
+			_pips = Rarity.pips(rarity, 8.0)
+			_pips.z_index = 1
+			add_child(_pips)
+		var tier: int = Rarity.TIER[Rarity.key(rarity)]
+		_pips.set("tier", tier)
+		_pips.set("tint", _border_color)
+		_pips.visible = tier > 0
+		_pips.custom_minimum_size.x = maxf(1.0, tier) * 10.0
+		_pips.size = _pips.custom_minimum_size
+		_pips.position = rarity_icon.position + Vector2(rarity_icon.size.x + 3.0, 4.0)
+		_pips.queue_redraw()
+	if bg_texture:
+		bg_texture.texture = Rarity.gradient(rarity)
+
+
+## کارتی که در پنلِ کنار نشان داده می‌شود: قابِ طلایی (V3)
+func set_selected(on: bool) -> void:
+	_selected = on
+	if reference_rect:
+		reference_rect.border_color = MenuUI.GOLD if on else _border_color
+		reference_rect.border_width = 4.0 if on else 2.0
+
+
+## C13: پولش نمی‌رسد → قیمت کم‌رنگ (نه قرمز)
+func set_affordable(can: bool) -> void:
+	var l := _get_amount_label()
+	if l:
+		l.add_theme_color_override("font_color", Color(1.0, 0.92, 0.7) if can else MenuUI.MUTED)
+	var ic := _get_buy_icon()
+	if ic:
+		ic.modulate = Color.WHITE if can else Color(1, 1, 1, 0.55)
 
 
 # --- تعاملات ورودی، لمس و اسکرول (Touch, Click & Drag System) ---
 
 func _on_gui_input(event: InputEvent) -> void:
-	var event_global_pos: Vector2 = global_position + event.position if "position" in event else Vector2.ZERO
-
-	# ۱. ورودی موس
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	# فقط تاچ (emulate_touch_from_mouse روی PC همین را می‌سازد) — قبلاً موس هم جدا
+	# گرفته می‌شد و هر کلیک دو بار انتخاب می‌زد. اسکرول را خودِ ScrollContainer
+	# انجام می‌دهد؛ اینجا فقط تشخیص می‌دهیم لمس «کشیدن» بود نه «زدن».
+	if event is InputEventScreenTouch:
+		var gp: Vector2 = get_global_transform_with_canvas() * event.position
 		if event.pressed:
-			_touch_start_pos = event_global_pos
+			_touch_start_pos = gp
+			_touch_down = true
 			_is_swiping = false
-		elif not _is_swiping:
-			_play_card_selection_effect()
-			card_clicked.emit(item_data)
-
-	# ۲. ورودی لمسی (صفحات لمسی و موبایل)
-	elif event is InputEventScreenTouch:
-		if event.pressed:
-			_touch_start_pos = event_global_pos
-			_is_swiping = false
-		elif not _is_swiping:
-			_play_card_selection_effect()
-			card_clicked.emit(item_data)
-
-	# ۳. حرکت انگشت روی موبایل (انتقال جابجایی به اسکرول‌بار والد)
-	elif event is InputEventScreenDrag:
-		if event_global_pos.distance_to(_touch_start_pos) > DRAG_THRESHOLD:
+		else:
+			if _touch_down and not _is_swiping:
+				_play_card_selection_effect()
+				card_clicked.emit(item_data)
+			_touch_down = false
+	elif event is InputEventScreenDrag and _touch_down:
+		var gp: Vector2 = get_global_transform_with_canvas() * event.position
+		if gp.distance_to(_touch_start_pos) > DRAG_THRESHOLD:
 			_is_swiping = true
-		if _is_swiping and _parent_scroll:
+		# روی گوشی خودِ ScrollContainer با کشیدن اسکرول می‌کند؛ روی PC (بدونِ
+		# صفحه‌ی لمسی) نه — آنجا دستی، تا تست روی PC هم مثلِ گوشی باشد
+		if _is_swiping and _parent_scroll and not DisplayServer.is_touchscreen_available():
 			_parent_scroll.scroll_vertical -= int(event.relative.y)
-			_parent_scroll.scroll_horizontal -= int(event.relative.x)
-
-	# ۴. حرکت موس در حالت فشردن (تست اسکرول با درگ موس)
-	elif event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
-		if event_global_pos.distance_to(_touch_start_pos) > DRAG_THRESHOLD:
-			_is_swiping = true
-		if _is_swiping and _parent_scroll:
-			_parent_scroll.scroll_vertical -= int(event.relative.y)
-			_parent_scroll.scroll_horizontal -= int(event.relative.x)
 
 
 func _play_card_selection_effect() -> void:
-	if OS.has_feature("mobile"):
-		Input.vibrate_handheld(25)
+	LocalSettings.vibrate(20)
 
 	# روشن کردن visible افکت آتش قبل از شروع انیمیشن
 	if fire_icon:

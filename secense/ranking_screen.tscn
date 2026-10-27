@@ -16,7 +16,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/profile_menu/icon_friends.svg" id="14_friends"]
 
 [sub_resource type="Gradient" id="G_shade"]
-colors = PackedColorArray(0.01, 0.02, 0.05, 0.3, 0.01, 0.02, 0.05, 0.75)
+colors = PackedColorArray(0.01, 0.01, 0.012, 0.35, 0.01, 0.01, 0.012, 0.8)
 
 [sub_resource type="GradientTexture2D" id="GT_shade"]
 gradient = SubResource("G_shade")
@@ -45,12 +45,12 @@ fill_from = Vector2(0.8, 0.35)
 fill_to = Vector2(1.0, 0.1)
 
 [sub_resource type="StyleBoxFlat" id="SB_panel"]
-bg_color = Color(0.02, 0.04, 0.08, 0.82)
+bg_color = Color(0.055, 0.055, 0.062, 0.88)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.22, 0.36, 0.58, 0.8)
+border_color = Color(0.26, 0.26, 0.29, 0.85)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
@@ -73,12 +73,12 @@ shadow_color = Color(0.95, 0.7, 0.2, 0.18)
 shadow_size = 6
 
 [sub_resource type="StyleBoxFlat" id="SB_nav"]
-bg_color = Color(0.02, 0.04, 0.08, 0.82)
+bg_color = Color(0.055, 0.055, 0.062, 0.88)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.32, 0.5, 0.7)
+border_color = Color(0.28, 0.28, 0.31, 0.75)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -88,12 +88,12 @@ content_margin_left = 14.0
 content_margin_right = 12.0
 
 [sub_resource type="StyleBoxFlat" id="SB_nav_pressed"]
-bg_color = Color(0.05, 0.14, 0.3, 0.95)
+bg_color = Color(0.2, 0.15, 0.04, 0.95)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.3, 0.6, 1, 0.9)
+border_color = Color(1, 0.8, 0.26, 0.9)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -103,12 +103,12 @@ content_margin_left = 14.0
 content_margin_right = 12.0
 
 [sub_resource type="StyleBoxFlat" id="SB_icon_box"]
-bg_color = Color(0.02, 0.05, 0.1, 0.9)
+bg_color = Color(0.08, 0.08, 0.09, 0.92)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.25, 0.5, 0.85, 0.9)
+border_color = Color(0.72, 0.53, 0.14, 0.9)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -120,12 +120,12 @@ content_margin_right = 12.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="SB_icon_box_pressed"]
-bg_color = Color(0.06, 0.18, 0.38, 1)
+bg_color = Color(0.28, 0.2, 0.04, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.35, 0.7, 1, 1)
+border_color = Color(1, 0.85, 0.4, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -137,12 +137,12 @@ content_margin_right = 12.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="SB_icon_box_disabled"]
-bg_color = Color(0.02, 0.04, 0.07, 0.6)
+bg_color = Color(0.04, 0.04, 0.045, 0.6)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.3, 0.45, 0.5)
+border_color = Color(0.28, 0.28, 0.31, 0.55)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -154,7 +154,7 @@ content_margin_right = 12.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="SB_divider"]
-bg_color = Color(0.3, 0.42, 0.6, 0.45)
+bg_color = Color(0.32, 0.32, 0.36, 0.45)
 
 [sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
 bg_color = Color(0.08, 0.07, 0.05, 1)
@@ -189,18 +189,18 @@ shadow_size = 5
 bg_color = Color(0, 0, 0, 0.62)
 
 [sub_resource type="StyleBoxFlat" id="SB_rules"]
-bg_color = Color(0.02, 0.04, 0.09, 0.97)
+bg_color = Color(0.06, 0.06, 0.07, 0.97)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3, 0.55, 0.9, 0.95)
+border_color = Color(0.72, 0.53, 0.14, 0.95)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 corner_detail = 1
-shadow_color = Color(0.15, 0.5, 1, 0.3)
+shadow_color = Color(0, 0, 0, 0.35)
 shadow_size = 10
 
 [node name="RankingScreen" type="Control"]
@@ -221,7 +221,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.02, 0.03, 0.06, 1)
+color = Color(0.03, 0.03, 0.035, 1)
 
 [node name="BgImage" type="TextureRect" parent="."]
 layout_mode = 1
@@ -294,7 +294,7 @@ expand_icon = true
 
 [node name="TitleLabel" type="Label" parent="HeaderLeft"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.7)
 theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("3_display")
@@ -303,7 +303,7 @@ text = "رتبه بندی"
 vertical_alignment = 1
 
 [node name="HelpButton" type="TextureButton" parent="HeaderLeft"]
-modulate = Color(0.72, 0.8, 0.92, 1)
+modulate = Color(0.72, 0.72, 0.76, 1)
 custom_minimum_size = Vector2(34, 34)
 layout_mode = 2
 size_flags_vertical = 4
@@ -370,7 +370,7 @@ stretch_mode = 5
 [node name="Label" type="Label" parent="Content/Body/Sidebar/NavRank/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "رنک"
@@ -410,7 +410,7 @@ stretch_mode = 5
 [node name="Label" type="Label" parent="Content/Body/Sidebar/NavRanking/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "رتبه بندی"
@@ -450,7 +450,7 @@ stretch_mode = 5
 [node name="Label" type="Label" parent="Content/Body/Sidebar/NavCity/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "شهر"
@@ -601,7 +601,7 @@ theme_override_constants/separation = 10
 [node name="PosHead" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Header"]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "رتبه"
@@ -615,7 +615,7 @@ mouse_filter = 2
 [node name="NameHead" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "بازیکن"
@@ -623,7 +623,7 @@ text = "بازیکن"
 [node name="CityHead" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Header"]
 custom_minimum_size = Vector2(130, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "شهر"
@@ -632,7 +632,7 @@ horizontal_alignment = 1
 [node name="PointsHead" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Header"]
 custom_minimum_size = Vector2(78, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "امتیاز"
@@ -641,7 +641,7 @@ horizontal_alignment = 1
 [node name="MedalHead" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Header"]
 custom_minimum_size = Vector2(52, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.62, 0.7, 0.82, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "مدال"
@@ -725,7 +725,7 @@ stretch_mode = 5
 [node name="PageLabel" type="Label" parent="Content/Body/Main/TablePanel/Margin/Body/Footer"]
 custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.86, 0.9, 0.97, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.92, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 17
 text = "۰ از ۰"
@@ -768,8 +768,8 @@ mouse_filter = 2
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(0.9, 0.93, 1, 1)
-theme_override_colors/font_disabled_color = Color(0.5, 0.56, 0.66, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.54, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 15
 theme_override_styles/focus = SubResource("SB_focus")
@@ -807,7 +807,7 @@ theme_override_constants/separation = 3
 
 [node name="TitleLabel" type="Label" parent="Content/Body/Side/RankCard/Margin/Body"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 17
 text = "رتبه فعلی شما"
@@ -866,7 +866,7 @@ show_percentage = false
 
 [node name="NextLabel" type="Label" parent="Content/Body/Side/RankCard/Margin/Body"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.86, 0.9, 0.97, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.92, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 14
 text = ""
@@ -874,7 +874,7 @@ horizontal_alignment = 1
 
 [node name="StandingLabel" type="Label" parent="Content/Body/Side/RankCard/Margin/Body"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.55, 0.78, 1, 1)
+theme_override_colors/font_color = Color(0.75, 0.75, 0.78, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 14
 text = ""
@@ -905,7 +905,7 @@ mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="HelpButton" type="TextureButton" parent="Content/Body/Side/RewardsCard/Margin/Body/HeaderRow"]
-modulate = Color(0.72, 0.8, 0.92, 1)
+modulate = Color(0.72, 0.72, 0.76, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_vertical = 4
@@ -917,7 +917,7 @@ stretch_mode = 5
 [node name="TitleLabel" type="Label" parent="Content/Body/Side/RewardsCard/Margin/Body/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 17
 text = "پاداش هفتگی سه نفر اول"
@@ -949,7 +949,7 @@ mouse_filter = 2
 theme_override_constants/separation = 8
 
 [node name="ClockIcon" type="TextureRect" parent="Content/Body/Side/WeekCard/Margin/Row"]
-modulate = Color(0.8, 0.87, 0.97, 1)
+modulate = Color(0.86, 0.86, 0.9, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_vertical = 4
@@ -966,7 +966,7 @@ theme_override_constants/separation = 0
 
 [node name="Caption" type="Label" parent="Content/Body/Side/WeekCard/Margin/Row/Col"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 15
 text = "پایان هفته و پرداخت پاداش"
@@ -975,7 +975,7 @@ text_overrun_behavior = 3
 
 [node name="WeekLabel" type="Label" parent="Content/Body/Side/WeekCard/Margin/Row/Col"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.86, 0.9, 0.97, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.92, 1)
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 15
 text = "—"
@@ -995,8 +995,8 @@ alignment = 1
 
 [node name="SloganLabel" type="Label" parent="Content/Body/Side/SloganCard/Slogan"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.97, 1, 1)
-theme_override_colors/font_outline_color = Color(0.03, 0.06, 0.15, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
+theme_override_colors/font_outline_color = Color(0.06, 0.06, 0.07, 1)
 theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_display")
 theme_override_font_sizes/font_size = 21

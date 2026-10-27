@@ -158,6 +158,31 @@ func _select(avatar_id: String) -> void:
 		var button := _cells[id] as TextureButton
 		var is_selected: bool = id == _selected_id
 		button.modulate = Color(1, 1, 1, 1) if is_selected else Color(0.62, 0.62, 0.64, 1)
+		# V1/V9 انتخاب با قاب طلایی + تیک، نه فقط روشنایی (رنگ همیشه همراه شکل)
+		var frame := button.get_node_or_null("SelFrame") as Panel
+		if is_selected and frame == null:
+			frame = Panel.new()
+			frame.name = "SelFrame"
+			frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var st := StyleBoxFlat.new()
+			st.draw_center = false
+			st.border_color = Color(1.0, 0.8, 0.26, 1.0)
+			st.set_border_width_all(3)
+			st.set_corner_radius_all(8)
+			frame.add_theme_stylebox_override("panel", st)
+			frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+			button.add_child(frame)
+			var tick := MenuUI.label("✓", 18, Color(0.1, 0.07, 0.0))
+			tick.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			var badge := PanelContainer.new()
+			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			badge.add_theme_stylebox_override("panel", MenuUI.box(Color(1.0, 0.8, 0.26, 1.0), Color(0, 0, 0, 0), 0, 12))
+			badge.custom_minimum_size = Vector2(24, 24)
+			badge.position = Vector2(4, 4)
+			badge.add_child(tick)
+			frame.add_child(badge)
+		if frame != null:
+			frame.visible = is_selected
 
 func _on_confirm_pressed() -> void:
 	if _selected_id.is_empty():
@@ -168,6 +193,10 @@ func _on_confirm_pressed() -> void:
 func _on_cancel_pressed() -> void:
 	cancelled.emit()
 	close()
+
+## Back اندروید از profile_menu
+func dismiss() -> void:
+	_on_cancel_pressed()
 
 func _on_dim_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:

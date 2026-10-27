@@ -8,22 +8,22 @@
 [sub_resource type="StyleBoxFlat" id="SB_row_normal"]
 bg_color = Color(1, 1, 1, 0)
 border_width_bottom = 1
-border_color = Color(0.13, 0.2, 0.3, 0.85)
+border_color = Color(0.2, 0.2, 0.22, 0.85)
 
 [sub_resource type="StyleBoxFlat" id="SB_row_pressed"]
-bg_color = Color(0.25, 0.6, 1, 0.1)
+bg_color = Color(1, 0.8, 0.26, 0.1)
 border_width_bottom = 1
-border_color = Color(0.13, 0.2, 0.3, 0.85)
+border_color = Color(0.2, 0.2, 0.22, 0.85)
 
 [sub_resource type="StyleBoxEmpty" id="SB_focus"]
 
 [sub_resource type="StyleBoxFlat" id="SB_selected"]
-bg_color = Color(0.04, 0.2, 0.42, 0.7)
+bg_color = Color(0.24, 0.17, 0.04, 0.7)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.25, 0.64, 1, 1)
+border_color = Color(1, 0.8, 0.26, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -35,7 +35,7 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.03, 0.05, 0.09, 1)
+border_color = Color(0.05, 0.05, 0.055, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -51,12 +51,12 @@ corner_radius_bottom_left = 12
 [sub_resource type="StyleBoxFlat" id="SB_level"]
 content_margin_left = 4.0
 content_margin_right = 4.0
-bg_color = Color(0.03, 0.05, 0.09, 0.92)
+bg_color = Color(0.05, 0.05, 0.055, 0.92)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.2, 0.3, 0.45, 1)
+border_color = Color(0.3, 0.3, 0.33, 1)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -162,7 +162,7 @@ offset_bottom = 4.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.85, 0.9, 0.97, 1)
+theme_override_colors/font_color = Color(0.9, 0.9, 0.92, 1)
 theme_override_fonts/font = ExtResource("3_num")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("SB_level")
@@ -186,7 +186,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.33, 0.7, 1, 1)
+theme_override_colors/font_color = Color(0.96, 0.96, 0.97, 1)
 theme_override_fonts/font = ExtResource("3_num")
 theme_override_font_sizes/font_size = 19
 text = "Player"
@@ -195,7 +195,7 @@ text_overrun_behavior = 3
 [node name="TimeLabel" type="Label" parent="Margin/Row/Info/TopLine"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.53, 0.58, 0.66, 1)
+theme_override_colors/font_color = Color(0.55, 0.55, 0.59, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
 text = "الان"
@@ -204,7 +204,7 @@ vertical_alignment = 1
 [node name="PreviewLabel" type="Label" parent="Margin/Row/Info"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.6, 0.66, 0.74, 1)
+theme_override_colors/font_color = Color(0.62, 0.62, 0.66, 1)
 theme_override_fonts/font = ExtResource("3_num")
 theme_override_font_sizes/font_size = 15
 text = "..."

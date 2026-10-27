@@ -140,7 +140,7 @@ func _apply() -> void:
 	# --- خط پیش‌نمایش آخرین پیام ---
 	_preview_label.text = _preview_text(is_private)
 	_preview_label.add_theme_color_override("font_color",
-		Color(0.45, 0.76, 1.0, 1.0) if unread > 0 else Color(0.6, 0.66, 0.74, 1.0))
+		MenuUI.GOLD if unread > 0 else MenuUI.MUTED)
 
 	# --- زمان آخرین پیام ---
 	var last_at := str(_data.get("last_at", ""))

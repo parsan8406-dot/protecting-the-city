@@ -32,6 +32,7 @@ signal closed
 const FONT_UI := preload("res://fonts/SJADIDBD.TTF")
 const FONT_NUM := preload("res://fonts/Lalezar-Regular.ttf")
 const CONFETTI := preload("res://scripts/psych_results_confetti.gd")
+const ProgFx := preload("res://scripts/psych_prog_fx.gd")
 
 ## بالاتر از هر پاپ‌آپ و تاپ‌بار دیگری
 const LAYER := 100
@@ -55,15 +56,15 @@ const T_COUNT := 0.7
 ## صندوق را زده، با بلند شدنش صفحه را همان لحظه می‌بندد
 const INPUT_GUARD := 0.45
 
-const COLOR_GOLD := Color(0.91, 0.76, 0.29, 1.0)
-const COLOR_TEXT := Color(0.95, 0.96, 0.98, 1.0)
-const COLOR_MUTED := Color(0.62, 0.67, 0.75, 1.0)
+const COLOR_GOLD := MenuUI.GOLD
+const COLOR_TEXT := MenuUI.TEXT
+const COLOR_MUTED := MenuUI.MUTED
 
 ## رنگ قاب هر نوع جایزه — همان حسی که عکس مرجع دارد
 const TINTS := {
 	"coin": Color(0.91, 0.76, 0.29, 1.0),
 	"gem": Color(0.95, 0.36, 0.47, 1.0),
-	"xp": Color(0.31, 0.62, 0.97, 1.0),
+	"xp": Color(0.66, 0.36, 0.85, 1.0),  # همان بنفشِ تجربه‌ی ردیف‌های ماموریت
 	"cup": Color(0.98, 0.7, 0.25, 1.0),
 	"trophy": Color(0.98, 0.7, 0.25, 1.0),
 	"chest_common": Color(0.62, 0.69, 0.78, 1.0),
@@ -107,6 +108,7 @@ var _title_box: Control
 var _cards_row: HBoxContainer
 var _cards: Array[Control] = []
 var _hint: Label
+var _halo: TextureRect
 
 var _opened_at := 0.0
 var _closing := false
@@ -194,6 +196,19 @@ func _build() -> void:
 
 	_title_box = _build_title()
 	column.add_child(_title_box)
+
+	# V8 هاله‌ی گرمِ نرم پشتِ کارت‌ها — کارت‌ها روی «نور» می‌نشینند نه روی سیاهیِ تخت
+	var halo_holder := Control.new()
+	halo_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	halo_holder.custom_minimum_size = Vector2(0, 0)
+	column.add_child(halo_holder)
+	_halo = TextureRect.new()
+	_halo.texture = _halo_texture()
+	_halo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_halo.stretch_mode = TextureRect.STRETCH_SCALE
+	_halo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_halo.modulate.a = 0.0
+	halo_holder.add_child(_halo)
 
 	_cards_row = HBoxContainer.new()
 	_cards_row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -336,7 +351,8 @@ func _build_card(item: Dictionary, width: float) -> Control:
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.035, 0.05, 0.085, 0.97)
+	# زمینه‌ی سیاهِ گرم با نیمه‌ی بالای کمی روشن‌تر (پالت MenuUI، نه سرمه‌ای)
+	style.bg_color = Color(0.075, 0.07, 0.07, 0.97)
 	style.set_border_width_all(2)
 	style.border_color = Color(tint.r, tint.g, tint.b, 0.75)
 	style.set_corner_radius_all(12)
@@ -384,6 +400,7 @@ func _build_card(item: Dictionary, width: float) -> Control:
 	body.add_child(amount_label)
 	card.set_meta("amount_label", amount_label)
 	card.set_meta("amount", amount)
+	card.set_meta("icon_id", icon_id)
 
 	var name_label := Label.new()
 	name_label.text = str(item.get("label", LABELS.get(icon_id, "")))
@@ -416,6 +433,13 @@ func _play_in() -> void:
 
 	for i in _cards.size():
 		_animate_card(_cards[i], 0.18 + T_STAGGER * float(i))
+	if _halo != null and _cards_row != null:
+		var r := _cards_row.get_rect()
+		var holder := _halo.get_parent() as Control
+		var sz := Vector2(maxf(r.size.x * 1.6, 520.0), r.size.y * 1.9)
+		_halo.size = sz
+		_halo.position = Vector2(r.get_center().x - sz.x * 0.5, r.get_center().y - sz.y * 0.5) - holder.position
+		create_tween().tween_property(_halo, "modulate:a", 1.0, 0.5).set_delay(0.15)
 
 	var after_cards := 0.18 + T_STAGGER * float(_cards.size()) + T_CARD * 0.6
 
@@ -534,6 +558,9 @@ func _close() -> void:
 	if Time.get_ticks_msec() / 1000.0 - _opened_at < INPUT_GUARD:
 		return
 	_closing = true
+	# E17/V7 سکه و جم به سمتِ شمارنده‌ی بالای صفحه پرواز می‌کنند (اگر صفحه‌ی
+	# زیرین شمارنده‌ای ثبت کرده باشد) — «رسیدنِ» جایزه دیده می‌شود
+	_fly_to_counters()
 
 	var t := create_tween().set_parallel()
 	for i in _cards.size():
@@ -544,6 +571,8 @@ func _close() -> void:
 	t.tween_property(_hint, "modulate:a", 0.0, 0.15)
 	t.tween_property(_title_box, "modulate:a", 0.0, 0.18)
 	t.tween_property(_dim, "modulate:a", 0.0, 0.26).set_delay(0.08)
+	if _halo != null:
+		t.tween_property(_halo, "modulate:a", 0.0, 0.18)
 	await t.finished
 
 	closed.emit()
@@ -555,3 +584,46 @@ func _close() -> void:
 	if not _queue.is_empty():
 		var next: Array = _queue.pop_front()
 		RewardPopup.show_rewards(next[0], next[1], next[2], str(next[3]) if next.size() > 3 else "")
+
+## کارتِ سکه/جم → شمارنده‌ی هم‌نوعش در گروهِ ProgFx.COIN_TARGET / GEM_TARGET.
+## شمارنده می‌تواند meta «psych_on_receive» (Callable) داشته باشد تا با رسیدنِ
+## اولین سکه شمردن را شروع کند.
+func _fly_to_counters() -> void:
+	for card in _cards:
+		var amount := int(card.get_meta("amount", 0))
+		var icon_id := str(card.get_meta("icon_id", ""))
+		var group := ""
+		match icon_id:
+			"coin": group = ProgFx.COIN_TARGET
+			"gem": group = ProgFx.GEM_TARGET
+		if group == "" or amount <= 0:
+			continue
+		var target: Control = null
+		for n in get_tree().get_nodes_in_group(group):
+			if n is Control and (n as Control).is_visible_in_tree():
+				target = n
+				break
+		if target == null:
+			continue
+		var icon := card.get_meta("icon") as TextureRect
+		if icon == null or icon.texture == null:
+			continue
+		var cb: Callable = target.get_meta("psych_on_receive", Callable())
+		ProgFx.fly(icon.texture, icon.get_global_rect().get_center(), target,
+			clampi(3 + int(amount / 200.0), 3, 8), cb)
+
+
+## هاله‌ی گردِ طلایی‌ـقرمزِ کم‌رنگ (بدون فایل)
+static func _halo_texture() -> GradientTexture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1.0, 0.72, 0.25, 0.28))
+	g.set_color(1, Color(0.6, 0.05, 0.05, 0.0))
+	g.add_point(0.5, Color(0.85, 0.3, 0.1, 0.1))
+	var t := GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	t.width = 128
+	t.height = 128
+	return t

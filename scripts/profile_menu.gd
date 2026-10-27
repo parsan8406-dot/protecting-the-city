@@ -331,7 +331,8 @@ func _set_badge(tab_id: String, count: int) -> void:
 	var panel := label.get_parent() as Control
 	var was_visible := panel.visible
 	panel.visible = count > 0
-	label.text = "99+" if count > 99 else str(count)
+	# V10 ارقام فارسی، هم‌خانواده‌ی بقیه‌ی اعداد منو
+	label.text = "+۹۹" if count > 99 else MenuUI.fa(count)
 	if panel.visible and not was_visible:
 		panel.pivot_offset = panel.size * 0.5
 		panel.scale = Vector2(0.4, 0.4)
@@ -369,8 +370,9 @@ func _apply_safe_area() -> void:
 	_content.offset_left = _base_offsets["content_left"] + ins.x
 	_content.offset_right = _base_offsets["content_right"] - ins.z
 	_content.offset_bottom = _base_offsets["content_bottom"] - ins.w
-	_home_button.offset_left = _base_offsets["home_left"] - ins.z
-	_home_button.offset_right = _base_offsets["home_right"] - ins.z
+	# خانه زیر ستون تب‌ها (پایین-چپ، دسترس شست) — دیگر روی محتوای تب‌ها نمی‌افتد
+	_home_button.offset_left = _base_offsets["home_left"] + ins.x
+	_home_button.offset_right = _base_offsets["home_right"] + ins.x
 	_home_button.offset_top = _base_offsets["home_top"] - ins.w
 	_home_button.offset_bottom = _base_offsets["home_bottom"] - ins.w
 	var hb := _top_bar.get_node_or_null("HBoxContainer") as Control

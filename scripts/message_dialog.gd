@@ -36,6 +36,7 @@ const ENDPOINT := "/support/message"
 
 var _http: HTTPRequest
 var _sending := false
+var _closing := false
 
 
 func _ready() -> void:
@@ -103,6 +104,9 @@ func _hide_keyboard() -> void:
 
 
 func close() -> void:
+	if _closing:
+		return
+	_closing = true
 	_hide_keyboard()
 	var t := create_tween()
 	t.set_parallel(true)
@@ -141,10 +145,11 @@ func _on_text_changed() -> void:
 
 
 func _update_counter() -> void:
-	_counter_label.text = "%s / %s" % [
-		_to_fa(_text_edit.text.strip_edges().length()),
-		_to_fa(MAX_LENGTH),
-	]
+	var n := _text_edit.text.strip_edges().length()
+	_counter_label.text = "%s / %s" % [_to_fa(n), _to_fa(MAX_LENGTH)]
+	# C12/C13 شمارنده می‌گوید کِی پیام قابل ارسال است (طلایی) و کِی نه (کم‌رنگ)
+	_counter_label.add_theme_color_override("font_color", MenuUI.GOLD if n >= MIN_LENGTH else MenuUI.DIM)
+	_send_button.disabled = _sending or n < MIN_LENGTH
 
 
 func _on_send_pressed() -> void:
@@ -198,15 +203,21 @@ func _on_request_completed(_result: int, response_code: int, _headers: PackedStr
 
 
 func _on_cancel_pressed() -> void:
+	if _closing:
+		return
 	cancelled.emit()
 	close()
 
 
+## فقط تاچ (ماوسِ شبیه‌سازی‌شده همان لمس را دوباره می‌فرستد)
 func _on_dim_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and event.pressed:
 		_on_cancel_pressed()
-	elif event is InputEventMouseButton and event.pressed:
-		_on_cancel_pressed()
+
+
+## Back اندروید از profile_menu
+func dismiss() -> void:
+	_on_cancel_pressed()
 
 
 func _unhandled_input(event: InputEvent) -> void:

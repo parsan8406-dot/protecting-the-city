@@ -18,6 +18,7 @@ extends Control
 const MESSAGE_ROW_SCENE := preload("res://secense/message_row.tscn")
 const GIFT_DIALOG_SCENE := preload("res://secense/gift_dialog.tscn")
 const PsychSocialGift := preload("res://scripts/psych_social_gift.gd")
+const UI := preload("res://scripts/psych_profile_ui.gd")
 
 const TYPE_FRIEND_REQUEST := "friend_request"
 const TYPE_GIFT := "gift"
@@ -77,6 +78,9 @@ var _loaded_once := false
 var _toast_tween: Tween
 ## کاری که الان روی سرور در جریان است: {kind, message_id, reward}
 var _pending: Dictionary = {}
+var _skeleton: Control
+var _empty_hint: Label
+var _empty_action: Button
 
 # ------------------------------------------------------------------ آماده‌سازی
 
@@ -108,6 +112,7 @@ func _ready() -> void:
 
 	UIScroll.attach(_scroll)
 	UIScroll.attach(_detail_scroll)
+	_build_round3()
 	_toast.visible = false
 	_set_detail_empty()
 
@@ -167,6 +172,7 @@ func refresh() -> void:
 # ------------------------------------------------------------------ پاسخ سرور
 
 func _on_messages_received(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	_clear_skeleton()
 	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
 		if _messages.is_empty():
 			_show_list_error(MenuUI.server_error(body, response_code if result == HTTPRequest.RESULT_SUCCESS else 0,
@@ -229,7 +235,19 @@ func _build_list() -> void:
 	else:
 		for child in _list.get_children():
 			child.queue_free()
+		# C14 دو گروه: «کارهای مانده» بالا، «قبلی‌ها» پایین (لیست از قبل همین‌طور مرتب است)
+		var attention := 0
 		for m in shown:
+			if _needs_attention(m):
+				attention += 1
+		var older_header_done := false
+		if attention > 0 and attention < shown.size():
+			_list.add_child(UI.group_header("جدید و منتظر تو — %s" % MenuUI.fa(attention), MenuUI.GOLD))
+		for m in shown:
+			if attention > 0 and not older_header_done and not _needs_attention(m):
+				older_header_done = true
+				if attention < shown.size():
+					_list.add_child(UI.group_header("قبلی‌ها"))
 			var row: MessageRow = MESSAGE_ROW_SCENE.instantiate()
 			row.setup(m)
 			row.row_selected.connect(func(r: MessageRow) -> void: _select(r.message_id, true))
@@ -244,8 +262,18 @@ func _build_list() -> void:
 	_scroll.visible = not empty
 	_empty_box.visible = empty
 	_retry_button.visible = false
+	_empty_action.visible = empty
 	if empty:
-		_empty_label.text = "صندوق پیامت خالی است" if _filter == "all" else "پیامی در این دسته نیست"
+		# E1 حالت خالی دوستانه با یک کار پیشنهادی
+		if _filter == "all":
+			_empty_label.text = "صندوقت مرتب و خالیه!"
+			_empty_hint.text = "هدیه‌ی دوستان، جایزه‌ها و درخواست‌های دوستی این‌جا می‌رسند."
+			_empty_action.text = "رفتن به دوستان"
+		else:
+			_empty_label.text = "پیامی در این دسته نیست"
+			_empty_hint.text = ""
+			_empty_action.text = "نمایش همه"
+		_empty_hint.visible = not _empty_hint.text.is_empty()
 
 	if _find_message(_selected_id).is_empty() or not ids.has(_selected_id):
 		if not shown.is_empty():
@@ -273,12 +301,18 @@ func _update_header() -> void:
 	_read_all_button.visible = unread > 0
 	_claim_all_button.visible = claimable > 1
 	_claim_all_button.text = "دریافت همه (%s)" % MenuUI.fa(claimable)
+	_refresh_filter_counts()
 
 func _show_list_error(message: String) -> void:
+	_clear_skeleton()
 	_scroll.visible = false
 	_empty_box.visible = true
 	_empty_label.text = message
 	_retry_button.visible = true
+	if _empty_action != null:
+		_empty_action.visible = false
+		_empty_hint.text = "" if "اینترنت" in message else "اینترنت را بررسی کن و دوباره امتحان کن"
+		_empty_hint.visible = not _empty_hint.text.is_empty()
 
 func _find_message(message_id: String) -> Dictionary:
 	if message_id.is_empty():
@@ -483,8 +517,13 @@ func _on_dismiss_pressed(message_id: String) -> void:
 	if MessageRow.reward_pending(data):
 		_show_toast("اول جایزه‌ی این پیام را دریافت کن")
 		return
-	_post("/messages/delete", {"username": Global.my_username, "message_id": message_id},
-		{"kind": "delete", "message_id": message_id})
+	# C13 حذف برگشت ندارد — یک تأیید کوتاه
+	var on_answer := func(ok: bool) -> void:
+		if ok:
+			_post("/messages/delete", {"username": Global.my_username, "message_id": message_id},
+				{"kind": "delete", "message_id": message_id})
+	MenuUI.confirm(self, "حذف پیام", "«%s» برای همیشه از صندوقت پاک می‌شود." % str(data.get("title", "پیام")),
+		"حذف کن", on_answer, true)
 
 func _on_read_all_pressed() -> void:
 	_post("/messages/read_all", {"username": Global.my_username}, {"kind": "read_all"})
@@ -531,6 +570,7 @@ func _on_action_completed(result: int, response_code: int, _headers: PackedStrin
 		"read_all":
 			_show_toast("همه‌ی پیام‌ها خوانده شد")
 		"claim":
+			UI.pop(_reward_box, 1.08)
 			_celebrate(pending.get("reward", {}) if pending.get("reward") is Dictionary else {}, "هدیه دریافت شد")
 		"claim_all":
 			var total = data.get("reward", {})
@@ -612,3 +652,65 @@ func _play_intro() -> void:
 		var t := create_tween()
 		t.tween_interval(0.035 * i)
 		t.tween_property(row, "modulate:a", 1.0, 0.20).set_trans(Tween.TRANS_SINE)
+
+# ------------------------------------------------------------------ دور ۳
+
+func _build_round3() -> void:
+	# شبکه‌ی موبایل ناپایدار است: درخواست آویزان بعد از ۱۲ ثانیه خطا + «تلاش دوباره» می‌دهد
+	if _http.timeout <= 0.0:
+		_http.timeout = 12.0
+	if _action_http.timeout <= 0.0:
+		_action_http.timeout = 12.0
+	# حالت خالی: راهنما + یک دکمه‌ی پیشنهادی
+	_empty_hint = MenuUI.label("", 15, MenuUI.MUTED)
+	_empty_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_empty_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_empty_hint.visible = false
+	_empty_box.add_child(_empty_hint)
+	_empty_box.move_child(_empty_hint, _empty_label.get_index() + 1)
+	_empty_action = MenuUI.button("", "gold", 17)
+	_empty_action.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_empty_action.custom_minimum_size = Vector2(220, MenuUI.TOUCH_H)
+	_empty_action.visible = false
+	_empty_action.pressed.connect(func() -> void:
+		UIFx.press(_empty_action)
+		if _filter != "all":
+			_set_filter("all")
+		else:
+			Global.request_profile_tab("friends"))
+	_empty_box.add_child(_empty_action)
+	var empty_icon := _empty_box.get_node_or_null("EmptyIcon") as TextureRect
+	if empty_icon != null:
+		empty_icon.modulate = Color(MenuUI.GOLD, 0.8)
+		empty_icon.custom_minimum_size.y = 72
+	# C12 ردیف‌های اسکلتی تا رسیدن پاسخ اول
+	_skeleton = UI.skeleton(4, 62)
+	_list.add_child(_skeleton)
+	_scroll.visible = true
+	_empty_box.visible = false
+
+func _clear_skeleton() -> void:
+	if _skeleton != null and is_instance_valid(_skeleton):
+		_skeleton.queue_free()
+	_skeleton = null
+
+## C2 شمار هر دسته روی دکمه‌ی فیلتر («جایزه‌ها ۲») — فقط کارهای مانده شمرده می‌شوند
+func _refresh_filter_counts() -> void:
+	var counts := {"all": 0, "reward": 0, "friend_request": 0, "system": 0}
+	for m in _messages:
+		if not (m is Dictionary) or not _needs_attention(m):
+			continue
+		counts["all"] += 1
+		var t := str(m.get("type", ""))
+		if t == TYPE_GIFT or t == TYPE_REWARD:
+			counts["reward"] += 1
+		elif t == TYPE_FRIEND_REQUEST:
+			counts["friend_request"] += 1
+		else:
+			counts["system"] += 1
+	for f in FILTERS:
+		var b: Button = _filter_buttons.get(f[0])
+		if b == null:
+			continue
+		var n := int(counts.get(f[0], 0))
+		b.text = str(f[1]) if n == 0 or f[0] == "all" else "%s %s" % [f[1], MenuUI.fa(n)]

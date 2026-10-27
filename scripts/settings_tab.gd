@@ -16,6 +16,10 @@ const SUPPORT_TELEGRAM := "https://t.me/gun_game_support"
 
 ## باکس نوشتن پیام (کیبورد اندروید) — با دکمه‌ی «ارسال پیام» باز می‌شود
 const MESSAGE_DIALOG := preload("res://secense/message_dialog.tscn")
+## باکس کد هدیه — همان باکس فروشگاه؛ این‌جا هم جایی است که بازیکن دنبالش می‌گردد (C4)
+const GIFT_CODE_DIALOG := preload("res://secense/gift_code_dialog.tscn")
+const ICON_GIFT := preload("res://assets/ui/profile_menu/friend_icon_gift.svg")
+const UI := preload("res://scripts/psych_profile_ui.gd")
 
 const ICON_MASTER := preload("res://assets/ui/profile_menu/settings_icon_master.svg")
 const ICON_SFX := preload("res://assets/ui/profile_menu/settings_icon_sfx.svg")
@@ -119,9 +123,16 @@ func _ready() -> void:
 	MenuUI.style_button(_unlink_button, "ghost")
 	MenuUI.style_button(_cancel_wait_button, "dark")
 	MenuUI.style_button(_returned_button, "gold")
-	MenuUI.style_button(_message_button, "white")
-	MenuUI.style_button(_telegram_button, "white")
-	MenuUI.style_button(_reset_button, "red")
+	# V5 فقط «اتصال با گوگل» دکمه‌ی پررنگ این صفحه است؛ پشتیبانی آرام‌تر
+	MenuUI.style_button(_message_button, "dark")
+	MenuUI.style_button(_telegram_button, "dark")
+	# C13 کار برگشت‌پذیر ولی مخرب: کم‌رنگ با متن قرمز + پنجره‌ی تأیید
+	MenuUI.style_button(_reset_button, "ghost")
+	_reset_button.add_theme_color_override("font_color", MenuUI.RED_HOT)
+	_reset_button.add_theme_color_override("icon_normal_color", MenuUI.RED_HOT)
+	_build_extras()
+	UI.style_toggle(_vibration_toggle)
+	UI.style_toggle(_shake_toggle)
 
 	_google_button.pressed.connect(_on_google_pressed)
 	_recover_button.pressed.connect(_on_recover_pressed)
@@ -155,6 +166,79 @@ func _ready() -> void:
 	if is_visible_in_tree():
 		refresh_status()
 		_play_intro()
+
+## کد هدیه کنار پشتیبانی + شماره‌ی نسخه (برای گزارش مشکل)
+var _gift_code_button: Button
+var _benefits: VBoxContainer
+func _build_extras() -> void:
+	_gift_code_button = MenuUI.button("کد هدیه", "dark", 19)
+	_gift_code_button.icon = ICON_GIFT
+	_gift_code_button.expand_icon = true
+	_gift_code_button.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_gift_code_button.add_theme_constant_override("icon_max_width", 26)
+	_gift_code_button.add_theme_constant_override("h_separation", 10)
+	_gift_code_button.add_theme_color_override("icon_normal_color", MenuUI.GOLD)
+	_gift_code_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_gift_code_button.custom_minimum_size = Vector2(0, 50)
+	_gift_code_button.pressed.connect(_on_gift_code_pressed)
+	var row := _message_button.get_parent()
+	row.add_child(_gift_code_button)
+	row.move_child(_gift_code_button, 0)
+	for b in [_message_button, _telegram_button]:
+		(b as Button).add_theme_font_size_override("font_size", 17)
+	_message_button.text = "پیام"
+
+	# C10/E6 مزیت اتصال روشن گفته شود (قاب مثبت، بدون ترساندن) — جای خالی ستون هم پر می‌شود
+	_benefits = VBoxContainer.new()
+	_benefits.add_theme_constant_override("separation", 6)
+	_benefits.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_benefits.add_child(UI.group_header("چرا اتصال به گوگل؟", MenuUI.GOLD))
+	for line in ["گوشی عوض شد یا بازی پاک شد؟ همه‌چیز برمی‌گردد",
+			"سکه، جم و خریدهایت روی حسابت امن می‌ماند",
+			"روی هر گوشی با همان حساب گوگل وارد شو"]:
+		var r := HBoxContainer.new()
+		r.add_theme_constant_override("separation", 8)
+		r.alignment = BoxContainer.ALIGNMENT_END
+		r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var l := MenuUI.label(line, 15, MenuUI.TEXT)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		r.add_child(l)
+		r.add_child(MenuUI.label("✓", 17, MenuUI.GOLD))
+		_benefits.add_child(r)
+	var account_body := _google_button.get_parent()
+	var spacer := account_body.get_node_or_null("Spacer")
+	account_body.add_child(_benefits)
+	if spacer != null:
+		account_body.move_child(_benefits, spacer.get_index())
+
+	var version := str(ProjectSettings.get_setting("application/config/version", ""))
+	if not version.is_empty():
+		var v := MenuUI.label("نسخه‌ی %s" % version, 13, MenuUI.DIM, true)
+		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var body := row.get_parent()
+		body.add_child(v)
+
+func _on_gift_code_pressed() -> void:
+	UIFx.press(_gift_code_button)
+	var dialog := GIFT_CODE_DIALOG.instantiate()
+	dialog.add_to_group("modal")
+	dialog.z_index = 60
+	dialog.redeemed.connect(_on_gift_code_redeemed)
+	get_tree().root.add_child(dialog)
+	dialog.open()
+
+## E17 جشن کوتاه با همان صفحه‌ی جایزه‌ی بقیه‌ی بازی
+func _on_gift_code_redeemed(data: Dictionary) -> void:
+	var reward = data.get("reward", {})
+	var items := RewardPopup.items_from_reward(reward if reward is Dictionary else {})
+	LocalSettings.vibrate(35)
+	Global.refresh_player_data()
+	if items.is_empty():
+		_show_toast("کد هدیه اعمال شد ✓")
+	else:
+		RewardPopup.show_rewards(items, "کد هدیه")
 
 func _on_visibility_changed() -> void:
 	if is_visible_in_tree():
@@ -355,6 +439,9 @@ func _apply_account_view() -> void:
 		_recover_button.visible = not waiting
 		_recover_button.text = "حساب دیگری داری؟ ورود با گوگل"
 		MenuUI.style_button(_recover_button, "dark")
+
+	if _benefits != null:
+		_benefits.visible = not linked and not locked and not waiting
 
 	if not available and not waiting:
 		_status_detail.text += "\nورود با گوگل هنوز روی سرور فعال نشده."

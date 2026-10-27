@@ -8,24 +8,24 @@
 [ext_resource type="Script" path="res://scripts/scroll_safe_button.gd" id="6_safebtn"]
 
 [sub_resource type="StyleBoxFlat" id="SB_row"]
-bg_color = Color(0.055, 0.086, 0.133, 0.94)
+bg_color = Color(0.11, 0.105, 0.106, 0.94)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.114, 0.165, 0.235, 1)
+border_color = Color(0.2, 0.192, 0.194, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="SB_icon"]
-bg_color = Color(0.031, 0.055, 0.09, 1)
+bg_color = Color(0.072, 0.069, 0.07, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.153, 0.227, 0.325, 1)
+border_color = Color(0.276, 0.265, 0.268, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -68,14 +68,14 @@ content_margin_right = 6.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
-bg_color = Color(0.086, 0.125, 0.184, 1)
+bg_color = Color(0.155, 0.149, 0.151, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
-bg_color = Color(0.176, 0.553, 0.878, 1)
+bg_color = Color(0.85, 0.043, 0.075, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -206,7 +206,7 @@ theme_override_constants/separation = 3
 [node name="TitleLabel" type="Label" parent="Margin/Row/Info"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.91, 0.93, 0.96, 1)
+theme_override_colors/font_color = Color(0.963, 0.925, 0.934, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 17
 text = "—"
@@ -215,7 +215,7 @@ horizontal_alignment = 2
 [node name="DescLabel" type="Label" parent="Margin/Row/Info"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.42, 0.478, 0.557, 1)
+theme_override_colors/font_color = Color(0.524, 0.503, 0.508, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
 text = ""
@@ -242,7 +242,7 @@ show_percentage = false
 custom_minimum_size = Vector2(52, 0)
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_colors/font_color = Color(0.64, 0.615, 0.621, 1)
 theme_override_fonts/font = ExtResource("3_num")
 theme_override_font_sizes/font_size = 13
 text = "—"

@@ -28,10 +28,17 @@ static func open(host: Node, catalog: Array) -> void:
 	host.get_tree().root.add_child(sheet)
 	var col := sheet.build("دستاوردها  •  %s از %s" % [MenuUI.fa(unlocked), MenuUI.fa(catalog.size())], 700.0)
 
+	# E8/E15 «ویترینِ جام‌ها»: قفسه‌ای از مدال‌ها بالای لیست — بازشده‌ها طلایی و
+	# براق، بسته‌ها سیلوئتِ تیره با قفل (E12 تیزر). یک نگاه = کلکسیونِ من.
+	var view_h := host.get_viewport().get_visible_rect().size.y
+	var shelf_h := 0.0
+	if not catalog.is_empty():
+		col.add_child(_shelf(catalog, unlocked))
+		shelf_h = 118.0
+
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	var view_h := host.get_viewport().get_visible_rect().size.y
-	scroll.custom_minimum_size = Vector2(0, clampf(view_h - 200.0, 220.0, 520.0))
+	scroll.custom_minimum_size = Vector2(0, clampf(view_h - 200.0 - shelf_h, 150.0, 520.0))
 	col.add_child(scroll)
 	UIScroll.attach(scroll)
 
@@ -241,3 +248,110 @@ static func _new_tag() -> Control:
 	tag.add_theme_stylebox_override("panel", sb)
 	tag.add_child(MenuUI.label("جدید!", 13, Color(0.12, 0.08, 0.02)))
 	return tag
+
+
+# ------------------------------------------------------------ ویترین
+
+const PADLOCK := "res://assets/ui/psych/tease_padlock.png"
+const MEDAL := 60.0
+
+## قفسه: نوارِ پیشرفتِ کل + ردیفِ افقیِ مدال‌ها روی یک لبه‌ی فلزی
+static func _shelf(catalog: Array, unlocked: int) -> Control:
+	var box := VBoxContainer.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_theme_constant_override("separation", 6)
+
+	# C9 پیشرفتِ کلکسیون: «۲ از ۶» + نوارِ طلایی (از صفر شروع نمی‌شود)
+	var head := HBoxContainer.new()
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_theme_constant_override("separation", 10)
+	var bar := MenuUI.progress_bar(MenuUI.GOLD, 8)
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	bar.max_value = float(maxi(catalog.size(), 1))
+	bar.value = PsychProgress.bar_value(bar, unlocked, catalog.size())
+	head.add_child(bar)
+	var cap := MenuUI.label("ویترینِ جام‌های تو", 15, MenuUI.GOLD)
+	head.add_child(cap)
+	box.add_child(head)
+
+	var shelf := PanelContainer.new()
+	shelf.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := MenuUI.box(Color(0.05, 0.045, 0.045, 0.95), Color(0.3, 0.27, 0.22, 0.8), 1, 8)
+	sb.border_width_bottom = 4
+	sb.border_color = Color(0.42, 0.33, 0.16, 0.9)
+	sb.content_margin_left = 8
+	sb.content_margin_right = 8
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = 4
+	shelf.add_theme_stylebox_override("panel", sb)
+	box.add_child(shelf)
+
+	var scroll := ScrollContainer.new()
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.custom_minimum_size = Vector2(0, MEDAL + 10.0)
+	shelf.add_child(scroll)
+	UIScroll.attach(scroll)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 10)
+	row.alignment = BoxContainer.ALIGNMENT_END
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(row)
+
+	# بازشده‌ها اول (سمتِ راست، شروعِ خواندن)، بعد نزدیک‌ترین بسته‌ها
+	var done: Array = []
+	var locked: Array = []
+	for item in catalog:
+		if not (item is Dictionary):
+			continue
+		if bool(item.get("unlocked", false)):
+			done.append(item)
+		else:
+			locked.append(item)
+	locked.sort_custom(func(a, b) -> bool: return _ratio(a) > _ratio(b))
+	var ordered: Array = done + locked
+	ordered.reverse()  # HBox چپ‌به‌راست است؛ اولین مدال باید سمتِ راست باشد
+	var k := 0
+	for item in ordered:
+		var m := _medal(item, bool(item.get("unlocked", false)))
+		row.add_child(m)
+		# ورودِ پلکانیِ کوتاه (≤۲۵۰ms، ورودی را قفل نمی‌کند)
+		m.modulate.a = 0.0
+		var t := m.create_tween()
+		t.tween_interval(0.03 * float(ordered.size() - 1 - k))
+		t.tween_property(m, "modulate:a", 1.0, 0.2)
+		k += 1
+	return box
+
+
+## یک مدال: دایره‌ی طلاییِ براق با آیکنِ متریک، یا سیلوئتِ تیره با قفل
+static func _medal(item: Dictionary, done: bool) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(MEDAL, MEDAL)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var icon_tex := MenuUI.metric_icon(str(item.get("metric", "")))
+	c.draw.connect(func() -> void:
+		var ctr := c.size * 0.5
+		var r := minf(c.size.x, c.size.y) * 0.46
+		if done:
+			c.draw_circle(ctr + Vector2(0, 2), r, Color(0, 0, 0, 0.5))
+			c.draw_circle(ctr, r, MenuUI.GOLD_DEEP)
+			c.draw_circle(ctr, r * 0.86, MenuUI.GOLD)
+			c.draw_circle(ctr, r * 0.7, Color(0.55, 0.36, 0.06))
+			# براقیِ نیمه‌ی بالا
+			c.draw_arc(ctr, r * 0.78, PI * 1.1, PI * 1.9, 16, Color(1, 1, 1, 0.45), 2.0, true)
+		else:
+			c.draw_circle(ctr, r, Color(0.16, 0.16, 0.17))
+			c.draw_circle(ctr, r * 0.86, Color(0.09, 0.09, 0.1))
+			c.draw_arc(ctr, r, 0.0, TAU, 32, Color(0.32, 0.32, 0.35), 1.5, true))
+	var ic := MenuUI.icon(icon_tex, MEDAL * 0.44, Color(1.0, 0.92, 0.7) if done else Color(0.3, 0.3, 0.33))
+	ic.position = Vector2(MEDAL * 0.28, MEDAL * 0.28)
+	ic.size = Vector2(MEDAL * 0.44, MEDAL * 0.44)
+	c.add_child(ic)
+	if not done and ResourceLoader.exists(PADLOCK):
+		var lock := MenuUI.icon(load(PADLOCK), 24.0)
+		lock.position = Vector2(MEDAL - 24.0, MEDAL - 24.0)
+		lock.size = Vector2(24, 24)
+		c.add_child(lock)
+	return c

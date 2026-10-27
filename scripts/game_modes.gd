@@ -24,6 +24,8 @@ var _http: HTTPRequest = null
 var _list: HBoxContainer = null
 var _scroll: ScrollContainer = null
 var _status: Label = null
+## C12/شبکه: دکمه‌ی «تلاش دوباره» زیرِ پیامِ خطا — بدونِ آن صفحه بن‌بست بود
+var _retry: Button = null
 var _top_bar: Control = null
 var _content: MarginContainer = null
 var _help: Control = null           # پنجره‌ی راهنما، وقتی باز است
@@ -51,6 +53,8 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_safe_area)
 	_apply_safe_area()
 	_http = HTTPRequest.new()
+	# اینترنتِ موبایل گاهی جواب نمی‌دهد؛ بدونِ سقف، اسکلت تا ابد می‌تپید
+	_http.timeout = 10.0
 	add_child(_http)
 	_http.request_completed.connect(_on_modes_received)
 	_fetch()
@@ -184,6 +188,17 @@ func _build() -> void:
 	_status = _label("در حال گرفتن مودها…", 18, COL_DIM)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_status)
+	_retry = MenuUI.button("تلاش دوباره", "gold", 18)
+	_retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_retry.custom_minimum_size = Vector2(220, MenuUI.TOUCH_H)
+	_retry.hide()
+	_retry.pressed.connect(func() -> void:
+		_retry.hide()
+		_status.text = "در حال گرفتن مودها…"
+		_status.add_theme_color_override("font_color", COL_DIM)
+		_show_skeleton()
+		_fetch())
+	col.add_child(_retry)
 
 	# کارت‌ها کنارِ هم. اگر صفحه باریک بود (یا مودها بیشتر شدند) با کشیدنِ
 	# انگشت افقی جابه‌جا می‌شوند؛ اسکرول‌بار فقط جا می‌گیرد، پس مخفی است.
@@ -201,6 +216,50 @@ func _build() -> void:
 
 	col.add_child(_info_bar())
 	_build_toast()
+	_show_skeleton()
+
+
+## C12: تا رسیدنِ مودها جای کارت‌ها اسکلتِ تپنده است، نه صفحه‌ی خالی
+func _show_skeleton() -> void:
+	for c in _list.get_children():
+		c.queue_free()
+	for i in 4:
+		var sk := Panel.new()
+		sk.custom_minimum_size = Vector2(ModeCard.MIN_W, 0)
+		sk.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		sk.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		sk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.035, 0.04, 0.055, 0.96)
+		sb.set_corner_radius_all(10)
+		sb.set_border_width_all(1)
+		sb.border_color = Color(1, 1, 1, 0.08)
+		sk.add_theme_stylebox_override("panel", sb)
+		# جای تصویر و نشان و متن — همان چیدمانِ کارتِ واقعی
+		sk.draw.connect(func() -> void:
+			var w := sk.size.x
+			var h := sk.size.y
+			sk.draw_rect(Rect2(8, 8, w - 16, h * 0.5), Color(1, 1, 1, 0.05))
+			sk.draw_circle(Vector2(w * 0.5, h * 0.5), minf(w, h) * 0.13, Color(1, 1, 1, 0.07))
+			sk.draw_rect(Rect2(w * 0.2, h * 0.68, w * 0.6, 14), Color(1, 1, 1, 0.07))
+			sk.draw_rect(Rect2(w * 0.12, h * 0.76, w * 0.76, 9), Color(1, 1, 1, 0.05))
+			sk.draw_rect(Rect2(12, h - 52, w - 24, 38), Color(1, 1, 1, 0.05)))
+		_list.add_child(sk)
+		sk.modulate.a = 0.72
+		var tw := sk.create_tween().set_loops()
+		tw.tween_interval(float(i) * 0.12)
+		tw.tween_property(sk, "modulate:a", 1.0, 0.55).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(sk, "modulate:a", 0.72, 0.55).set_trans(Tween.TRANS_SINE)
+
+
+## خطای شبکه: اسکلت برداشته می‌شود، پیام + «تلاش دوباره»
+func _show_error(msg: String) -> void:
+	for c in _list.get_children():
+		c.queue_free()
+	_status.text = msg
+	_status.add_theme_color_override("font_color", COL_LOSE)
+	_status.show()
+	_retry.show()
 
 
 ## نوارِ بالای مشترکِ بازی (سکه، جم، پیام، دوستان، تنظیمات) را دوباره
@@ -580,7 +639,7 @@ func _fetch() -> void:
 		Global.SERVER_BASE, Global.my_username.uri_encode()]
 	var err := _http.request(url, Global.auth_headers())
 	if err != OK:
-		_status.text = "اتصال به سرور ممکن نشد"
+		_show_error("اتصال به سرور ممکن نشد")
 
 
 func _on_modes_received(_result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
@@ -590,11 +649,12 @@ func _on_modes_received(_result: int, code: int, _headers: PackedStringArray, bo
 		return
 
 	if code != 200:
-		_status.text = "مودهای بازی خوانده نشد — اینترنت را چک کن (کد %d)" % code
+		_show_error("مودهای بازی خوانده نشد — اینترنت را چک کن" if code == 0
+			else "مودهای بازی خوانده نشد (کد %d)" % code)
 		return
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if typeof(data) != TYPE_DICTIONARY:
-		_status.text = "پاسخ سرور خوانده نشد"
+		_show_error("پاسخ سرور خوانده نشد")
 		return
 
 	_modes = data.get("modes", [])
@@ -614,11 +674,14 @@ func _on_modes_received(_result: int, code: int, _headers: PackedStringArray, bo
 	Global.rank_id = str(data.get("rank_id", Global.rank_id))
 	_apply_theme_background()
 	_status.hide()
+	_retry.hide()
 	_rebuild_list(true)
 
 
 func _rebuild_list(intro := false) -> void:
+	# همان فریم بیرون کشیده می‌شوند تا اسکلت‌ها یک فریم کنارِ کارت‌ها جا نگیرند
 	for c in _list.get_children():
+		_list.remove_child(c)
 		c.queue_free()
 
 	var idx := 0

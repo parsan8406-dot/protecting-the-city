@@ -125,6 +125,12 @@ var _ping_label: Label = null
 var _tip_label: Label = null
 var _tip_icon: TextureRect = null
 var _search_text: Label = null
+## C12/C9: نوارِ باریکِ «تکمیلِ تیم» زیرِ متنِ وضعیت — تا bots_at ثانیه‌ی سرور
+var _team_bar: Control = null
+var _team_ratio := 0.0
+var _bots_at := 20.0
+var _server_waited := -1.0
+var _waited_sync := 0.0
 var _spinner: Control = null
 var _action_button: Button = null
 var _slots: Array[Slot] = []
@@ -186,6 +192,12 @@ func _process(delta: float) -> void:
 		return
 
 	_elapsed += delta
+	if _team_bar != null:
+		var waited := _elapsed if _server_waited < 0.0 else _server_waited + (_elapsed - _waited_sync)
+		var r := clampf(waited / maxf(_bots_at, 1.0), 0.0, 1.0)
+		if absf(r - _team_ratio) > 0.002:
+			_team_ratio = r
+			_team_bar.queue_redraw()
 	var t := _fmt_time(_elapsed)
 	_timer_label.text = t
 	_elapsed_value.text = t
@@ -537,15 +549,21 @@ func _divider() -> Control:
 
 ## نوارِ «در حال جستجو…» زیرِ دایره. دکمه نیست — فقط نشانگرِ وضعیت، پس
 ## لمس هم نمی‌گیرد تا کسی خیال نکند کاری انجام می‌دهد.
+## V9: قبلاً قابِ درخشانِ ضخیم داشت و از دکمه‌ی واقعیِ «لغو» دکمه‌تر دیده
+## می‌شد؛ حالا تخت و بی‌قاب است و زیرش نوارِ پیشرفتِ «تکمیلِ تیم» می‌آید.
 func _build_search_bar() -> Control:
-	var bar := _panel(Color(0.03, 0.09, 0.18, 0.92), COL_HOLO, 14)
+	var bar := _panel(Color(0.0, 0.0, 0.0, 0.0), Color(0, 0, 0, 0), 14)
 	var sb := bar.get_theme_stylebox("panel") as StyleBoxFlat
-	sb.set_border_width_all(2)
-	sb.shadow_color = Color(COL_HOLO, 0.35)
-	sb.shadow_size = 10
+	sb.set_border_width_all(0)
+	sb.content_margin_top = 2.0
+	sb.content_margin_bottom = 2.0
 	bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	bar.custom_minimum_size = Vector2(320, 62)
+	bar.custom_minimum_size = Vector2(320, 0)
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var stack := VBoxContainer.new()
+	stack.add_theme_constant_override("separation", 6)
+	stack.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(stack)
 
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -565,9 +583,23 @@ func _build_search_bar() -> Control:
 	)
 	holder.add_child(_spinner)
 	row.add_child(holder)
-	_search_text = _label("در حال جستجو...", 24, COL_TEXT)
+	_search_text = _label("در حال جستجو...", 22, COL_TEXT)
 	row.add_child(_search_text)
-	bar.add_child(row)
+	stack.add_child(row)
+
+	# راست‌به‌چپ پر می‌شود؛ رنگِ رادار، و طلایی وقتی مسابقه جور شد
+	_team_bar = Control.new()
+	_team_bar.custom_minimum_size = Vector2(300, 6)
+	_team_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_team_bar.draw.connect(func() -> void:
+		var w := _team_bar.size.x
+		var h := _team_bar.size.y
+		_team_bar.draw_rect(Rect2(0, 0, w, h), Color(1, 1, 1, 0.08))
+		var fw := w * clampf(_team_ratio, 0.0, 1.0)
+		if fw > 0.5:
+			var col := COL_GOLD if _state == "ready" else COL_HOLO_HI
+			_team_bar.draw_rect(Rect2(w - fw, 0, fw, h), col))
+	stack.add_child(_team_bar)
 	return bar
 
 
@@ -1191,6 +1223,9 @@ func _on_status(result: int, code: int, _h: PackedStringArray, body: PackedByteA
 		# کنارت می‌نشاند و سرِ ۲۰ ثانیه صندلی‌های خالی را با بات پر می‌کند.
 		# لیست فقط کسانی است که واقعاً با تو می‌افتند (سرورِ جدید)، پس اگر
 		# آدمی پیدا شده نباید بگوییم «هم‌سطحی پیدا نشد».
+		_bots_at = maxf(float(d.get("bots_at", 20)), 1.0)
+		_server_waited = float(d.get("waited", 0))
+		_waited_sync = _elapsed
 		var others := maxi(roster.size() - 1, 0)
 		var left := maxi(int(d.get("bots_at", 20)) - int(d.get("waited", 0)), 0)
 		if str(d.get("phase", "human")) == "bots":
@@ -1230,6 +1265,9 @@ func _on_match_ready(match_data: Dictionary) -> void:
 	_search_text.text = "حریف پیدا شد!"
 	_search_text.add_theme_color_override("font_color", COL_GOLD)
 	_spinner.visible = false
+	_team_ratio = 1.0
+	if _team_bar != null:
+		_team_bar.queue_redraw()
 	_tint_ring(COL_GOLD)
 	# دیگر راهِ برگشتی نیست؛ دکمه نباید «لغو» بماند
 	_set_action("در حال ورود...", COL_GOLD)
@@ -1273,6 +1311,10 @@ func _show_dropped(reason: String) -> void:
 	_search_text.text = "جستجو متوقف شد"
 	_search_text.add_theme_color_override("font_color", COL_DIM)
 	_spinner.visible = false
+	_team_ratio = 0.0
+	_server_waited = -1.0
+	if _team_bar != null:
+		_team_bar.queue_redraw()
 	_set_action("جستجوی دوباره", COL_GOLD)
 	_action_button.disabled = false
 
@@ -1286,6 +1328,8 @@ func _start_search() -> void:
 	_search_text.text = "در حال جستجو..."
 	_search_text.add_theme_color_override("font_color", COL_TEXT)
 	_spinner.visible = true
+	_team_ratio = 0.0
+	_server_waited = -1.0
 	_tint_ring(COL_HOLO)
 	_set_action("لغو جستجو", COL_FOE)
 	_action_button.disabled = false

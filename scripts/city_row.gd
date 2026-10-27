@@ -22,11 +22,12 @@ func get_data() -> Dictionary:
 	return _data
 
 ## `position_in_list` جایگاه در رتبه‌بندی (۱ = بهترین)
-func setup(data: Dictionary, position_in_list: int, request_pending: bool) -> void:
+## `suggested` = C2 پیشنهادِ هوشمندِ city.gd (شلوغ‌ترین شهری که الان می‌شود مستقیم عضوش شد)
+func setup(data: Dictionary, position_in_list: int, request_pending: bool, suggested: bool = false) -> void:
 	_data = data
 	clan_id = str(data.get("clan_id", ""))
 	custom_minimum_size = Vector2(0, 68)
-	apply_row_style(false)
+	apply_row_style(suggested)
 
 	for child in get_children():
 		child.queue_free()
@@ -75,7 +76,18 @@ func setup(data: Dictionary, position_in_list: int, request_pending: bool) -> vo
 
 	var tag := str(data.get("tag", ""))
 	if not tag.is_empty():
-		name_row.add_child(CityUI.label("[%s]" % tag, 15, CityUI.BLUE, true))
+		name_row.add_child(CityUI.label("[%s]" % tag, 15, CityUI.MUTED, true))
+	if suggested:
+		# V5 یک برچسبِ طلایی، فقط روی یک ردیف
+		var chip := PanelContainer.new()
+		chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var st := CityUI.box(Color(0.32, 0.22, 0.03, 0.95), CityUI.GOLD, 1, 10)
+		st.content_margin_left = 8
+		st.content_margin_right = 8
+		chip.add_theme_stylebox_override("panel", st)
+		chip.add_child(CityUI.label("پیشنهاد برای تو", 12, CityUI.GOLD))
+		name_row.add_child(chip)
 
 	var desc := str(data.get("description", "")).strip_edges()
 	var desc_label := CityUI.label(desc if not desc.is_empty() else "بدون شعار",
@@ -119,12 +131,18 @@ func setup(data: Dictionary, position_in_list: int, request_pending: bool) -> vo
 	var is_public := bool(data.get("is_public", true))
 	var status_text := "عمومی"
 	var status_color := CityUI.GREEN
+	# C8/C11 شرطِ ورود همین‌جا روشن است: سطحِ لازم اگر از سطحِ من بیشتر است
+	var need := int(data.get("min_level", 0))
 	if request_pending:
 		status_text = "در انتظار"
 		status_color = CityUI.BLUE
 	elif bool(data.get("is_full", false)):
 		status_text = "تکمیل"
 		status_color = CityUI.RED
+	elif need > int(Global.level):
+		status_text = "سطح %s+" % CityUI.fa(need)
+		status_color = CityUI.MUTED
+		status_box.add_child(CityUI.icon(ICON_LOCK, 14, CityUI.MUTED))
 	elif not is_public:
 		status_text = "خصوصی"
 		status_color = CityUI.GOLD

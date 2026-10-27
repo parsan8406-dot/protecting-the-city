@@ -1,10 +1,12 @@
 extends Control
 ## کارت یک آیتم (کاراکتر یا سلاح) توی صفحه‌ی انتخاب.
 ##
-## سه حالت دارد:
-##   equipped — همین الان تجهیز شده: قاب طلایی نفس‌کش + چیپ «انتخاب شده»
-##   owned    — خریده شده ولی تجهیز نیست: رنگی و قابل انتخاب
-##   locked   — خریده نشده: خاکستری، تیره، غیرفعال (فقط پیام «قفل» می‌دهد)
+## سه حالت دارد (V1/V2: هر حالت هم رنگ دارد هم شکل، نه فقط رنگ):
+##   equipped — همین الان تجهیز شده: قاب طلایی نفس‌کش + نشانِ تیکِ گوشه + چیپ «مجهز»
+##   owned    — خریده شده ولی تجهیز نیست: رنگی و قابل انتخاب (چیپ سطح/«انتخاب»)
+##   locked   — خریده نشده: سیلوئتِ خاکستری + قفل + شرطِ باز شدن (E12)
+## به‌علاوه‌ی «در حال دیدن» (previewing): قابِ سفیدِ بیرونی روی کارتی که
+## همین الان در پنل بزرگ نشان داده می‌شود ولی مجهز نیست.
 ##
 ## انیمیشن لمس عمداً «تیز» است نه کِش‌دار: یک فرو رفتن کوتاه، یک جهش کوتاه با
 ## نور مورب که از روی کارت رد می‌شود و یک حلقه‌ی طلایی که بیرون می‌زند و محو
@@ -90,7 +92,12 @@ var _glow_tween: Tween
 
 var _touch_start := Vector2.ZERO
 var _is_swiping := false
-var _parent_scroll: ScrollContainer = null
+var _touch_down := false
+## C11/E8: متنِ چیپِ کارتِ «مال تو» (مثلاً «سطح ۲/۵») — خالی = «انتخاب»
+var owned_text := ""
+var previewing := false
+var _preview_ring: Panel
+var _check_badge: Control
 
 
 func _ready() -> void:
@@ -104,11 +111,11 @@ func _ready() -> void:
 	_build_dim_overlay()
 	_build_sweep_layer()
 	_build_pulse_ring()
+	_build_preview_ring()
+	_build_check_badge()
 
 	if not gui_input.is_connected(_on_gui_input):
 		gui_input.connect(_on_gui_input)
-
-	call_deferred("_find_parent_scroll")
 
 
 # -----------------------------------------------------------------------------
@@ -190,14 +197,54 @@ func _build_pulse_ring() -> void:
 	add_child(_pulse_ring)
 
 
+## قابِ «در حال دیدن»: کمی بیرون از کارت، سفیدِ گرم — با طلاییِ «مجهز» قاطی نشود
+func _build_preview_ring() -> void:
+	var ring_style := StyleBoxFlat.new()
+	ring_style.draw_center = false
+	ring_style.set_border_width_all(3)
+	ring_style.border_color = Color(1.0, 0.97, 0.9, 0.95)
+	ring_style.set_corner_radius_all(19)
+	_preview_ring = Panel.new()
+	_preview_ring.name = "PreviewRing"
+	_preview_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_preview_ring.add_theme_stylebox_override("panel", ring_style)
+	_preview_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_preview_ring.offset_left = -4.0
+	_preview_ring.offset_top = -4.0
+	_preview_ring.offset_right = 4.0
+	_preview_ring.offset_bottom = 4.0
+	_preview_ring.visible = false
+	add_child(_preview_ring)
+
+
+## V2: «مجهز» با شکل هم دیده شود (برای کوررنگ‌ها) — دایره‌ی طلایی با تیک
+func _build_check_badge() -> void:
+	_check_badge = _CheckBadge.new()
+	_check_badge.name = "CheckBadge"
+	add_child(_check_badge)
+	_check_badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_check_badge.offset_left = -34.0
+	_check_badge.offset_right = -6.0
+	_check_badge.offset_top = 6.0
+	_check_badge.offset_bottom = 34.0
+	_check_badge.visible = false
+
+
+func set_previewing(on: bool) -> void:
+	previewing = on
+	if _preview_ring:
+		_preview_ring.visible = on and state != STATE_EQUIPPED
+
+
 # -----------------------------------------------------------------------------
 # پر کردن کارت
 # -----------------------------------------------------------------------------
 
-func setup(data: Dictionary, card_state: String, texture: Texture2D, unlock := "") -> void:
+func setup(data: Dictionary, card_state: String, texture: Texture2D, unlock := "", owned_chip := "") -> void:
 	item_data = data
 	state = card_state
 	unlock_text = unlock
+	owned_text = owned_chip
 
 	if item_image:
 		item_image.texture = texture
@@ -246,6 +293,9 @@ func _apply_state(style: Dictionary) -> void:
 
 	_apply_chip(locked, equipped)
 	_set_equipped_glow(equipped)
+	if _check_badge:
+		_check_badge.visible = equipped
+	set_previewing(previewing)
 
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if locked else Control.CURSOR_POINTING_HAND
 
@@ -288,12 +338,12 @@ func _apply_chip(locked: bool, equipped: bool) -> void:
 		_chip_style.bg_color = Color(0, 0, 0, 0.72)
 		_chip_style.border_color = LOCK_GRAY
 	elif equipped:
-		status_label.text = "انتخاب شده"
+		status_label.text = "مجهز"
 		status_label.add_theme_color_override("font_color", Color("101010"))
 		_chip_style.bg_color = GOLD
 		_chip_style.border_color = GOLD
 	else:
-		status_label.text = "انتخاب"
+		status_label.text = owned_text if owned_text != "" else "انتخاب"
 		status_label.add_theme_color_override("font_color", GOLD)
 		_chip_style.bg_color = Color(0.12, 0.02, 0.03, 0.85)
 		_chip_style.border_color = GOLD_DIM
@@ -355,59 +405,44 @@ func _to_gray(color: Color) -> Color:
 # ورودی: تفکیک تپ از اسکرول (روی موبایل کل گرید با انگشت بالا/پایین می‌رود)
 # -----------------------------------------------------------------------------
 
+## فقط تاچ خوانده می‌شود (روی PC هم emulate_touch_from_mouse روشن است)؛
+## رویدادهای ماوسِ شبیه‌سازی‌شده دست‌نخورده به ScrollContainer می‌رسند تا
+## خودش با کشیدنِ انگشت اسکرول کند. قبلاً هر لمس دو بار (تاچ + ماوس) حساب
+## می‌شد و کارت خودش هم دستی اسکرول می‌کرد — اسکرول دو برابر و انتخاب دوبل.
 func _on_gui_input(event: InputEvent) -> void:
-	var pos: Vector2 = global_position + event.position if "position" in event else Vector2.ZERO
-
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventScreenTouch:
+		var pos: Vector2 = global_position + event.position
 		if event.pressed:
 			_begin_touch(pos)
-		elif not _is_swiping:
+		elif _touch_down and not _is_swiping:
+			_touch_down = false
 			_end_touch()
-
-	elif event is InputEventScreenTouch:
-		if event.pressed:
-			_begin_touch(pos)
-		elif not _is_swiping:
-			_end_touch()
-
-	elif event is InputEventScreenDrag:
-		_handle_drag(pos, event.relative)
-
-	elif event is InputEventMouseMotion and (event.button_mask & MOUSE_BUTTON_MASK_LEFT):
-		_handle_drag(pos, event.relative)
+		else:
+			_touch_down = false
+	elif event is InputEventScreenDrag and _touch_down:
+		_handle_drag(global_position + event.position)
 
 
 func _begin_touch(pos: Vector2) -> void:
 	_touch_start = pos
 	_is_swiping = false
-	if state != STATE_LOCKED:
-		_animate_press_down()
+	_touch_down = true
+	_animate_press_down()
 
 
 func _end_touch() -> void:
 	if state == STATE_LOCKED:
-		_animate_reject()
+		_animate_tease()
 		locked_tapped.emit(item_data)
 		return
 	_animate_select()
 	card_selected.emit(item_data)
 
 
-func _handle_drag(pos: Vector2, relative: Vector2) -> void:
+func _handle_drag(pos: Vector2) -> void:
 	if pos.distance_to(_touch_start) > DRAG_THRESHOLD and not _is_swiping:
 		_is_swiping = true
 		_animate_press_release()
-	if _is_swiping and _parent_scroll:
-		_parent_scroll.scroll_vertical -= int(relative.y)
-
-
-func _find_parent_scroll() -> void:
-	var current: Node = get_parent()
-	while current:
-		if current is ScrollContainer:
-			_parent_scroll = current as ScrollContainer
-			return
-		current = current.get_parent()
 
 
 # -----------------------------------------------------------------------------
@@ -483,18 +518,35 @@ func _play_pulse_ring() -> void:
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
-## تپ روی کارت قفل: یک «نه» کوتاه و قاطع، بدون لرزش طولانی
-func _animate_reject() -> void:
-	LocalSettings.vibrate(25)
-
+## E12: تپ روی کارت قفل «خطا» نیست، کنجکاوی است — پیش‌نمایش باز می‌شود.
+## پس به‌جای لرزش و فلشِ قرمز، یک برگشتِ نرم و تکانِ کوچکِ قفل.
+func _animate_tease() -> void:
+	LocalSettings.vibrate(12)
 	_kill_press_tween()
-	var base_x := position.x
 	_press_tween = create_tween()
-	_press_tween.tween_property(self, "position:x", base_x - 7.0, 0.05).set_trans(Tween.TRANS_SINE)
-	_press_tween.tween_property(self, "position:x", base_x + 7.0, 0.07).set_trans(Tween.TRANS_SINE)
-	_press_tween.tween_property(self, "position:x", base_x, 0.07).set_trans(Tween.TRANS_SINE)
+	_press_tween.tween_property(self, "scale", Vector2.ONE, 0.2) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if _padlock and _padlock.visible:
+		_padlock.pivot_offset = _padlock.size * Vector2(0.5, 0.2)
+		var wig := create_tween()
+		wig.tween_property(_padlock, "rotation", 0.22, 0.06).set_trans(Tween.TRANS_SINE)
+		wig.tween_property(_padlock, "rotation", -0.16, 0.09).set_trans(Tween.TRANS_SINE)
+		wig.tween_property(_padlock, "rotation", 0.0, 0.12).set_trans(Tween.TRANS_SINE)
 
-	if _frame_style:
-		var flash := create_tween()
-		flash.tween_property(_frame_style, "border_color", Color("d33b3b"), 0.06)
-		flash.tween_property(_frame_style, "border_color", LOCK_GRAY, 0.24)
+
+## دایره‌ی طلایی با تیکِ تیره — نشانِ «مجهز»
+class _CheckBadge extends Control:
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var r := minf(size.x, size.y) * 0.5
+		var c := size * 0.5
+		draw_circle(c + Vector2(0, 1.5), r, Color(0, 0, 0, 0.45))
+		draw_circle(c, r, Color("ffc93c"))
+		draw_arc(c, r - 1.0, 0.0, TAU, 32, Color("fff1c2"), 1.5, true)
+		var pts := PackedVector2Array([
+			c + Vector2(-r * 0.45, 0.0),
+			c + Vector2(-r * 0.12, r * 0.34),
+			c + Vector2(r * 0.48, -r * 0.32)])
+		draw_polyline(pts, Color("1a1206"), maxf(2.5, r * 0.22), true)

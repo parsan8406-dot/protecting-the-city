@@ -1,19 +1,20 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/season_challenge_row.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://dnd6ludlpgkcf" path="res://fonts/SJADIDBD.TTF" id="2_font"]
 [ext_resource type="FontFile" uid="uid://br8u0x5sfmub" path="res://fonts/Lalezar-Regular.ttf" id="3_num"]
 [ext_resource type="Texture2D" path="res://assets/ui/coin_icon.png" id="4_coin"]
+[ext_resource type="Script" path="res://scripts/scroll_safe_button.gd" id="5_safebtn"]
 
 [sub_resource type="StyleBoxFlat" id="SB_bar_bg"]
-bg_color = Color(0.086, 0.125, 0.184, 1)
+bg_color = Color(0.155, 0.149, 0.151, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxFlat" id="SB_bar_fill"]
-bg_color = Color(0.176, 0.553, 0.878, 1)
+bg_color = Color(0.85, 0.043, 0.075, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -30,16 +31,17 @@ theme_override_constants/separation = 10
 script = ExtResource("1_script")
 
 [node name="ActionButton" type="Button" parent="."]
-custom_minimum_size = Vector2(78, 30)
+custom_minimum_size = Vector2(96, 44)
 layout_mode = 2
 size_flags_vertical = 4
 focus_mode = 0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_disabled_color = Color(0.35, 0.4, 0.47, 1)
+theme_override_colors/font_disabled_color = Color(0.44, 0.423, 0.427, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/focus = SubResource("SB_focus")
 text = "رفتن"
+script = ExtResource("5_safebtn")
 
 [node name="Reward" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(58, 0)
@@ -71,7 +73,7 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(48, 0)
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.54, 0.59, 0.67, 1)
+theme_override_colors/font_color = Color(0.64, 0.615, 0.621, 1)
 theme_override_fonts/font = ExtResource("3_num")
 theme_override_font_sizes/font_size = 13
 text = "—"
@@ -87,7 +89,7 @@ theme_override_constants/separation = 4
 [node name="TitleLabel" type="Label" parent="Info"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.88, 0.92, 0.96, 1)
+theme_override_colors/font_color = Color(0.955, 0.918, 0.927, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "—"

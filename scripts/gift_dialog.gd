@@ -41,6 +41,12 @@ const XP_MAX := 15
 var _friend_id: String = ""
 var _http: HTTPRequest
 var _sending := false
+var _closing := false
+## C13 جم زیاد قبل از ارسال یک بار تأیید می‌خواهد (جم با پول واقعی خریده می‌شود)
+const GEM_CONFIRM_AT := 50
+## C2 مقدارهای پیشنهادی سکه — یک لمس به‌جای تایپ
+const QUICK_COINS := [100, 500, 1000]
+var _quick_buttons: Array[Button] = []
 
 func _ready() -> void:
 	_http = HTTPRequest.new()
@@ -68,6 +74,12 @@ func _ready() -> void:
 	for button: Button in [_send_button, _cancel_button, _coin_max_button, _gem_max_button]:
 		button.button_down.connect(_press_visual.bind(button, true))
 		button.button_up.connect(_press_visual.bind(button, false))
+	_build_quick_row()
+	# CLAUDE.md حداقل ناحیه‌ی لمس ~۴۸dp (دکمه‌های صحنه ۳۴ پیکسل بودند)
+	for button: Button in [_send_button, _cancel_button, _coin_max_button, _gem_max_button]:
+		button.custom_minimum_size.y = maxf(button.custom_minimum_size.y, MenuUI.TOUCH_H)
+	for edit: LineEdit in [_coin_edit, _gem_edit]:
+		edit.custom_minimum_size.y = maxf(edit.custom_minimum_size.y, MenuUI.TOUCH_H)
 
 func open(friend_id: String, friend_username: String) -> void:
 	_friend_id = friend_id
@@ -77,7 +89,8 @@ func open(friend_id: String, friend_username: String) -> void:
 	_gem_edit.text = ""
 	# E10 عمل متقابل: هدیه با پیام به صندوق دوست می‌رسد
 	_title_label.text = "هدیه‌ی امروز برای %s" % friend_username
-	_balance_label.text = "موجودی تو : %d سکه  |  %d جم" % [Global.coins, Global.gems]
+	# V10 ارقام فارسی مثل بقیه‌ی منو
+	_balance_label.text = "موجودی تو : %s سکه  |  %s جم" % [MenuUI.fa_grouped(Global.coins), MenuUI.fa_grouped(Global.gems)]
 	_refresh_preview()
 
 	visible = true
@@ -94,6 +107,9 @@ func open(friend_id: String, friend_username: String) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func close() -> void:
+	if _closing:
+		return
+	_closing = true
 	_hide_keyboard()
 	var t := create_tween()
 	t.set_parallel(true)
@@ -164,8 +180,11 @@ func _refresh_preview() -> void:
 	var empty := coins == 0 and gems == 0
 
 	_send_button.disabled = _sending or empty
-	_xp_label.text = "هدیه‌ای انتخاب نشده" if empty \
-		else "به صندوق پیام دوستت می‌رسد — تو هم %d تجربه می‌گیری" % _preview_xp(coins, gems)
+	_xp_label.text = "یک مقدار انتخاب کن" if empty \
+		else "به صندوق پیام دوستت می‌رسد — تو هم %s تجربه می‌گیری" % MenuUI.fa(_preview_xp(coins, gems))
+	for b in _quick_buttons:
+		MenuUI.style_button(b, "gold" if int(b.get_meta("amount", 0)) == coins else "dark")
+		b.disabled = int(b.get_meta("amount", 0)) > Global.coins
 
 # ------------------------------------------------------------------ ارسال
 
@@ -182,7 +201,20 @@ func _on_send_pressed() -> void:
 	if coins > Global.coins or gems > Global.gems:
 		show_error("موجودی کافی نداری")
 		return
+	if gems >= GEM_CONFIRM_AT:
+		_sending = true
+		_send_button.disabled = true
+		MenuUI.confirm(self, "ارسال جم", "%s جم برای دوستت فرستاده می‌شود و برنمی‌گردد. مطمئنی؟" % MenuUI.fa_grouped(gems),
+			"بفرست", func(ok: bool) -> void:
+				_sending = false
+				if ok:
+					_do_send(coins, gems)
+				else:
+					_refresh_preview())
+		return
+	_do_send(coins, gems)
 
+func _do_send(coins: int, gems: int) -> void:
 	_sending = true
 	_send_button.disabled = true
 	_hide_keyboard()
@@ -229,15 +261,20 @@ func _hide_keyboard() -> void:
 		DisplayServer.virtual_keyboard_hide()
 
 func _on_cancel_pressed() -> void:
+	if _closing:
+		return
 	UIFx.press(_cancel_button)
 	cancelled.emit()
 	close()
 
+## فقط تاچ — ماوسِ شبیه‌سازی‌شده همان لمس را دوباره می‌فرستاد و دو بار لغو می‌شد
 func _on_dim_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and event.pressed:
 		_on_cancel_pressed()
-	elif event is InputEventMouseButton and event.pressed:
-		_on_cancel_pressed()
+
+## Back اندروید از profile_menu همین را صدا می‌زند
+func dismiss() -> void:
+	_on_cancel_pressed()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -251,3 +288,21 @@ func _press_visual(button: Button, down: bool) -> void:
 	var target := Vector2(0.96, 0.96) if down else Vector2.ONE
 	create_tween().tween_property(button, "scale", target, 0.10) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+## ردیف مقدارهای پیشنهادی زیر سکه (C2)
+func _build_quick_row() -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	for amount in QUICK_COINS:
+		var b := MenuUI.button("%s سکه" % MenuUI.fa_grouped(amount), "dark", 15)
+		b.custom_minimum_size = Vector2(0, 44)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.set_meta("amount", amount)
+		b.pressed.connect(func() -> void:
+			_coin_edit.text = str(mini(amount, Global.coins))
+			_on_amount_changed(""))
+		row.add_child(b)
+		_quick_buttons.append(b)
+	var coin_row := _coin_edit.get_parent()
+	coin_row.get_parent().add_child(row)
+	coin_row.get_parent().move_child(row, coin_row.get_index() + 1)

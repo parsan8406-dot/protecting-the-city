@@ -15,8 +15,9 @@ const FA_DIGITS := ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"]
 
 const COLOR_IDLE := Color(0.78, 0.78, 0.80, 1.0)
 const COLOR_HOT := Color(1.0, 1.0, 1.0, 1.0)
-const COLOR_RED := Color(0.85, 0.043, 0.075, 1.0)
-const COLOR_RED_HOT := Color(1.0, 0.22, 0.26, 1.0)
+## V1 قرمز فقط برای خطر است؛ مقدارِ انتخاب‌شده طلایی (هم‌رنگ دکمه‌ی کیفیتِ انتخابی)
+const COLOR_RED := Color(0.85, 0.64, 0.2, 1.0)
+const COLOR_RED_HOT := Color(1.0, 0.86, 0.42, 1.0)
 
 @onready var _slider: HSlider = $Row/Slider
 @onready var _value_label: Label = $Row/ValueLabel

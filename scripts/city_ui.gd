@@ -1,6 +1,7 @@
 class_name CityUI
 extends RefCounted
-## ظاهر مشترک صفحه‌ی «شهر» (کلن) و دیالوگ‌هایش — همان پالت آبی صفحه‌ی رنک.
+## ظاهر مشترک صفحه‌ی «شهر» (کلن) و دیالوگ‌هایش — پالت سیاه/قرمز/طلایی MenuUI
+## (round 3: قبلاً آبی بود). طلایی = ارزش و کار اصلی، قرمز = خطر، بقیه خنثی.
 ##
 ## نکته: این «شهر» همان کلن بازیکن‌هاست و هیچ ربطی به مود بازی
 ## «عملیات امتیاز شهر» (citypoint) ندارد؛ برای همین هیچ‌جا از آرت آن مود
@@ -12,32 +13,36 @@ const FONT := preload("res://fonts/SJADIDBD.TTF")
 ## اعداد با Lalezar — ارقام SJADIDBD هم‌تراز نمی‌شوند
 const FONT_NUM := preload("res://fonts/Lalezar-Regular.ttf")
 
-const TEXT := Color(0.9, 0.93, 1.0, 1.0)
-const MUTED := Color(0.68, 0.74, 0.84, 1.0)
-const GOLD := Color(0.97, 0.78, 0.3, 1.0)
-const BLUE := Color(0.3, 0.6, 1.0, 1.0)
+const TEXT := Color(0.96, 0.96, 0.97, 1.0)
+const MUTED := Color(0.62, 0.62, 0.66, 1.0)
+const GOLD := Color(1.0, 0.8, 0.26, 1.0)
+## نام قدیمی ماند تا کدهای قبلی نشکنند؛ رنگِ تأکید حالا طلایی کم‌رنگ است (V2)
+const BLUE := Color(1.0, 0.86, 0.5, 1.0)
 const GREEN := Color(0.35, 0.86, 0.45, 1.0)
 const RED := Color(1.0, 0.36, 0.33, 1.0)
 
-const PANEL_BG := Color(0.02, 0.04, 0.08, 0.82)
-const PANEL_BORDER := Color(0.22, 0.36, 0.58, 0.8)
+const PANEL_BG := Color(0.055, 0.055, 0.062, 0.88)
+const PANEL_BORDER := Color(0.26, 0.26, 0.29, 0.85)
 
 ## حداقل ارتفاع دکمه‌های لمسی (~۴۸dp)
-const TOUCH_H := 48.0
+const TOUCH_H := 50.0
 
 ## نوع دکمه → (زمینه، حاشیه)
 const BUTTON_KINDS := {
-	"primary": [Color(0.05, 0.2, 0.46, 0.96), Color(0.3, 0.65, 1.0, 1.0)],
+	# V5 کارِ اصلی طلایی (مثل MenuUI)، خطر قرمز، بقیه خاکستریِ آرام
+	"primary": [Color(0.32, 0.22, 0.03, 0.98), Color(1.0, 0.8, 0.26, 1.0)],
 	"danger": [Color(0.42, 0.05, 0.05, 0.96), Color(1.0, 0.36, 0.3, 1.0)],
-	"gold": [Color(0.3, 0.2, 0.03, 0.96), Color(0.97, 0.78, 0.3, 1.0)],
-	"ghost": [Color(0.03, 0.06, 0.12, 0.92), Color(0.3, 0.42, 0.6, 0.8)],
+	"gold": [Color(0.32, 0.22, 0.03, 0.98), Color(1.0, 0.8, 0.26, 1.0)],
+	"ghost": [Color(0.09, 0.09, 0.1, 0.92), Color(0.34, 0.34, 0.38, 0.85)],
+	# خطرِ آرام: «ترک شهر» دیده شود ولی چشم را از کار اصلی ندزدد (V5/C13)
+	"danger_quiet": [Color(0.09, 0.05, 0.05, 0.92), Color(0.7, 0.2, 0.2, 0.75)],
 }
 
 const ROLE_LABELS := {"leader": "رهبر", "officer": "معاون", "member": "عضو"}
 const ROLE_COLORS := {
 	"leader": Color(0.97, 0.78, 0.3, 1.0),
-	"officer": Color(0.62, 0.8, 1.0, 1.0),
-	"member": Color(0.72, 0.76, 0.84, 1.0),
+	"officer": Color(0.84, 0.86, 0.9, 1.0),
+	"member": Color(0.66, 0.66, 0.7, 1.0),
 }
 
 const ICON_CROWN := preload("res://assets/icons/missions/icon_crown.svg")
@@ -101,7 +106,7 @@ static func style_button(b: Button, kind: String) -> void:
 	var pressed := box(bg.lightened(0.18), border.lightened(0.25), 2, 8)
 	pressed.content_margin_left = 16
 	pressed.content_margin_right = 16
-	var disabled := box(Color(0.06, 0.08, 0.12, 0.9), Color(0.25, 0.3, 0.38, 0.7), 1, 8)
+	var disabled := box(Color(0.1, 0.1, 0.11, 0.9), Color(0.26, 0.26, 0.3, 0.7), 1, 8)
 	disabled.content_margin_left = 16
 	disabled.content_margin_right = 16
 	b.add_theme_stylebox_override("normal", normal)
@@ -110,8 +115,11 @@ static func style_button(b: Button, kind: String) -> void:
 	b.add_theme_stylebox_override("hover_pressed", pressed)
 	b.add_theme_stylebox_override("disabled", disabled)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	b.add_theme_color_override("font_color", TEXT)
-	b.add_theme_color_override("font_hover_color", TEXT)
+	var fg := Color(1.0, 0.92, 0.7, 1.0) if kind == "primary" or kind == "gold" else TEXT
+	if kind == "danger_quiet":
+		fg = Color(1.0, 0.55, 0.5, 1.0)
+	b.add_theme_color_override("font_color", fg)
+	b.add_theme_color_override("font_hover_color", fg)
 	b.add_theme_color_override("font_pressed_color", Color.WHITE)
 	b.add_theme_color_override("font_disabled_color", MUTED.darkened(0.2))
 
@@ -129,7 +137,7 @@ static func line_edit(placeholder: String) -> LineEdit:
 	return e
 
 static func style_input(control: Control) -> void:
-	var normal := box(Color(0.02, 0.05, 0.1, 0.95), Color(0.22, 0.36, 0.58, 0.9), 1, 8)
+	var normal := box(Color(0.035, 0.035, 0.04, 0.95), Color(0.28, 0.28, 0.31, 0.9), 1, 8)
 	normal.content_margin_left = 12
 	normal.content_margin_right = 12
 	normal.content_margin_top = 6
@@ -145,7 +153,7 @@ static func divider() -> Panel:
 	var p := Panel.new()
 	p.custom_minimum_size = Vector2(0, 1)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_theme_stylebox_override("panel", box(Color(0.3, 0.42, 0.6, 0.35), Color(0, 0, 0, 0), 0, 0))
+	p.add_theme_stylebox_override("panel", box(Color(0.32, 0.32, 0.36, 0.4), Color(0, 0, 0, 0), 0, 0))
 	return p
 
 ## کوتاه کردن متن با «…» — برای برچسب‌هایی که کنارشان چیز دیگری

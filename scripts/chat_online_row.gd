@@ -21,7 +21,7 @@ const ICON_MESSAGE := preload("res://assets/chat/icons/message.svg")
 const DRAG_THRESHOLD := 12.0
 
 const COLOR_ONLINE := Color(0.2, 0.85, 0.38, 1.0)
-const COLOR_OFFLINE := Color(0.5, 0.55, 0.62, 1.0)
+const COLOR_OFFLINE := Color(0.5, 0.5, 0.54, 1.0)
 
 @onready var _avatar: ChatAvatar = $Margin/Row/AvatarSlot/Avatar
 @onready var _name_label: Label = $Margin/Row/Info/Head/NameLabel
@@ -71,7 +71,9 @@ func _apply() -> void:
 
 	_avatar.set_avatar(str(_data.get("avatar_id", "")))
 	_avatar.set_ring(ChatAvatar.RING_GOLD if is_leader else (ChatAvatar.RING_GREEN if online else ChatAvatar.RING_DEFAULT))
-	_avatar.modulate = Color.WHITE if online else Color(0.72, 0.74, 0.78, 1.0)
+	# V1 حضور: آفلاین‌ها کم‌رنگ‌تر تا آنلاین‌ها پیش‌توجهی دیده شوند
+	_avatar.modulate = Color.WHITE if online else Color(0.6, 0.6, 0.62, 1.0)
+	_name_label.modulate = Color.WHITE if online else Color(1, 1, 1, 0.7)
 
 	_dot.self_modulate = COLOR_ONLINE if online else COLOR_OFFLINE
 	_status_label.text = "آنلاین" if online else ChatBubble.last_seen_text(str(_data.get("last_seen_at", "")))

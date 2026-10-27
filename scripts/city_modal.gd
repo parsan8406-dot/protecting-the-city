@@ -28,7 +28,7 @@ func build(title: String, min_width: float = 440.0) -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	_dim = ColorRect.new()
-	_dim.color = Color(0.0, 0.01, 0.03, 0.72)
+	_dim.color = Color(0.0, 0.0, 0.0, 0.72)
 	_dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_dim.gui_input.connect(_on_dim_input)
@@ -42,8 +42,11 @@ func build(title: String, min_width: float = 440.0) -> void:
 	_panel = PanelContainer.new()
 	_panel.custom_minimum_size = Vector2(min_width, 0)
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var style := CityUI.box(Color(0.02, 0.05, 0.1, 0.98), Color(0.3, 0.55, 0.9, 0.95), 2, 12)
-	style.shadow_color = Color(0.1, 0.4, 1.0, 0.3)
+	# همان قاب ModalSheet منو: مشکی، لبه‌ی بالای قرمز، حاشیه‌ی طلایی تیره
+	var style := CityUI.box(Color(0.07, 0.07, 0.08, 0.99), Color(0.72, 0.53, 0.14, 1.0), 1, 10)
+	style.border_width_top = 3
+	style.border_color = Color(0.85, 0.043, 0.075, 1.0)
+	style.shadow_color = Color(0, 0, 0, 0.6)
 	style.shadow_size = 14
 	_panel.add_theme_stylebox_override("panel", style)
 	center.add_child(_panel)

@@ -19,6 +19,11 @@ extends Control
 const ROW_SCENE := preload("res://secense/ranking_row.tscn")
 ## E9/E5 پنجره‌ی نزدیک من و فاصله تا نفر بالایی
 const PsychSocialRival := preload("res://scripts/psych_social_rival.gd")
+## V8/E17 سکوی سه نفر اول
+const Podium := preload("res://scripts/psych_social_podium.gd")
+## E9/V1 جایگاه‌های آخرین بازدید (برای فلش‌های ▲▼) — فقط روی همین دستگاه
+const SEEN_PATH := "user://ranking_seen.cfg"
+const SEEN_MAX_PER_SCOPE := 300
 
 const MAIN_MENU_SCENE := "res://secense/main_menu.tscn"
 const RANK_SCENE := "res://secense/rank_screen.tscn"
@@ -39,11 +44,12 @@ const NEAR_BELOW := 4
 ## جدول کمتر از این عرض داشت، ستون شهر جمع می‌شود (مثلاً تبلت 4:3)
 const COMPACT_TABLE_WIDTH := 540.0
 
-const COLOR_TEXT := Color(0.94, 0.96, 1.0, 1.0)
-const COLOR_MUTED := Color(0.62, 0.7, 0.82, 1.0)
-const COLOR_GOLD := Color(0.97, 0.78, 0.3, 1.0)
-const COLOR_BLUE := Color(0.3, 0.6, 1.0, 1.0)
-const PLACE_COLORS := {1: Color(0.97, 0.78, 0.3), 2: Color(0.8, 0.86, 0.95), 3: Color(0.88, 0.56, 0.3)}
+const COLOR_TEXT := Color(0.96, 0.96, 0.97, 1.0)
+const COLOR_MUTED := Color(0.62, 0.62, 0.66, 1.0)
+const COLOR_GOLD := Color(1.0, 0.8, 0.26, 1.0)
+## نام قدیمی؛ round 3 رنگ تأکید طلایی شد (پالت سیاه/قرمز/طلایی)
+const COLOR_BLUE := Color(1.0, 0.8, 0.26, 1.0)
+const PLACE_COLORS := {1: Color(1.0, 0.8, 0.26), 2: Color(0.82, 0.84, 0.88), 3: Color(0.88, 0.56, 0.3)}
 
 const RULES := [
 	"امتیاز هر بازیکن همان تعداد کاپ‌های اوست؛ با برد کاپ می‌گیری و با باخت کاپ کم می‌شود.",
@@ -151,6 +157,13 @@ var _rival_label: Label = null
 ## دکمه‌ی «جایگاه من» / «صدر جدول» در پایین جدول
 var _near_button: Button = null
 
+## E9 جایگاه‌های آخرین بازدید: scope → {id: position}
+var _seen_prev: Dictionary = {}
+var _seen_now: Dictionary = {}
+## C8/E5 خطِ «X کاپ تا نفر سوم و جایزه‌ی هفتگی»
+var _reward_hint: Label = null
+var _third_points := 0
+
 # ------------------------------------------------------------------ آماده‌سازی
 
 func _ready() -> void:
@@ -184,6 +197,13 @@ func _ready() -> void:
 	_rules_dim.pressed.connect(_close_rules)
 
 	UIScroll.attach(_scroll)
+	_load_seen()
+	_reward_hint = _make_number("", COLOR_MUTED, 14)
+	_reward_hint.add_theme_font_override("font", (_nav_rank.get_node("Row/Label") as Label).get_theme_font("font"))
+	_reward_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_reward_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_reward_hint.visible = false
+	_reward_rows.get_parent().add_child(_reward_hint)
 	_build_near_ui()
 	_build_rules()
 	_rules_overlay.visible = false
@@ -210,7 +230,10 @@ func _notification(what: int) -> void:
 			# برگشت از پس‌زمینه — جدول ممکن است کهنه باشد
 			if is_inside_tree():
 				refresh()
+		NOTIFICATION_APPLICATION_PAUSED:
+			_save_seen()
 		NOTIFICATION_EXIT_TREE:
+			_save_seen()
 			get_tree().set_quit_on_go_back(true)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -243,8 +266,8 @@ func _bind_nav(button: Button, action: Callable) -> void:
 
 func _set_active_nav(active: Button) -> void:
 	if _nav_active_style == null:
-		_nav_active_style = _make_box(Color(0.05, 0.2, 0.45, 0.92), Color(0.3, 0.65, 1.0), 2, 6)
-		_nav_active_style.shadow_color = Color(0.15, 0.5, 1.0, 0.45)
+		_nav_active_style = _make_box(Color(0.28, 0.2, 0.04, 0.95), COLOR_GOLD, 2, 6)
+		_nav_active_style.shadow_color = Color(1.0, 0.75, 0.2, 0.25)
 		_nav_active_style.shadow_size = 8
 		_nav_active_style.content_margin_left = 14
 		_nav_active_style.content_margin_right = 12
@@ -277,14 +300,14 @@ func _on_tab_pressed(scope: String) -> void:
 	_set_loading()
 	refresh()
 
-## فقط تب فعال آبیِ روشن است (مثل طرح)
+## C2 فقط تب فعال طلایی است؛ بقیه آرام
 func _apply_tab_styles() -> void:
 	if _tab_on == null:
-		_tab_on = _make_box(Color(0.07, 0.3, 0.72, 0.95), Color(0.45, 0.75, 1.0), 2, 8)
-		_tab_on.shadow_color = Color(0.15, 0.5, 1.0, 0.45)
+		_tab_on = _make_box(Color(0.32, 0.22, 0.03, 0.97), COLOR_GOLD, 2, 8)
+		_tab_on.shadow_color = Color(1.0, 0.75, 0.2, 0.25)
 		_tab_on.shadow_size = 8
-		_tab_off = _make_box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.85), 1, 8)
-		_tab_pressed = _make_box(Color(0.05, 0.18, 0.4, 0.95), Color(0.35, 0.7, 1.0), 2, 8)
+		_tab_off = _make_box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.85), 1, 8)
+		_tab_pressed = _make_box(Color(0.2, 0.15, 0.04, 0.95), Color(1.0, 0.85, 0.4), 2, 8)
 
 	var tabs := {"global": _tab_global, "cities": _tab_cities, "friends": _tab_friends}
 	for scope: String in tabs:
@@ -293,7 +316,7 @@ func _apply_tab_styles() -> void:
 		button.add_theme_stylebox_override("normal", style)
 		button.add_theme_stylebox_override("hover", style)
 		button.add_theme_stylebox_override("pressed", _tab_pressed)
-		var tint := COLOR_TEXT if scope == _scope else COLOR_MUTED
+		var tint := Color(1.0, 0.92, 0.7) if scope == _scope else COLOR_MUTED
 		for child in button.get_node("Row").get_children():
 			(child as CanvasItem).modulate = tint
 
@@ -400,12 +423,40 @@ func _apply_table(entries: Array, data: Dictionary) -> void:
 	for child in _list.get_children():
 		child.queue_free()
 
+	# V8/E17 سکوی سه نفر اول فقط در صفحه‌ی اولِ عادی (نه «نزدیک من»)
+	var top: Array = []
+	if not _near_mode and _page == 0:
+		for entry in entries:
+			if typeof(entry) == TYPE_DICTIONARY and int(entry.get("position", 0)) in [1, 2, 3]:
+				top.append(entry)
+				_track_seen(entry)
+	if _scope == "global" and not _near_mode:
+		var third := PsychSocialRival.entry_at(entries, 3)
+		if not third.is_empty():
+			_third_points = int(third.get("points", 0))
+	if not top.is_empty():
+		var podium := Podium.new()
+		_list.add_child(podium)
+		podium.setup(top, _scope == "cities")
+		podium.play()
+
+	var shown := 0
 	for entry in entries:
 		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		if not top.is_empty() and int(entry.get("position", 0)) <= 3:
 			continue
 		var row := ROW_SCENE.instantiate()
 		_list.add_child(row)
 		_setup_row(row, entry)
+		# V7 ورودِ پله‌ای و کوتاه (فقط چند ردیفِ اول؛ در «نزدیک من» ردیفِ خودم چشمک می‌زند، نه این)
+		if shown < 8 and not _near_mode:
+			var target_a: float = row.modulate.a
+			row.modulate.a = 0.0
+			var tw := row.create_tween()
+			tw.tween_interval(0.03 * shown + (0.2 if not top.is_empty() else 0.0))
+			tw.tween_property(row, "modulate:a", target_a, 0.18)
+		shown += 1
 
 	_list.modulate.a = 1.0
 	_scroll.scroll_vertical = 0
@@ -427,6 +478,7 @@ func _setup_row(row: Node, entry: Dictionary) -> void:
 	else:
 		row.setup_player(entry)
 	row.set_compact(_compact)
+	row.set_movement(_track_seen(entry))
 
 ## اگر جایگاه من در این صفحه نیست، چسبیده به پایین جدول نشانش می‌دهیم.
 ## زدن رویش جدول را به صفحه‌ی خودم می‌برد.
@@ -551,6 +603,10 @@ func _apply_standing(data: Dictionary) -> void:
 	_standing_label.text = "جایگاه تو: %s از %s" % [
 		MissionArt.fa_grouped(int(_me.get("position", 0))), MissionArt.fa_grouped(_total)
 	]
+	# E9 «از آخرین بازدید»: فقط وقتی واقعاً جابه‌جا شده‌ای
+	var moved := _track_seen(_me)
+	if moved != 0:
+		_standing_label.text += "  %s%s" % ["▲" if moved > 0 else "▼", MissionArt.fa_number(absi(moved))]
 
 ## «پاداش هفتگی» — فقط نفرات اول تا سوم: جم، تجربه و سکه (اعداد از سرور)
 func _apply_rewards(rewards: Array) -> void:
@@ -566,14 +622,15 @@ func _apply_rewards(rewards: Array) -> void:
 			continue
 		var place := int(reward.get("position", 0))
 		_reward_rows.add_child(_make_reward_row(place, reward, place == my_position))
+	_apply_reward_hint(my_position)
 
 func _make_reward_row(place: int, reward: Dictionary, is_mine: bool) -> Control:
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var color: Color = PLACE_COLORS.get(place, COLOR_TEXT)
 	var style := _make_box(
-		Color(0.05, 0.2, 0.45, 0.9) if is_mine else Color(0.02, 0.05, 0.1, 0.85),
-		Color(0.3, 0.65, 1.0) if is_mine else Color(color, 0.55), 1, 6)
+		Color(0.28, 0.2, 0.04, 0.95) if is_mine else Color(0.06, 0.06, 0.07, 0.88),
+		COLOR_GOLD if is_mine else Color(color, 0.55), 2 if is_mine else 1, 6)
 	style.content_margin_left = 6
 	style.content_margin_right = 6
 	style.content_margin_top = 3
@@ -654,18 +711,38 @@ func _refresh_week_label() -> void:
 
 # ------------------------------------------------------------- حالت‌های خالی
 
+## C12 اسکلتِ تپنده‌ی جدول به‌جای متنِ «در حال گرفتن»
 func _set_loading() -> void:
 	for child in _list.get_children():
 		child.queue_free()
-	_scroll.visible = false
+	_scroll.visible = true
 	_pinned_me.visible = false
-	_empty_label.visible = true
-	_empty_label.text = "در حال گرفتن جدول..."
+	_empty_label.visible = false
+	for i in 6:
+		var p := Panel.new()
+		p.set_meta(&"skeleton", true)
+		p.custom_minimum_size = Vector2(0, 54)
+		p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_theme_stylebox_override("panel", _make_box(Color(0.12, 0.12, 0.13, 1.0), Color(0, 0, 0, 0), 0, 6))
+		_list.add_child(p)
+		p.modulate.a = 0.35
+		var t := p.create_tween().set_loops()
+		t.tween_interval(0.07 * i)
+		t.tween_property(p, "modulate:a", 0.75, 0.5).set_trans(Tween.TRANS_SINE)
+		t.tween_property(p, "modulate:a", 0.35, 0.5).set_trans(Tween.TRANS_SINE)
 
 func _show_message(message: String) -> void:
 	_list.modulate.a = 1.0
-	if _list.get_child_count() > 0:
+	var real := 0
+	for child in _list.get_children():
+		if not child.has_meta(&"skeleton") and not child.is_queued_for_deletion():
+			real += 1
+	if real > 0:
 		return
+	for child in _list.get_children():
+		child.queue_free()
+	if message.begins_with("اتصال"):
+		message += " — دکمه‌ی «بروزرسانی» را بزن"
 	_scroll.visible = false
 	_empty_label.visible = true
 	_empty_label.text = message
@@ -802,6 +879,8 @@ func _focus_me() -> void:
 		return
 	var pos := int(_me.get("position", 0))
 	for row in _list.get_children():
+		if row.get("position_in_table") == null:
+			continue
 		if int(row.get("position_in_table")) == pos and not row.is_queued_for_deletion():
 			_scroll.ensure_control_visible(row)
 			row.flash()
@@ -845,7 +924,7 @@ func _style_top_bar() -> void:
 	if profile:
 		profile.visible = false
 
-	var pill := _make_box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 8)
+	var pill := _make_box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 8)
 	pill.content_margin_left = 10
 	pill.content_margin_right = 6
 	pill.content_margin_top = 3
@@ -855,7 +934,7 @@ func _style_top_bar() -> void:
 		if p:
 			p.add_theme_stylebox_override("panel", pill)
 
-	var box := _make_box(Color(0.02, 0.05, 0.1, 0.88), Color(0.22, 0.36, 0.58, 0.9), 1, 7)
+	var box := _make_box(Color(0.06, 0.06, 0.07, 0.9), Color(0.28, 0.28, 0.31, 0.9), 1, 7)
 	for path in ["HBoxContainer/HBoxContainer3/MessagesButton",
 			"HBoxContainer/HBoxContainer3/FriendsButton",
 			"HBoxContainer/HBoxContainer3/SettingsButton"]:
@@ -922,7 +1001,8 @@ func _on_table_resized() -> void:
 	_compact = compact
 	_head_city.visible = not compact
 	for row in _list.get_children():
-		row.set_compact(compact)
+		if row.has_method("set_compact"):
+			row.set_compact(compact)
 	for row in _pinned_me.get_children():
 		row.set_compact(compact)
 
@@ -935,7 +1015,7 @@ func _show_toast(text: String) -> void:
 		_toast.add_theme_font_override("font", (_nav_rank.get_node("Row/Label") as Label).get_theme_font("font"))
 		_toast.add_theme_font_size_override("font_size", 16)
 		_toast.add_theme_color_override("font_color", COLOR_TEXT)
-		var style := _make_box(Color(0.03, 0.08, 0.18, 0.95), COLOR_BLUE, 1, 8)
+		var style := _make_box(Color(0.07, 0.07, 0.08, 0.97), COLOR_GOLD, 1, 8)
 		style.content_margin_left = 18
 		style.content_margin_right = 18
 		style.content_margin_top = 8
@@ -952,3 +1032,68 @@ func _show_toast(text: String) -> void:
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(1.8)
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
+
+# ------------------------------------------------- round 3: فلش جابه‌جایی و جایزه‌ی هفتگی
+
+func _load_seen() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(SEEN_PATH) != OK:
+		return
+	for scope in cfg.get_sections():
+		var d := {}
+		for key in cfg.get_section_keys(scope):
+			d[key] = int(cfg.get_value(scope, key, 0))
+		_seen_prev[scope] = d
+
+## جایگاهِ امروزِ یک ردیف را ثبت می‌کند و جابه‌جایی‌اش نسبت به آخرین بازدید را برمی‌گرداند
+## (مثبت = بالا رفته). ردیفی که قبلاً ندیده‌ایم صفر است — فلشِ ساختگی نداریم.
+func _track_seen(entry: Dictionary) -> int:
+	var id := str(entry.get("clan_id" if _scope == "cities" else "player_id", ""))
+	var pos := int(entry.get("position", 0))
+	if id.is_empty() or pos <= 0:
+		return 0
+	if not _seen_now.has(_scope):
+		_seen_now[_scope] = {}
+	(_seen_now[_scope] as Dictionary)[id] = pos
+	var prev := int((_seen_prev.get(_scope, {}) as Dictionary).get(id, 0))
+	return prev - pos if prev > 0 else 0
+
+func _save_seen() -> void:
+	if _seen_now.is_empty():
+		return
+	var cfg := ConfigFile.new()
+	for scope in _seen_prev:
+		for id in _seen_prev[scope]:
+			cfg.set_value(scope, id, _seen_prev[scope][id])
+	for scope in _seen_now:
+		for id in _seen_now[scope]:
+			cfg.set_value(scope, id, _seen_now[scope][id])
+	# فایل کوچک بماند
+	for scope in cfg.get_sections():
+		var keys := cfg.get_section_keys(scope)
+		if keys.size() > SEEN_MAX_PER_SCOPE:
+			for i in range(SEEN_MAX_PER_SCOPE, keys.size()):
+				cfg.erase_section_key(scope, keys[i])
+	cfg.save(SEEN_PATH)
+
+## C8/E5 هدفِ مشخص: «X کاپ تا نفر سوم» — یا E6 «جایت را نگه دار» برای برنده‌های فعلی
+func _apply_reward_hint(my_position: int) -> void:
+	if _reward_hint == null:
+		return
+	_reward_hint.visible = true
+	_reward_hint.add_theme_color_override("font_color", COLOR_MUTED)
+	if _scope != "global":
+		_reward_hint.text = "پاداش فقط برای سه نفر اول «رتبه کلی» است"
+		return
+	if my_position >= 1 and my_position <= 3:
+		_reward_hint.text = "تو الان جزو برنده‌های این هفته‌ای — تا شنبه جایت را نگه دار!"
+		_reward_hint.add_theme_color_override("font_color", COLOR_GOLD)
+		return
+	var mine := int(_me.get("points", 0))
+	if my_position > 3 and _third_points > 0:
+		var gap := maxi(_third_points - mine + 1, 1)
+		_reward_hint.text = "%s کاپ تا نفر سوم و جایزه‌ی هفتگی" % MissionArt.fa_grouped(gap)
+		if gap <= PsychSocialRival.NEAR_GAP * 3:
+			_reward_hint.add_theme_color_override("font_color", COLOR_GOLD)
+		return
+	_reward_hint.visible = false
